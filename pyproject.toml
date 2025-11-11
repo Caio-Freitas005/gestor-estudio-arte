@@ -1,0 +1,11 @@
+[project]
+name = "gestor-estudio-arte"
+version = "1.0"
+description = "Gestor de clientes, pedidos e produtos"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.121.1",
+    "sqlmodel>=0.0.27",
+    "uvicorn>=0.38.0",
+]
