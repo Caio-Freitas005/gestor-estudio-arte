@@ -7,9 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
 from .database import create_db_and_tables
+from .routers import clientes
 
 load_dotenv()
 origin = os.getenv("FRONT_URL")
+
 
 # Gerencia o clico de vida da aplicação
 # Cria o banco apenas uma vez, se ainda não existir
@@ -31,6 +33,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(clientes.router)
 
 
 @app.get("/")
