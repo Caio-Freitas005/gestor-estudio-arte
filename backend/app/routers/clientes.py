@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from fastapi import APIRouter, HTTPException, Response, status
 from sqlmodel import select
 
@@ -8,7 +10,7 @@ router = APIRouter(prefix="/clientes", tags=["clientes"])
 
 
 @router.post("/", response_model=ClientePublic)
-async def create_client(cliente: ClienteCreate, session: SessionDep) -> ClientePublic:
+async def create_client(cliente: ClienteCreate, session: SessionDep) -> Cliente:
     db_cliente = Cliente.model_validate(cliente)
     session.add(db_cliente)
     session.commit()
@@ -17,14 +19,14 @@ async def create_client(cliente: ClienteCreate, session: SessionDep) -> ClienteP
 
 
 @router.get("/", response_model=list[ClientePublic])
-async def get_all_clients(session: SessionDep) -> list[ClientePublic]:
+async def get_all_clients(session: SessionDep) -> Sequence[Cliente]:
     query = select(Cliente)
     clientes = session.exec(query).all()
     return clientes
 
 
 @router.get("/{cd_cliente}", response_model=ClientePublic)
-async def get_client_by_id(cd_cliente: int, session: SessionDep) -> ClientePublic:
+async def get_client_by_id(cd_cliente: int, session: SessionDep) -> Cliente:
     db_cliente = session.get(Cliente, cd_cliente)
     if not db_cliente:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
@@ -34,7 +36,7 @@ async def get_client_by_id(cd_cliente: int, session: SessionDep) -> ClientePubli
 @router.patch("/{cd_cliente}", response_model=ClientePublic)
 async def update_client(
     cd_cliente: int, cliente: ClienteUpdate, session: SessionDep
-) -> ClientePublic:
+) -> Cliente:
     db_cliente = session.get(Cliente, cd_cliente)
     if not db_cliente:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
