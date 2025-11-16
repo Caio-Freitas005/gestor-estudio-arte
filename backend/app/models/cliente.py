@@ -4,8 +4,8 @@ from sqlmodel import Field, SQLModel
 
 
 class ClienteBase(SQLModel):
-    cd_telefone: str | None = Field(default=None, max_length=11)
     nm_cliente: str = Field(index=True)
+    cd_telefone: str | None = Field(default=None, max_length=11)
     nm_email: str | None = Field(default=None, max_length=100)
     dt_nascimento: date | None = None
     ds_observacoes: str | None = None
