@@ -4,13 +4,13 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import Response 
 
 from .database import create_db_and_tables
-from .routers import clientes
+from .routers import clientes, produtos
 
 load_dotenv()
-origin = os.getenv("FRONT_URL")
+origin = os.getenv("FRONT_URL") 
 
 
 # Gerencia o clico de vida da aplicação
@@ -28,13 +28,14 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin],
+    allow_origins=[origin], #type: ignore
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(clientes.router)
+app.include_router(produtos.router)
 
 
 @app.get("/")
