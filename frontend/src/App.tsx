@@ -11,7 +11,7 @@ function App() {
             Dashboard
           </Link>
           <Link to="/clientes">Clientes</Link>
-          {/* /produtos aqui quando a US-07 for iniciada */}
+          <Link to="/produtos">Produtos</Link>
         </nav>
 
         <hr />

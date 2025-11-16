@@ -7,6 +7,7 @@ import App from "./App";
 import Dashboard from "./pages/Dashboard";
 
 import { clientRoutes } from "./pages/clientes/routes";
+import { productRoutes } from "./pages/produtos/routes";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: "/clientes",
         children: clientRoutes,
+      },
+      {
+        path: "/produtos",
+        children: productRoutes,
       },
     ],
   },
