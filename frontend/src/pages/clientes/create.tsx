@@ -5,7 +5,7 @@ import { createClient } from "../../services/clients.service";
 import { ClienteCreate } from "../../types/cliente.types";
 
 // Essa action será chamada pelo <Form> do ClientForm.jsx
-export async function clientCreateAction({ request }: {request: Request}) {
+export async function clientCreateAction({ request }: { request: Request }) {
   const formData = await request.formData();
   const clientData = Object.fromEntries(formData);
 
