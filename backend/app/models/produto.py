@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel  # type: ignore
 
 
 class ProdutoBase(SQLModel):

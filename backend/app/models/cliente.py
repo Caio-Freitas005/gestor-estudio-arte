@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel  # type: ignore
 
 
 class ClienteBase(SQLModel):
