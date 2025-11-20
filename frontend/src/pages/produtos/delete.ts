@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, redirect } from "react-router";
-import { deleteProduct } from "../../services/products.service";
+import { productsService } from "../../services/products.service";
 
 export async function productDeleteAction({ params }: ActionFunctionArgs) {
   if (!params.id) {
@@ -7,7 +7,7 @@ export async function productDeleteAction({ params }: ActionFunctionArgs) {
   }
 
   try {
-    await deleteProduct(params.id);
+    await productsService.delete(params.id);
     return redirect("/produtos");
   } catch (err) {
     console.error(err);

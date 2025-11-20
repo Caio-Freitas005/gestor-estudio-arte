@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, redirect } from "react-router";
-import { deleteClient } from "../../services/clients.service";
+import { clientsService } from "../../services/clients.service";
 
 export async function clientDeleteAction({ params }: ActionFunctionArgs) {
   if (!params.id) {
@@ -7,7 +7,7 @@ export async function clientDeleteAction({ params }: ActionFunctionArgs) {
   }
 
   try {
-    await deleteClient(params.id);
+    await clientsService.delete(params.id);
     return redirect("/clientes");
   } catch (err) {
     console.error(err);

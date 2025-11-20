@@ -1,7 +1,7 @@
 import { redirect } from "react-router";
 import { Box, Typography } from "@mui/material";
 import ClientForm from "../../components/ClientForm";
-import { createClient } from "../../services/clients.service";
+import { clientsService } from "../../services/clients.service";
 import { ClienteCreate } from "../../types/cliente.types";
 
 // Essa action será chamada pelo <Form> do ClientForm.jsx
@@ -19,7 +19,7 @@ export async function clientCreateAction({ request }: { request: Request }) {
   };
 
   try {
-    await createClient(dataToSend);
+    await clientsService.create(dataToSend);
     return redirect("/clientes");
   } catch (err) {
     console.error(err);

@@ -1,7 +1,7 @@
 import { redirect } from "react-router";
 import { Box, Typography } from "@mui/material";
 import ProductForm from "../../components/ProductForm";
-import { createProduct } from "../../services/products.service";
+import { productsService } from "../../services/products.service";
 import { ProdutoCreate } from "../../types/produto.types";
 
 export async function productCreateAction({ request }: { request: Request }) {
@@ -16,7 +16,7 @@ export async function productCreateAction({ request }: { request: Request }) {
   };
 
   try {
-    await createProduct(dataToSend);
+    await productsService.create(dataToSend);
     return redirect("/produtos");
   } catch (err) {
     console.error(err);

@@ -1,7 +1,7 @@
 import { useLoaderData, redirect, LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { Box, Typography } from "@mui/material";
 import ProductForm from "../../components/ProductForm";
-import { getProduct, updateProduct } from "../../services/products.service";
+import { productsService } from "../../services/products.service";
 import { ProdutoPublic, ProdutoUpdate } from "../../types/produto.types";
 
 export async function productUpdateLoader({ params }: LoaderFunctionArgs): Promise<ProdutoPublic> {
@@ -10,7 +10,7 @@ export async function productUpdateLoader({ params }: LoaderFunctionArgs): Promi
   }
 
   try {
-    const product = await getProduct(params.id);
+    const product = await productsService.getById(params.id);
     return product;
   } catch (err) {
     console.error(err);
@@ -34,7 +34,7 @@ export async function productUpdateAction({ request, params }: ActionFunctionArg
   };
 
   try {
-    await updateProduct(params.id, dataToSend);
+    await productsService.update(params.id, dataToSend);
     return redirect("/produtos");
   } catch (err) {
     console.error(err);

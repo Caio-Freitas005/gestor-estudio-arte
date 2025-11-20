@@ -1,7 +1,7 @@
 import { useLoaderData, redirect, LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { Box, Typography } from "@mui/material";
 import ClientForm from "../../components/ClientForm";
-import { getClient, updateClient } from "../../services/clients.service"
+import { clientsService } from "../../services/clients.service"
 import { ClientePublic, ClienteUpdate } from "../../types/cliente.types";
 
 // Busca os dados do cliente específico antes da página carregar
@@ -11,7 +11,7 @@ export async function clientUpdateLoader({ params }: LoaderFunctionArgs): Promis
   }
 
   try {
-    const client = await getClient(params.id);
+    const client = await clientsService.getById(params.id);
     return client;
   } catch (err) {
     console.error(err);
@@ -36,7 +36,7 @@ export async function clientUpdateAction({ request, params }: ActionFunctionArgs
   };
 
   try {
-    await updateClient(params.id, dataToSend);
+    await clientsService.update(params.id, dataToSend);
     return redirect("/clientes");
   } catch (err) {
     console.error(err);
