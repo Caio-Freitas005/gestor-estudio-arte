@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import create_db_and_tables
-from .routers import clientes, produtos
+from .routers import clientes, pedidos, produtos
 
 load_dotenv()
 origin = os.getenv("FRONT_URL")
@@ -35,3 +35,4 @@ app.add_middleware(
 
 app.include_router(clientes.router)
 app.include_router(produtos.router)
+app.include_router(pedidos.router)
