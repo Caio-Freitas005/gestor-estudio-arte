@@ -1,6 +1,10 @@
 from datetime import date
+from typing import TYPE_CHECKING
 
-from sqlmodel import Field, SQLModel  # type: ignore
+from sqlmodel import Field, Relationship, SQLModel  # type: ignore
+
+if TYPE_CHECKING:
+    from .pedido import Pedido
 
 
 class ClienteBase(SQLModel):
@@ -13,6 +17,8 @@ class ClienteBase(SQLModel):
 
 class Cliente(ClienteBase, table=True):
     cd_cliente: int | None = Field(default=None, primary_key=True)
+    # Relacionamento um para muitos com pedidos
+    pedidos: list["Pedido"] = Relationship(back_populates="cliente")
 
 
 class ClienteCreate(ClienteBase):
