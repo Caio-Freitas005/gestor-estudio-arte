@@ -1,16 +1,12 @@
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import ClientForm from "../../components/ClientForm";
 
 function ClientCreatePage() {
   return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h3" gutterBottom>
-        Formulário de Clientes
-      </Typography>
-
+    <div className="flex flex-col gap-6">
+      <Typography variant="h4">Novo Cliente</Typography>
       <ClientForm />
-    </Box>
+    </div>
   );
 }
-
 export default ClientCreatePage;

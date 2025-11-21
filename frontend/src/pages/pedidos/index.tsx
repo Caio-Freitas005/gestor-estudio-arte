@@ -1,5 +1,4 @@
 import {
-  Box,
   Typography,
   Button,
   Table,
@@ -11,11 +10,9 @@ import {
   Paper,
   Chip,
 } from "@mui/material";
-
 import { useLoaderData, Link } from "react-router";
 import { PedidoPublic, StatusPedido } from "../../types/pedido.types";
 
-// Função auxiliar para colorir o status
 function getStatusColor(status: StatusPedido) {
   switch (status) {
     case StatusPedido.CONCLUIDO:
@@ -35,31 +32,30 @@ function OrdersListPage() {
   const orders = useLoaderData() as PedidoPublic[];
 
   return (
-    <Box sx={{ padding: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 3,
-        }}
-      >
-        <Typography variant="h4">Dashboard de Pedidos</Typography>
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-center">
+        <Typography variant="h4" component="h1" className="text-white-800">
+          Dashboard de Pedidos
+        </Typography>
         <Button
           component={Link}
           to="cadastrar"
           variant="contained"
           color="primary"
+          disableElevation
         >
           Novo Pedido
         </Button>
-      </Box>
+      </div>
 
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        className="shadow-sm border border-gray-200"
+      >
         <Table sx={{ minWidth: 650 }} aria-label="tabela de pedidos">
-          <TableHead>
+          <TableHead className="bg-gray-50">
             <TableRow>
-              <TableCell>#ID</TableCell>
+              <TableCell className="font-bold">#ID</TableCell>
               <TableCell>Data</TableCell>
               <TableCell>Cliente</TableCell>
               <TableCell>Status</TableCell>
@@ -70,7 +66,11 @@ function OrdersListPage() {
           <TableBody>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell
+                  colSpan={6}
+                  align="center"
+                  className="py-8 text-gray-500"
+                >
                   Nenhum pedido encontrado. Comece criando um!
                 </TableCell>
               </TableRow>
@@ -79,6 +79,7 @@ function OrdersListPage() {
                 <TableRow
                   key={order.cd_pedido}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  className="hover:bg-gray-50 transition-colors"
                 >
                   <TableCell component="th" scope="row">
                     {order.cd_pedido}
@@ -89,7 +90,9 @@ function OrdersListPage() {
                     })}
                   </TableCell>
                   <TableCell>
-                    {order.cliente?.nm_cliente || "Cliente Removido"}
+                    {order.cliente?.nm_cliente || (
+                      <span className="text-red-400">Cliente Removido</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Chip
@@ -99,7 +102,7 @@ function OrdersListPage() {
                       variant="outlined"
                     />
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" className="font-mono">
                     R$ {Number(order.vl_total_pedido).toFixed(2)}
                   </TableCell>
                   <TableCell align="center">
@@ -107,6 +110,7 @@ function OrdersListPage() {
                       size="small"
                       component={Link}
                       to={`/pedidos/${order.cd_pedido}`}
+                      variant="outlined"
                     >
                       Ver Detalhes
                     </Button>
@@ -117,7 +121,7 @@ function OrdersListPage() {
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+    </div>
   );
 }
 

@@ -1,5 +1,5 @@
 import { Form, useNavigation } from "react-router";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { ClientePublic } from "../types/cliente.types";
 
 interface ClienteFormProps {
@@ -13,20 +13,11 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
   const data = defaultValues || ({} as ClientePublic);
 
   return (
-    <Box
-      component={Form}
+    <Form
       method="post"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        padding: 2,
-        border: "1px solid #ccc",
-        borderRadius: 1,
-        maxWidth: 500,
-      }}
+      className="flex flex-col gap-4 p-6 border border-gray-200 rounded-lg shadow-sm bg-white max-w-lg"
     >
-      <Typography variant="h6">
+      <Typography variant="h6" className="mb-2 text-gray-700">
         {data.cd_cliente ? "Editar Cliente" : "Cadastrar Novo Cliente"}
       </Typography>
 
@@ -37,14 +28,15 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         defaultValue={data.nm_cliente}
         variant="outlined"
         size="small"
+        fullWidth
       />
       <TextField
         label="Telefone (ex: (00) 99999-8888)"
         name="cd_telefone"
-        // ?? (Coalescência Nula) para converter null ou undefined para string vazia
         defaultValue={data.cd_telefone ?? ""}
         variant="outlined"
         size="small"
+        fullWidth
       />
       <TextField
         label="Email"
@@ -53,6 +45,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         defaultValue={data.nm_email ?? ""}
         variant="outlined"
         size="small"
+        fullWidth
       />
       <TextField
         label="Data de Nascimento"
@@ -61,6 +54,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         defaultValue={data.dt_nascimento ?? ""}
         variant="outlined"
         size="small"
+        fullWidth
         slotProps={{ inputLabel: { shrink: true } }}
       />
       <TextField
@@ -71,6 +65,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         size="small"
         multiline
         rows={3}
+        fullWidth
       />
 
       <Button
@@ -78,10 +73,12 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         variant="contained"
         color="primary"
         disabled={isSubmitting}
+        className="mt-2"
+        disableElevation
       >
         {isSubmitting ? "Salvando..." : "Salvar Cliente"}
       </Button>
-    </Box>
+    </Form>
   );
 }
 

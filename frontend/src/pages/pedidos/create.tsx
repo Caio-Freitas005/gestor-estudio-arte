@@ -1,18 +1,15 @@
 import { useLoaderData } from "react-router";
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import OrderForm from "../../components/OrderForm";
 import { ClientePublic } from "../../types/cliente.types";
 
 function OrderCreatePage() {
   const clients = useLoaderData() as ClientePublic[];
   return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h3" gutterBottom>
-        Abrir Novo Pedido
-      </Typography>
+    <div className="flex flex-col gap-6">
+      <Typography variant="h4">Abrir Novo Pedido</Typography>
       <OrderForm clientes={clients} />
-    </Box>
+    </div>
   );
 }
-
 export default OrderCreatePage;

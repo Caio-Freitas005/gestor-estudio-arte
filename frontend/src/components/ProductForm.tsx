@@ -1,5 +1,5 @@
 import { Form, useNavigation } from "react-router";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { ProdutoPublic } from "../types/produto.types";
 
 interface ProdutoFormProps {
@@ -13,20 +13,11 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
   const data = defaultValues || ({} as ProdutoPublic);
 
   return (
-    <Box
-      component={Form}
+    <Form
       method="post"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        padding: 2,
-        border: "1px solid #ccc",
-        borderRadius: 1,
-        maxWidth: 500,
-      }}
+      className="flex flex-col justify-center gap-4 p-6 border border-gray-200 rounded-lg shadow-sm bg-white max-w-lg"
     >
-      <Typography variant="h6">
+      <Typography variant="h6" className="mb-2 text-gray-700">
         {data.cd_produto ? "Editar Produto" : "Cadastrar Novo Produto"}
       </Typography>
 
@@ -37,6 +28,7 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
         defaultValue={data.nm_produto}
         variant="outlined"
         size="small"
+        fullWidth
       />
 
       <TextField
@@ -47,34 +39,41 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
         size="small"
         multiline
         rows={3}
+        fullWidth
       />
 
-      <TextField
-        label="Valor Base (R$ 00.00)"
-        name="vl_base"
-        defaultValue={data.vl_base ?? ""}
-        variant="outlined"
-        size="small"
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <TextField
+          label="Valor Base (R$)"
+          name="vl_base"
+          defaultValue={data.vl_base ?? ""}
+          variant="outlined"
+          size="small"
+          fullWidth
+        />
 
-      <TextField
-        label="Unidade de Medida"
-        name="ds_unidade_medida"
-        defaultValue={data.ds_unidade_medida ?? ""}
-        variant="outlined"
-        size="small"
-        slotProps={{ inputLabel: { shrink: true } }}
-      />
+        <TextField
+          label="Unidade Medida"
+          name="ds_unidade_medida"
+          defaultValue={data.ds_unidade_medida ?? ""}
+          variant="outlined"
+          size="small"
+          fullWidth
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
+      </div>
 
       <Button
         type="submit"
         variant="contained"
         color="primary"
         disabled={isSubmitting}
+        className="mt-2"
+        disableElevation
       >
         {isSubmitting ? "Salvando..." : "Salvar Produto"}
       </Button>
-    </Box>
+    </Form>
   );
 }
 

@@ -1,16 +1,12 @@
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import ProductForm from "../../components/ProductForm";
 
 function ProductCreatePage() {
   return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h3" gutterBottom>
-        Formulário de Produtos
-      </Typography>
-
+    <div className="flex flex-col gap-6 justify-center">
+      <Typography variant="h4">Novo Produto</Typography>
       <ProductForm />
-    </Box>
+    </div>
   );
 }
-
 export default ProductCreatePage;

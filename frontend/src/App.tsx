@@ -1,28 +1,29 @@
 import { Outlet, Link } from "react-router";
-import "./App.css";
 
 function App() {
   return (
-    <>
-      <div id="app-layout">
-        {/* Um menu de navegação simples */}
-        <nav style={{ padding: "1rem", backgroundColor: "#333" }}>
-          <Link to="/" style={{ marginRight: "1rem" }}>
-            Dashboard
-          </Link>
-          <Link to="/clientes" style={{ marginRight: "1rem" }}>Clientes</Link>
-          <Link to="/produtos" style={{ marginRight: "1rem" }}>Produtos</Link>
-          <Link to="/pedidos">Pedidos</Link>
-        </nav>
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {/* Navegação com Tailwind */}
+      <nav className="p-4 bg-gray-800 text-white flex gap-6 shadow-md">
+        <Link to="/" className="hover:text-blue-400 font-semibold transition-colors">
+          Dashboard
+        </Link>
+        <Link to="/clientes" className="hover:text-blue-400 font-semibold transition-colors">
+          Clientes
+        </Link>
+        <Link to="/produtos" className="hover:text-blue-400 font-semibold transition-colors">
+          Produtos
+        </Link>
+        <Link to="/pedidos" className="hover:text-blue-400 font-semibold transition-colors">
+          Pedidos
+        </Link>
+      </nav>
 
-        <hr />
-
-        {/* O 'Outlet' é onde o react-router irá renderizar a página da rota atual */}
-        <main style={{ padding: "1rem" }}>
-          <Outlet />
-        </main>
-      </div>
-    </>
+      {/* Área principal */}
+      <main className="p-6 max-w-7xl mx-auto w-full">
+        <Outlet />
+      </main>
+    </div>
   );
 }
 

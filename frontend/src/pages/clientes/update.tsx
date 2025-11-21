@@ -1,22 +1,15 @@
 import { useLoaderData } from "react-router";
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import ClientForm from "../../components/ClientForm";
 import { ClientePublic } from "../../types/cliente.types";
 
 function ClientUpdatePage() {
-  // Busca os dados carregados pelo loader
   const clientData = useLoaderData() as ClientePublic;
   return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h3" gutterBottom>
-        Formulário de Clientes
-      </Typography>
-      {/* Passa os dados do cliente para o formulário
-        para pré-preencher os campos
-      */}
+    <div className="flex flex-col gap-6">
+      <Typography variant="h4">Editar Cliente</Typography>
       <ClientForm defaultValues={clientData} />
-    </Box>
+    </div>
   );
 }
-
 export default ClientUpdatePage;

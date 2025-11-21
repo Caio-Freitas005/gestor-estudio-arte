@@ -1,20 +1,14 @@
 import { useLoaderData, Link, Form } from "react-router";
-import { Box, Typography, Button } from "@mui/material";
+import { Typography, Button } from "@mui/material";
 import { ClientePublic } from "../../types/cliente.types";
 
 function ClientsListPage() {
   const clients = useLoaderData() as ClientePublic[];
 
   return (
-    <Box sx={{ padding: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h4" gutterBottom>
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-center">
+        <Typography variant="h4" component="h1" className="text-white-800">
           Gestão de Clientes
         </Typography>
 
@@ -23,57 +17,96 @@ function ClientsListPage() {
           to="cadastrar"
           variant="contained"
           color="primary"
+          disableElevation
         >
           Cadastrar Cliente
         </Button>
-      </Box>
+      </div>
 
-      <hr style={{ margin: "2rem 0" }} />
+      <hr className="border-gray-200" />
 
-      <Typography variant="h5" gutterBottom>
-        Clientes Cadastrados
-      </Typography>
+      <div>
+        <Typography variant="h5" className="mb-4 text-white-700">
+          Clientes Cadastrados
+        </Typography>
 
-      {clients.length === 0 ? (
-        <p>Nenhum cliente cadastrado ainda.</p>
-      ) : (
-        <ul>
-          {clients.map((client) => (
-            <li key={client.cd_cliente}>
-              <strong>{client.nm_cliente}</strong> (Telefone:{" "}
-              {client.cd_telefone || "N/A"})
-              <Button
-                component={Link}
-                to={`${client.cd_cliente}/editar`}
-                size="small"
-                color="warning"
-                style={{ marginLeft: "1rem" }}
+        {clients.length === 0 ? (
+          <p className="text-white-500 italic">
+            Nenhum cliente cadastrado ainda.
+          </p>
+        ) : (
+          <ul className="grid gap-3">
+            {clients.map((client) => (
+              <li
+                key={client.cd_cliente}
+                className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
               >
-                Editar
-              </Button>
-              <Form
-                method="post"
-                action={`${client.cd_cliente}/excluir`}
-                onSubmit={(e) => {
-                  if (
-                    !window.confirm(
-                      "Tem certeza que deseja excluir este cliente?"
-                    )
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                style={{ display: "inline", marginLeft: "1rem" }}
-              >
-                <Button type="submit" size="small" color="error">
-                  Excluir
-                </Button>
-              </Form>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Box>
+                <div className="flex flex-col">
+                  <span className="font-medium text-yellow-500 text-lg">
+                    Nome: {client.nm_cliente}
+                  </span>
+                  <span className="text-sm text-blue-500">
+                    Telefone: {client.cd_telefone || "N/A"}
+                  </span>
+                  <span className="text-sm text-purple-500">
+                    Email: {client.nm_email || "N/A"}
+                  </span>
+                  <span className="text-sm text-green-500">
+                    Data de Nascimento:{" "}
+                    {client.dt_nascimento
+                      ? new Date(client.dt_nascimento).toLocaleDateString(
+                          "pt-BR",
+                          {
+                            timeZone: "UTC",
+                          }
+                        )
+                      : "N/A"}
+                  </span>
+                  <span className="text-sm text-green-500">
+                    Observações: {client.ds_observacoes || "N/A"}
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    component={Link}
+                    to={`${client.cd_cliente}/editar`}
+                    size="small"
+                    color="warning"
+                    variant="outlined"
+                  >
+                    Editar
+                  </Button>
+
+                  <Form
+                    method="post"
+                    action={`${client.cd_cliente}/excluir`}
+                    onSubmit={(e) => {
+                      if (
+                        !window.confirm(
+                          "Tem certeza que deseja excluir este cliente?"
+                        )
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    <Button
+                      type="submit"
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                    >
+                      Excluir
+                    </Button>
+                  </Form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 

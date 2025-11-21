@@ -1,20 +1,14 @@
 import { useLoaderData, Link, Form } from "react-router";
-import { Box, Typography, Button } from "@mui/material";
+import { Typography, Button } from "@mui/material";
 import { ProdutoPublic } from "../../types/produto.types";
 
 function ProductsListPage() {
   const products = useLoaderData() as ProdutoPublic[];
 
   return (
-    <Box sx={{ padding: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h4" gutterBottom>
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-center">
+        <Typography variant="h4" component="h1" className="text-white-800">
           Gestão de Produtos
         </Typography>
 
@@ -23,57 +17,89 @@ function ProductsListPage() {
           to="cadastrar"
           variant="contained"
           color="primary"
+          disableElevation
         >
           Cadastrar Produto
         </Button>
-      </Box>
+      </div>
 
-      <hr style={{ margin: "2rem 0" }} />
+      <hr className="border-gray-200" />
 
-      <Typography variant="h5" gutterBottom>
-        Produtos Cadastrados
-      </Typography>
+      <div>
+        <Typography variant="h5" className="mb-4 text-white-700">
+          Produtos Cadastrados
+        </Typography>
 
-      {products.length === 0 ? (
-        <p>Nenhum produto cadastrado ainda.</p>
-      ) : (
-        <ul>
-          {products.map((product) => (
-            <li key={product.cd_produto}>
-              <strong>{product.nm_produto}</strong> (Valor Base:{" "}
-              {product.vl_base || "N/A"})
-              <Button
-                component={Link}
-                to={`${product.cd_produto}/editar`}
-                size="small"
-                color="warning"
-                style={{ marginLeft: "1rem" }}
+        {products.length === 0 ? (
+          <p className="text-gray-500 italic">
+            Nenhum produto cadastrado ainda.
+          </p>
+        ) : (
+          <ul className="grid gap-3">
+            {products.map((product) => (
+              <li
+                key={product.cd_produto}
+                className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
               >
-                Editar
-              </Button>
-              <Form
-                method="post"
-                action={`${product.cd_produto}/excluir`}
-                onSubmit={(e) => {
-                  if (
-                    !window.confirm(
-                      "Tem certeza que deseja excluir este produto?"
-                    )
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                style={{ display: "inline", marginLeft: "1rem" }}
-              >
-                <Button type="submit" size="small" color="error">
-                  Excluir
-                </Button>
-              </Form>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Box>
+                <div className="flex flex-col">
+                  <span className="font-medium text-yellow-500 text-lg">
+                    {product.nm_produto}
+                  </span>
+                  <span className="text-sm text-green-500">
+                    Descrição:{" "}
+                    {product.ds_produto ? `${product.ds_produto}` : "N/A"}
+                  </span>
+                  <span className="text-sm text-green-500">
+                    Valor Base:{" "}
+                    {product.vl_base ? `R$ ${product.vl_base}` : "N/A"}
+                  </span>
+                  <span className="text-sm text-green-500">
+                    Unidade de Medida:{" "}
+                    {product.ds_unidade_medida
+                      ? `${product.ds_unidade_medida}`
+                      : "N/A"}
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    component={Link}
+                    to={`${product.cd_produto}/editar`}
+                    size="small"
+                    color="warning"
+                    variant="outlined"
+                  >
+                    Editar
+                  </Button>
+                  <Form
+                    method="post"
+                    action={`${product.cd_produto}/excluir`}
+                    onSubmit={(e) => {
+                      if (
+                        !window.confirm(
+                          "Tem certeza que deseja excluir este produto?"
+                        )
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    <Button
+                      type="submit"
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                    >
+                      Excluir
+                    </Button>
+                  </Form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 
