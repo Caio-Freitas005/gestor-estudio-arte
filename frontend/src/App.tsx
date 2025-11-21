@@ -10,8 +10,9 @@ function App() {
           <Link to="/" style={{ marginRight: "1rem" }}>
             Dashboard
           </Link>
-          <Link to="/clientes">Clientes</Link>
-          <Link to="/produtos">Produtos</Link>
+          <Link to="/clientes" style={{ marginRight: "1rem" }}>Clientes</Link>
+          <Link to="/produtos" style={{ marginRight: "1rem" }}>Produtos</Link>
+          <Link to="/pedidos">Pedidos</Link>
         </nav>
 
         <hr />
