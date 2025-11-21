@@ -1,13 +1,14 @@
-import OrdersListPage, { ordersListLoader } from "./index";
-import OrderCreatePage, {
+import OrdersListPage from "./index";
+import OrderCreatePage from "./create";
+import OrderUpdatePage from "./update";
+import {
   orderCreateAction,
   orderCreateLoader,
-} from "./create";
-
-import OrderUpdatePage, {
-  orderUpdateLoader,
+  ordersListLoader,
   orderUpdateAction,
-} from "./update";
+  orderUpdateLoader,
+} from "./orders.data";
+
 
 export const orderRoutes = [
   {

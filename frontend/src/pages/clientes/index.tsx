@@ -1,9 +1,6 @@
 import { useLoaderData, Link, Form } from "react-router";
 import { Box, Typography, Button } from "@mui/material";
-import { clientsService } from "../../services/clients.service";
 import { ClientePublic } from "../../types/cliente.types";
-
-export const clientsListLoader = () => clientsService.getAll();
 
 function ClientsListPage() {
   const clients = useLoaderData() as ClientePublic[];

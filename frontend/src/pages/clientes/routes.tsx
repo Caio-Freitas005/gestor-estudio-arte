@@ -1,11 +1,14 @@
 // Esse arquivo define as rotas filhas de clientes
-import ClientsListPage, { clientsListLoader } from "./index";
-import ClientCreatePage, { clientCreateAction } from "./create";
-import ClientUpdatePage, {
-  clientUpdateLoader,
+import ClientsListPage from "./index";
+import ClientCreatePage from "./create";
+import ClientUpdatePage from "./update";
+import {
+  clientLoader,
+  clientsListLoader,
+  clientCreateAction,
   clientUpdateAction,
-} from "./update";
-import { clientDeleteAction } from "./delete";
+  clientDeleteAction,
+} from "./clients.data";
 
 export const clientRoutes = [
   {
@@ -21,7 +24,7 @@ export const clientRoutes = [
   {
     path: ":id/editar",
     element: <ClientUpdatePage />,
-    loader: clientUpdateLoader,
+    loader: clientLoader,
     action: clientUpdateAction,
   },
   {

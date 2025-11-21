@@ -1,11 +1,14 @@
 // Esse arquivo define as rotas filhas de produtos
-import ProductsListPage, { productsListLoader } from "./index";
-import ProductCreatePage, { productCreateAction } from "./create";
-import ProductUpdatePage, {
-  productUpdateLoader,
+import ProductsListPage from "./index";
+import ProductCreatePage from "./create";
+import ProductUpdatePage from "./update";
+import {
+  productCreateAction,
+  productDeleteAction,
+  productLoader,
+  productsListLoader,
   productUpdateAction,
-} from "./update";
-import { productDeleteAction } from "./delete";
+} from "./products.data";
 
 export const productRoutes = [
   {
@@ -21,7 +24,7 @@ export const productRoutes = [
   {
     path: ":id/editar",
     element: <ProductUpdatePage />,
-    loader: productUpdateLoader,
+    loader: productLoader,
     action: productUpdateAction,
   },
   {

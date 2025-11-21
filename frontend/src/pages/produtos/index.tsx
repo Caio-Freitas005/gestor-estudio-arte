@@ -1,9 +1,6 @@
 import { useLoaderData, Link, Form } from "react-router";
 import { Box, Typography, Button } from "@mui/material";
-import { productsService } from "../../services/products.service";
 import { ProdutoPublic } from "../../types/produto.types";
-
-export const productsListLoader = () => productsService.getAll();
 
 function ProductsListPage() {
   const products = useLoaderData() as ProdutoPublic[];

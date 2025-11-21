@@ -13,15 +13,9 @@ import {
 } from "@mui/material";
 
 import { useLoaderData, Link } from "react-router";
-import { ordersService } from "../../services/orders.service";
 import { PedidoPublic, StatusPedido } from "../../types/pedido.types";
 
-export async function ordersListLoader() {
-  const orders = await ordersService.getAll();
-  return orders;
-}
-
-// Função auxiliar para colorir o status 
+// Função auxiliar para colorir o status
 function getStatusColor(status: StatusPedido) {
   switch (status) {
     case StatusPedido.CONCLUIDO:
@@ -112,7 +106,7 @@ function OrdersListPage() {
                     <Button
                       size="small"
                       component={Link}
-                      to={`/pedidos/${order.cd_pedido}`} 
+                      to={`/pedidos/${order.cd_pedido}`}
                     >
                       Ver Detalhes
                     </Button>
