@@ -6,5 +6,10 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.js", "eslint.config.js"]
+  "include": [
+    "vite.config.js",
+    "eslint.config.js",
+    "src/**/*",
+    "**/*.{ts,tsx,js,jsx}"
+  ]
 }
