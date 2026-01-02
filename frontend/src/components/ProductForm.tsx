@@ -46,6 +46,7 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
         <TextField
           label="Valor Base (R$)"
           name="vl_base"
+          required
           defaultValue={data.vl_base ?? ""}
           variant="outlined"
           size="small"
