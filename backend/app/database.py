@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, text
 
 # Define o caminho do arquivo do banco
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,8 +16,23 @@ connect_args = {"check_same_thread": False}
 engine = create_engine(db_url, echo=True, connect_args=connect_args)
 
 
+def run_migrations():
+    """
+    PLACEHOLDER: Função para futuras migrações de banco de dados.
+    """
+    with Session(engine) as session:
+        # --- Modelo de uso ---
+        # try:
+        #     session.exec(text("ALTER TABLE nome_tabela ADD COLUMN nova_coluna TIPO"))
+        #     session.commit()
+        # except Exception:
+        #     pass # Ignora se a coluna já existir
+        pass
+
+
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
+    run_migrations()
 
 
 def get_session():
