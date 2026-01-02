@@ -112,7 +112,7 @@ function OrdersListPage() {
                       to={`/pedidos/${order.cd_pedido}`}
                       variant="outlined"
                     >
-                      Ver Detalhes
+                      Editar
                     </Button>
                   </TableCell>
                 </TableRow>

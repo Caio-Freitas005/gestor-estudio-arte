@@ -1,13 +1,13 @@
 import { LoaderFunctionArgs, ActionFunctionArgs, redirect } from "react-router";
 import { ordersService } from "../../services/orders.service";
 import { clientsService } from "../../services/clients.service";
-import { clientsListLoader } from "../clientes/clients.data";
+import { productsService } from "../../services/products.service"; 
 import { ClientePublic } from "../../types/cliente.types";
+import { ProdutoPublic } from "../../types/produto.types"; 
 import {
-  PedidoCreate,
   PedidoPublic,
-  PedidoUpdate,
-  StatusPedido,
+  PedidoCreate,
+  ItemPedidoInput
 } from "../../types/pedido.types";
 
 export async function ordersListLoader() {
@@ -15,69 +15,82 @@ export async function ordersListLoader() {
   return orders;
 }
 
-export const orderCreateLoader = () => clientsListLoader();
+export type CreateLoaderData = {
+  clientes: ClientePublic[];
+  produtos: ProdutoPublic[];
+};
 
-export async function orderCreateAction({ request }: { request: Request }) {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
+export async function orderCreateLoader(): Promise<CreateLoaderData> {
+  const [clientes, produtos] = await Promise.all([
+    clientsService.getAll(),
+    productsService.getAll(),
+  ]);
+  return { clientes, produtos };
+}
 
-  const dataToSend: PedidoCreate = {
-    dt_pedido: data.dt_pedido as string,
-    ds_status: data.ds_status as StatusPedido,
-    cd_cliente: Number(data.cd_cliente), // Converte string do select para number
-  };
+export async function orderCreateAction({ request }: ActionFunctionArgs) {
+  const data = (await request.json()) as PedidoCreate;
 
   try {
-    await ordersService.create(dataToSend);
+    await ordersService.create(data);
     return redirect("/pedidos");
   } catch (err) {
-    console.error(err);
-    // Retornar o erro para exibição depois
+    console.error("Erro ao criar pedido:", err);
     return null;
   }
 }
 
-// Tipo de retorno do Loader (Pedido + Lista de Clientes para o select)
 export type UpdateLoaderData = {
   pedido: PedidoPublic;
   clientes: ClientePublic[];
+  produtos: ProdutoPublic[];
 };
 
-// Busca o pedido específico e a lista de clientes
-export async function orderUpdateLoader({ params }: LoaderFunctionArgs) {
+export async function orderUpdateLoader({
+  params,
+}: LoaderFunctionArgs): Promise<UpdateLoaderData> {
   if (!params.id) {
     throw new Error("ID do pedido não encontrado.");
   }
 
-  // Busca em paralelo para ser mais rápido
-  const [pedido, clientes] = await Promise.all([
+  const [pedido, clientes, produtos] = await Promise.all([
     ordersService.getById(params.id),
     clientsService.getAll(),
+    productsService.getAll(),
   ]);
 
-  return { pedido, clientes };
+  return { pedido, clientes, produtos };
 }
 
-export async function orderUpdateAction({
-  request,
-  params,
-}: ActionFunctionArgs) {
+export async function orderUpdateAction({ request, params }: ActionFunctionArgs) {
   if (!params.id) throw new Error("ID inválido");
+  const cd_pedido = Number(params.id);
 
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
-
-  const dataToSend: PedidoUpdate = {
-    dt_pedido: data.dt_pedido as string,
-    ds_status: data.ds_status as StatusPedido,
-    cd_cliente: Number(data.cd_cliente),
-  };
+  const data = await request.json();
+  const { intent, ...payload } = data; // Separa a "intenção" do resto dos dados
 
   try {
-    await ordersService.update(params.id, dataToSend);
-    return redirect("/pedidos");
+    switch (intent) {
+      case "add_item":
+        await ordersService.addItem(cd_pedido, payload as ItemPedidoInput);
+        break;
+
+      case "remove_item":
+        await ordersService.removeItem(cd_pedido, payload.cd_produto);
+        break;
+      
+      case "update_item":
+        await ordersService.updateItem(cd_pedido, payload.cd_produto, payload);
+        break;
+
+      default:
+        await ordersService.update(cd_pedido, payload);
+        return redirect("/pedidos")
+    }
+
   } catch (err) {
-    console.error(err);
+    console.error("Erro na action de pedido:", err);
     return null;
   }
 }
+
