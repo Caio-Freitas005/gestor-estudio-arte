@@ -31,7 +31,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         fullWidth
       />
       <TextField
-        label="Telefone (ex: (00) 99999-8888)"
+        label="Telefone"
         name="cd_telefone"
         defaultValue={data.cd_telefone ?? ""}
         variant="outlined"
