@@ -1,7 +1,6 @@
-from decimal import Decimal
 from typing import Sequence
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import joinedload
 from sqlmodel import select
 
@@ -16,49 +15,13 @@ from ..models.pedido import (
     PedidoUpdate,
 )
 from ..models.produto import Produto
+from ..services import pedido_service
 
 router = APIRouter(prefix="/pedidos", tags=["pedidos"])
 
 
-def calcular_total_pedido(pedido: Pedido, session: SessionDep):
-    """
-    Recalcula o valor total do pedido somando os itens.
-    Usa Decimal para evitar erros de arredondamento.
-    """
-    # Garante que a lista de itens está atualizada
-    session.refresh(pedido)
-
-    total = Decimal("0.00")
-    for item in pedido.itens:
-        qt = Decimal(item.qt_produto)
-        valor = item.vl_unitario_praticado
-        total += valor * qt
-
-    pedido.vl_total_pedido = total
-    session.add(pedido)
-    session.commit()
-    session.refresh(pedido)
-
-
 @router.post("/", response_model=PedidoPublic)
 async def create_order(pedido: PedidoCreate, session: SessionDep) -> Pedido:
-    if not pedido.itens:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="O pedido não pode ser vazio. Adicione pelo menos um produto.",
-        )
-
-    itens_consolidados = {}
-    for item in pedido.itens:
-        if item.cd_produto in itens_consolidados:
-            # Se o produto já está na lista temporária, soma a quantidade
-            itens_consolidados[item.cd_produto].qt_produto += item.qt_produto  # type: ignore
-        else:
-            # Se é a primeira vez que o produto aparece, adiciona ao dicionário
-            itens_consolidados[item.cd_produto] = item
-
-    pedido.itens = list(itens_consolidados.values())  # type: ignore
-
     cliente = session.get(Cliente, pedido.cd_cliente)
     if not cliente:
         raise HTTPException(
@@ -66,38 +29,7 @@ async def create_order(pedido: PedidoCreate, session: SessionDep) -> Pedido:
             detail=f"Cliente com ID {pedido.cd_cliente} não encontrado.",
         )
 
-    db_pedido = Pedido.model_validate(pedido.model_dump(exclude={"itens"}))
-
-    valor_total_acumulado = Decimal("0.00")
-
-    for item in pedido.itens:
-        produto = session.get(Produto, item.cd_produto)
-        if not produto:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Produto ID {item.cd_produto} não encontrado.",
-            )
-
-        preco_final = (
-            item.vl_unitario_praticado
-            if item.vl_unitario_praticado is not None
-            else produto.vl_base
-        )
-
-        novo_item = ItemPedido(
-            cd_produto=item.cd_produto,
-            qt_produto=item.qt_produto,
-            ds_observacoes_item=item.ds_observacoes_item,
-            vl_unitario_praticado=preco_final,
-        )
-
-        db_pedido.itens.append(novo_item)
-
-        valor_total_acumulado += novo_item.vl_unitario_praticado * Decimal(
-            item.qt_produto
-        )
-
-    db_pedido.vl_total_pedido = valor_total_acumulado
+    db_pedido = pedido_service.create_order(pedido, session)
 
     session.add(db_pedido)
     session.commit()
@@ -189,7 +121,7 @@ async def add_item_to_order(
     session.add(db_pedido)
     session.commit()
 
-    calcular_total_pedido(db_pedido, session)
+    pedido_service.calculate_total_order(db_pedido, session)
 
     return db_pedido
 
@@ -224,7 +156,7 @@ async def update_item_in_order(
     session.commit()
 
     # Recalcula o total do pedido com os novos valores do item
-    calcular_total_pedido(db_pedido, session)  
+    pedido_service.calculate_total_order(db_pedido, session)
 
     return db_pedido
 
@@ -250,16 +182,46 @@ async def remove_item_from_order(
         )
 
     # Busca o item específico para deletar
-    item = session.get(ItemPedido, (cd_pedido, cd_produto))
+    db_item = session.get(ItemPedido, (cd_pedido, cd_produto))
 
-    if not item:
+    if not db_item:
         raise HTTPException(status_code=404, detail="Item não encontrado neste pedido")
 
-    session.delete(item)
+    session.delete(db_item)
     session.commit()
 
-    # Recalcula o total 
+    # Recalcula o total
     session.refresh(db_pedido)  # Atualiza a lista de itens
-    calcular_total_pedido(db_pedido, session)
+    pedido_service.calculate_total_order(db_pedido, session)
 
+    return db_pedido
+
+
+@router.post("/{cd_pedido}/itens/{cd_produto}/upload-arte", response_model=PedidoPublic)
+async def upload_item_art(
+    cd_pedido: int, cd_produto: int, session: SessionDep, file: UploadFile = File(...)
+) -> Pedido:
+    db_item = session.get(ItemPedido, (cd_pedido, cd_produto))
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Item não encontrado.")
+
+    db_item.ds_caminho_arte = pedido_service.process_art_image(
+        file, cd_pedido, cd_produto
+    )
+
+    session.add(db_item)
+    session.commit()
+
+    statement = (
+        select(Pedido)
+        .where(Pedido.cd_pedido == cd_pedido)
+        .options(joinedload(Pedido.itens), joinedload(Pedido.cliente))  # type: ignore
+    )
+
+    db_pedido = session.exec(statement).unique().first()
+
+    if not db_pedido:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado.")
+
+    session.refresh(db_pedido)
     return db_pedido
