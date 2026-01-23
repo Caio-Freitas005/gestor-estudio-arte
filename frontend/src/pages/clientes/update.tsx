@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
 import { Typography } from "@mui/material";
-import ClientForm from "../../components/ClientForm";
+import ClientForm from "./components/ClientForm";
 import { ClientePublic } from "../../types/cliente.types";
 
 function ClientUpdatePage() {
@@ -12,4 +12,5 @@ function ClientUpdatePage() {
     </div>
   );
 }
+
 export default ClientUpdatePage;

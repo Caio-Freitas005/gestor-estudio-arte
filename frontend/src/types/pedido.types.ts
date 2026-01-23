@@ -17,6 +17,7 @@ export interface ItemPedidoInput {
   cd_produto: number;
   qt_produto: number;
   ds_observacoes_item?: string | null;
+  ds_caminho_arte?: string | null;
   vl_unitario_praticado?: number;
 }
 
@@ -32,6 +33,7 @@ export interface ItemPedidoPublic {
   qt_produto: number;
   vl_unitario_praticado: number;
   ds_observacoes_item?: string | null;
+  ds_caminho_arte?: string | null;
   vl_total_item?: number;
 }
 

@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import ClientForm from "../../components/ClientForm";
+import ClientForm from "./components/ClientForm";
 
 function ClientCreatePage() {
   return (
@@ -9,4 +9,5 @@ function ClientCreatePage() {
     </div>
   );
 }
+
 export default ClientCreatePage;

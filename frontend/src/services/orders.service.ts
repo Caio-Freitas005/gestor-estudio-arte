@@ -26,5 +26,14 @@ export const ordersService = {
   removeItem: async (cd_pedido: number, cd_produto: number) => {
     const response = await apiBase.delete(`${basePath}/${cd_pedido}/itens/${cd_produto}`);
     return response.data;
+  },
+
+  uploadArt: async (cd_pedido: number, cd_produto: number, formData: FormData) => {
+    const response = await apiBase.post(
+      `${basePath}/${cd_pedido}/itens/${cd_produto}/upload-arte`,
+      formData,
+    );
+    return response.data;
   }
+
 };

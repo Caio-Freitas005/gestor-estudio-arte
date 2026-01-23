@@ -7,8 +7,8 @@ import {
   ordersListLoader,
   orderUpdateAction,
   orderUpdateLoader,
+  orderUploadArtAction,
 } from "./orders.data";
-
 
 export const orderRoutes = [
   {
@@ -27,5 +27,17 @@ export const orderRoutes = [
     element: <OrderUpdatePage />,
     loader: orderUpdateLoader,
     action: orderUpdateAction,
+    children: [
+      {
+        index: true,
+        element: <OrderUpdatePage />,
+        loader: orderUpdateLoader,
+        action: orderUpdateAction,
+      },
+      {
+        path: "itens/:cd_produto/upload-arte",
+        action: orderUploadArtAction
+      },
+    ],
   },
 ];

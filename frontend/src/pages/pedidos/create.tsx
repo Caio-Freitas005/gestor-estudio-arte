@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
 import { Typography } from "@mui/material";
-import OrderForm from "../../components/OrderForm";
+import OrderForm from "./components/OrderForm";
 import { CreateLoaderData } from "./orders.data";
 
 function OrderCreatePage() {
@@ -17,4 +17,5 @@ function OrderCreatePage() {
     </div>
   );
 }
+
 export default OrderCreatePage;

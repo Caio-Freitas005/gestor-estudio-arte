@@ -35,7 +35,7 @@ function OrdersListPage() {
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <Typography variant="h4" component="h1" className="text-white-800">
-          Dashboard de Pedidos
+          Pedidos
         </Typography>
         <Button
           component={Link}

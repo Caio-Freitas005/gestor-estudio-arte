@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import ProductForm from "../../components/ProductForm";
+import ProductForm from "./components/ProductForm";
 
 function ProductCreatePage() {
   return (
@@ -9,4 +9,5 @@ function ProductCreatePage() {
     </div>
   );
 }
+
 export default ProductCreatePage;

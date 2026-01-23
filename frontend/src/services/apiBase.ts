@@ -1,20 +1,15 @@
-// Esse arquivo define o motor de acesso a API, que cuida das requisições e respostas
 const API_URL = import.meta.env.VITE_API_URL;
 
 async function handleResponse(response: Response): Promise<any> {
   if (!response.ok) {
     try {
       const errorData = await response.json();
-      throw new Error(
-        errorData.detail || `HTTP error! status: ${response.status}`
-      );
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
     } catch (jsonError) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   }
-  if (response.status === 204) {
-    return null;
-  }
+  if (response.status === 204) return null;
   return response.json();
 }
 
@@ -25,19 +20,25 @@ export const apiBase = {
   },
 
   post: async (path: string, data: any): Promise<any> => {
+    // Verifica se os dados são um FormData 
+    const isFormData = data instanceof FormData;
+
     const response = await fetch(`${API_URL}/${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      // Se for FormData, deixa os headers vazios para o fetch configurar o boundary
+      headers: isFormData ? {} : { "Content-Type": "application/json" },
+      // Se for FormData, envia o objeto direto. Se não, stringify.
+      body: isFormData ? data : JSON.stringify(data),
     });
     return handleResponse(response);
   },
 
   patch: async (path: string, data: any): Promise<any> => {
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_URL}/${path}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      headers: isFormData ? {} : { "Content-Type": "application/json" },
+      body: isFormData ? data : JSON.stringify(data),
     });
     return handleResponse(response);
   },

@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
 import { Typography, Alert } from "@mui/material";
-import OrderForm from "../../components/OrderForm";
+import OrderForm from "./components/OrderForm";
 import { UpdateLoaderData } from "./orders.data";
 
 function OrderUpdatePage() {
@@ -31,4 +31,5 @@ function OrderUpdatePage() {
     </div>
   );
 }
+
 export default OrderUpdatePage;
