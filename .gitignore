@@ -7,6 +7,10 @@ wheels/
 *.db
 *db.
 .env
+*.webp
+*.png
+*.jpg
+*.jpeg
 
 logs
 *.log
