@@ -4,7 +4,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import joinedload
 from sqlmodel import select
 
-from ..database import SessionDep
+from ..config import SessionDep
 from ..models.cliente import Cliente
 from ..models.item_pedido import ItemPedido, ItemPedidoUpdate
 from ..models.pedido import (

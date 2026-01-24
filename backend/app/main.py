@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .database import create_db_and_tables
+from .config import create_db_and_tables, UPLOAD_DIR
 from .routers import clientes, pedidos, produtos
 
 load_dotenv()
@@ -25,17 +25,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# Define o caminho absoluto para a pasta uploads dentro do backend
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
-
-# Cria a pasta física se ela não existir 
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
-    # Cria também a subpasta de artes
-    os.makedirs(os.path.join(UPLOAD_DIR, "artes"), exist_ok=True)
-
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,

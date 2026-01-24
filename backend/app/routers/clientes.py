@@ -3,7 +3,7 @@ from typing import Sequence
 from fastapi import APIRouter, HTTPException, Response, status
 from sqlmodel import select
 
-from ..database import SessionDep
+from ..config import SessionDep
 from ..models.cliente import Cliente, ClienteCreate, ClientePublic, ClienteUpdate
 
 router = APIRouter(prefix="/clientes", tags=["clientes"])

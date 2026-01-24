@@ -4,9 +4,12 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, SQLModel, create_engine, text
 
-# Define o caminho do arquivo do banco
+# Define o caminho dos arquivos e pastas
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_DIR = BASE_DIR
+UPLOAD_DIR = BASE_DIR / "uploads"
+ARTES_DIR = UPLOAD_DIR / "artes"
+ARTES_DIR.mkdir(parents=True, exist_ok=True)
 
 db_name = "gestor.db"
 db_path = DB_DIR / db_name

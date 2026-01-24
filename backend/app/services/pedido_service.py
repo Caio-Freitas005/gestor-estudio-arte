@@ -1,12 +1,11 @@
 import io
 from decimal import Decimal
-from pathlib import Path
 from uuid import uuid4
 
 from fastapi import HTTPException, UploadFile, status
 from PIL import Image, ImageOps
 from sqlmodel import Session
-
+from ..config import ARTES_DIR
 from ..models.item_pedido import ItemPedido
 from ..models.pedido import Pedido, PedidoCreate
 from ..models.produto import Produto
@@ -96,11 +95,6 @@ def process_art_image(file: UploadFile, cd_pedido: int, cd_produto: int) -> str:
             raise HTTPException(status_code=400, detail="Formato não suportado.")
 
         img = ImageOps.exif_transpose(img)
-
-        # Caminhos absolutos
-        BASE_DIR = Path(__file__).resolve().parent.parent.parent
-        ARTES_DIR = BASE_DIR / "uploads" / "artes"
-        ARTES_DIR.mkdir(parents=True, exist_ok=True)
 
         file_name = f"art_ped_{cd_pedido}_prod_{cd_produto}_{uuid4().hex}.webp"
         file_path = ARTES_DIR / file_name
