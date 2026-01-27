@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends
-from sqlmodel import Session, SQLModel, create_engine, text
+from sqlmodel import Session, SQLModel, create_engine, text # type: ignore 
 
 # Define o caminho dos arquivos e pastas
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +23,7 @@ def run_migrations():
     """
     PLACEHOLDER: Função para futuras migrações de banco de dados.
     """
-    with Session(engine) as session:
+    with Session(engine) as session: # type: ignore
         # --- Modelo de uso ---
         # try:
         #     session.exec(text("ALTER TABLE nome_tabela ADD COLUMN nova_coluna TIPO"))

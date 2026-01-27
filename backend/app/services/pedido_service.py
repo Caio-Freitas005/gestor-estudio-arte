@@ -51,7 +51,8 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
     def get_all_detailed(self, session: Session) -> Sequence[Pedido]:
         """Busca todos os pedidos com cliente e itens carregados."""
         query = select(Pedido).options(
-            joinedload(Pedido.cliente), joinedload(Pedido.itens) # type: ignore
+            joinedload(Pedido.cliente), # type: ignore
+            joinedload(Pedido.itens),  # type: ignore
         )
         return session.exec(query).unique().all()
 
@@ -60,7 +61,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         query = (
             select(Pedido)
             .where(Pedido.cd_pedido == cd_pedido)
-            .options(joinedload(Pedido.cliente), joinedload(Pedido.itens)) # type: ignore
+            .options(joinedload(Pedido.cliente), joinedload(Pedido.itens))  # type: ignore
         )
         db_pedido = session.exec(query).unique().first()
         if not db_pedido:
@@ -79,15 +80,15 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         itens_dict = {}
         for item in obj.itens:
             if item.cd_produto in itens_dict:
-                itens_dict[item.cd_produto].qt_produto += item.qt_produto
+                itens_dict[item.cd_produto].qt_produto += item.qt_produto  # type: ignore
             else:
                 itens_dict[item.cd_produto] = item
 
         db_pedido = Pedido.model_validate(obj.model_dump(exclude={"itens"}))
 
         # Usa o _prepare_item para cada item consolidado
-        for item_input in itens_dict.values():
-            novo_item = self._prepare_item(session, item_input)
+        for item_input in itens_dict.values():  # type: ignore
+            novo_item = self._prepare_item(session, item_input)  # type: ignore
             db_pedido.itens.append(novo_item)
 
         session.add(db_pedido)
@@ -103,7 +104,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             (item.vl_unitario_praticado * Decimal(item.qt_produto))
             for item in pedido.itens
         )
-        pedido.vl_total_pedido = total
+        pedido.vl_total_pedido = total  # type: ignore
         session.add(pedido)
         session.commit()
 
