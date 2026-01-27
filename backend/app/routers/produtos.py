@@ -1,57 +1,42 @@
-from fastapi import APIRouter, HTTPException, Response, status
-from sqlmodel import select
 from typing import Sequence
+
+from fastapi import APIRouter, Response, status
+
 from ..config import SessionDep
-from ..models.produto import Produto, ProdutoCreate, ProdutoPublic, ProdutoUpdate
+from ..models import Produto, ProdutoCreate, ProdutoPublic, ProdutoUpdate
+from ..services import produto_service
 
 router = APIRouter(prefix="/produtos", tags=["produtos"])
 
 
-@router.post("/", response_model=ProdutoPublic)
+@router.post("/", response_model=ProdutoPublic, status_code=status.HTTP_201_CREATED)
 async def create_product(produto: ProdutoCreate, session: SessionDep) -> Produto:
-    db_produto = Produto.model_validate(produto)
-    session.add(db_produto)
-    session.commit()
-    session.refresh(db_produto)
-    return db_produto
+    """Cria um novo produto."""
+    return produto_service.create(session, produto)
 
 
 @router.get("/", response_model=list[ProdutoPublic])
 async def get_all_products(session: SessionDep) -> Sequence[Produto]:
-    query = select(Produto)
-    produtos = session.exec(query).all()
-    return produtos
+    """Retorna a lista de todos os produtos."""
+    return produto_service.get_all(session)
 
 
 @router.get("/{cd_produto}", response_model=ProdutoPublic)
 async def get_product_by_id(cd_produto: int, session: SessionDep) -> Produto:
-    db_produto = session.get(Produto, cd_produto)
-    if not db_produto:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-    return db_produto
+    """Busca um produto por ID se existir"""
+    return produto_service.get_or_404(session, cd_produto)
 
 
 @router.patch("/{cd_produto}", response_model=ProdutoPublic)
 async def update_product(
     cd_produto: int, produto: ProdutoUpdate, session: SessionDep
 ) -> Produto:
-    db_produto = session.get(Produto, cd_produto)
-    if not db_produto:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-    produto_data = produto.model_dump(exclude_unset=True)
-    db_produto.sqlmodel_update(produto_data)
-    session.add(db_produto)
-    session.commit()
-    session.refresh(db_produto)
-    return db_produto
+    """Atualiza dados de um produto de forma parcial."""
+    return produto_service.update(session, cd_produto, produto)
 
 
 @router.delete("/{cd_produto}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(cd_produto: int, session: SessionDep):
-    db_produto = session.get(Produto, cd_produto)
-    if not db_produto:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-    session.delete(db_produto)
-    session.commit()
-
+    """Remove um produto."""
+    produto_service.delete(session, cd_produto)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
