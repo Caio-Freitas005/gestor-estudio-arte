@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs, ActionFunctionArgs, redirect } from "react-router";
 import { clientsService } from "../../services/clients.service";
+import { cleanFormData } from "../../utils/form.utils";
 import {
   ClienteCreate,
   ClienteUpdate,
@@ -27,16 +28,7 @@ export async function clientLoader({
 // Essa action será chamada pelo <Form> do ClientForm.jsx
 export async function clientCreateAction({ request }: { request: Request }) {
   const formData = await request.formData();
-  const clientData = Object.fromEntries(formData);
-
-  // as string necessário porque o formData só lida com string
-  const dataToSend: ClienteCreate = {
-    nm_cliente: clientData.nm_cliente as string,
-    cd_telefone: (clientData.cd_telefone as string) || null,
-    nm_email: (clientData.nm_email as string) || null,
-    dt_nascimento: (clientData.dt_nascimento as string) || null,
-    ds_observacoes: (clientData.ds_observacoes as string) || null,
-  };
+  const dataToSend = cleanFormData<ClienteCreate>(formData);
 
   try {
     await clientsService.create(dataToSend);
@@ -57,15 +49,7 @@ export async function clientUpdateAction({
   }
 
   const formData = await request.formData();
-  const clientData = Object.fromEntries(formData);
-
-  const dataToSend: ClienteUpdate = {
-    nm_cliente: clientData.nm_cliente as string | undefined,
-    cd_telefone: (clientData.cd_telefone as string) || null,
-    nm_email: (clientData.nm_email as string) || null,
-    dt_nascimento: (clientData.dt_nascimento as string) || null,
-    ds_observacoes: (clientData.ds_observacoes as string) || null,
-  };
+  const dataToSend = cleanFormData<ClienteUpdate>(formData);
 
   try {
     await clientsService.update(params.id, dataToSend);

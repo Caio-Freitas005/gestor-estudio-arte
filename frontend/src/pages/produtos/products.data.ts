@@ -1,5 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "react-router";
 import { productsService } from "../../services/products.service";
+import { cleanFormData } from "../../utils/form.utils";
 import {
   ProdutoCreate,
   ProdutoPublic,
@@ -10,14 +11,7 @@ export const productsListLoader = () => productsService.getAll();
 
 export async function productCreateAction({ request }: { request: Request }) {
   const formData = await request.formData();
-  const productData = Object.fromEntries(formData);
-
-  const dataToSend: ProdutoCreate = {
-    nm_produto: productData.nm_produto as string,
-    ds_produto: (productData.ds_produto as string) || null,
-    vl_base: (productData.vl_base as string) || null,
-    ds_unidade_medida: (productData.ds_unidade_medida as string) || null,
-  };
+  const dataToSend = cleanFormData<ProdutoCreate>(formData);
 
   try {
     await productsService.create(dataToSend);
@@ -54,14 +48,7 @@ export async function productUpdateAction({
   }
 
   const formData = await request.formData();
-  const productData = Object.fromEntries(formData);
-
-  const dataToSend: ProdutoUpdate = {
-    nm_produto: productData.nm_produto as string | undefined,
-    ds_produto: (productData.ds_produto as string) || null,
-    vl_base: (productData.vl_base as string) || null,
-    ds_unidade_medida: (productData.ds_unidade_medida as string) || null,
-  };
+  const dataToSend = cleanFormData<ProdutoUpdate>(formData);
 
   try {
     await productsService.update(params.id, dataToSend);
