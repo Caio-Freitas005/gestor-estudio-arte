@@ -1,104 +1,152 @@
-import { useLoaderData, Link, Form } from "react-router";
-import { Typography, Button } from "@mui/material";
+import { useState } from "react";
+import { Link, useLoaderData, useFetcher } from "react-router";
+import { DeleteOutline, Edit, SellOutlined } from "@mui/icons-material";
 import { ProdutoPublic } from "../../types/produto.types";
 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import PageHeader from "../../components/PageHeader";
+import DeleteDialog from "../../components/DeleteDialog";
+
 function ProductsListPage() {
-  const products = useLoaderData() as ProdutoPublic[];
+  const products = (useLoaderData() as ProdutoPublic[]) || [];
+  const fetcher = useFetcher();
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+
+  const confirmDelete = () => {
+    if (deleteId) {
+      fetcher.submit(null, {
+        method: "post",
+        action: `${deleteId}/excluir`,
+      });
+      setDeleteId(null);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
-        <Typography variant="h4" component="h1" className="text-white-800">
-          Gestão de Produtos
-        </Typography>
+    <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full">
+      <PageHeader
+        title="Catálogo de"
+        highlight="Produtos"
+        subtitle="Itens e Personalizáveis"
+        buttonLabel="Novo Produto"
+        buttonTo="cadastrar"
+      ></PageHeader>
 
-        <Button
-          component={Link}
-          to="cadastrar"
-          variant="contained"
-          color="primary"
-          disableElevation
-        >
-          Cadastrar Produto
-        </Button>
-      </div>
-
-      <hr className="border-gray-200" />
-
-      <div>
-        <Typography variant="h5" className="mb-4 text-white-700">
-          Produtos Cadastrados
-        </Typography>
-
-        {products.length === 0 ? (
-          <p className="text-gray-500 italic">
-            Nenhum produto cadastrado ainda.
-          </p>
-        ) : (
-          <ul className="grid gap-3">
-            {products.map((product) => (
-              <li
-                key={product.cd_produto}
-                className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+      <TableContainer className="!border-none !shadow-none overflow-hidden rounded-2xl border border-gray-100 bg-white">
+        <Table sx={{ minWidth: 650 }}>
+          <TableHead className="bg-gray-50/50">
+            <TableRow>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                Produto
+              </TableCell>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                Unidade
+              </TableCell>
+              <TableCell
+                align="right"
+                className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider"
               >
-                <div className="flex flex-col">
-                  <span className="font-medium text-yellow-500 text-lg">
-                    {product.nm_produto}
-                  </span>
-                  <span className="text-sm text-green-500">
-                    Descrição:{" "}
-                    {product.ds_produto ? `${product.ds_produto}` : "N/A"}
-                  </span>
-                  <span className="text-sm text-green-500">
-                    Valor Base:{" "}
-                    {product.vl_base ? `R$ ${product.vl_base}` : "N/A"}
-                  </span>
-                  <span className="text-sm text-green-500">
-                    Unidade de Medida:{" "}
-                    {product.ds_unidade_medida
-                      ? `${product.ds_unidade_medida}`
-                      : "N/A"}
-                  </span>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    component={Link}
-                    to={`${product.cd_produto}/editar`}
-                    size="small"
-                    color="warning"
-                    variant="outlined"
-                  >
-                    Editar
-                  </Button>
-                  <Form
-                    method="post"
-                    action={`${product.cd_produto}/excluir`}
-                    onSubmit={(e) => {
-                      if (
-                        !window.confirm(
-                          "Tem certeza que deseja excluir este produto?"
-                        )
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    <Button
-                      type="submit"
+                Valor Base
+              </TableCell>
+              <TableCell
+                align="center"
+                className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider"
+              >
+                Ações
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {products.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  align="center"
+                  className="py-20 text-gray-400 italic"
+                >
+                  Catálogo vazio.
+                </TableCell>
+              </TableRow>
+            ) : (
+              products.map((product) => (
+                <TableRow
+                  key={product.cd_produto}
+                  className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-pink-50 rounded-xl text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-all shadow-sm shadow-pink-50">
+                        <SellOutlined fontSize="small" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-gray-800 leading-tight">
+                          {product.nm_produto}
+                        </span>
+                        <span className="text-[10px] text-gray-400 italic">
+                          {product.ds_produto || "Sem descrição"}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={product.ds_unidade_medida || "UN"}
                       size="small"
-                      color="error"
-                      variant="outlined"
-                    >
-                      Excluir
-                    </Button>
-                  </Form>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                      className="!bg-gray-100 !text-gray-600 !font-black !text-[9px] !rounded-md"
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-50 text-sm">
+                      R$ {Number(product.vl_base).toFixed(2)}
+                    </span>
+                  </TableCell>
+                  <TableCell align="center">
+                    <div className="flex justify-center gap-1">
+                      <Tooltip title="Editar">
+                        <IconButton
+                          component={Link}
+                          to={`${product.cd_produto}`}
+                          size="small"
+                          className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
+                        >
+                          <Edit fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Excluir">
+                        <IconButton
+                          size="small"
+                          className="opacity-0 group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
+                          onClick={() => setDeleteId(product.cd_produto)}
+                        >
+                          <DeleteOutline fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <DeleteDialog
+        open={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        title="Excluir Produto"
+        content="Tem certeza que deseja remover esse produto? Essa ação não pode ser desfeita."
+        onConfirm={confirmDelete}
+      ></DeleteDialog>
     </div>
   );
 }

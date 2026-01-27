@@ -4,7 +4,7 @@ import ClientForm from "./components/ClientForm";
 function ClientCreatePage() {
   return (
     <div className="flex flex-col gap-6">
-      <Typography variant="h4">Novo Cliente</Typography>
+      <Typography variant="h4">Cadastrar <span className="text-pink-500">Cliente</span></Typography>
       <ClientForm />
     </div>
   );

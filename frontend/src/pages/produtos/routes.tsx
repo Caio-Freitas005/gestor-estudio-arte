@@ -2,6 +2,7 @@
 import ProductsListPage from "./index";
 import ProductCreatePage from "./create";
 import ProductUpdatePage from "./update";
+
 import {
   productCreateAction,
   productDeleteAction,
@@ -22,7 +23,7 @@ export const productRoutes = [
     action: productCreateAction,
   },
   {
-    path: ":id/editar",
+    path: ":id",
     element: <ProductUpdatePage />,
     loader: productLoader,
     action: productUpdateAction,

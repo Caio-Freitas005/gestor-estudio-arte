@@ -22,7 +22,7 @@ export const clientRoutes = [
     action: clientCreateAction,
   },
   {
-    path: ":id/editar",
+    path: ":id",
     element: <ClientUpdatePage />,
     loader: clientLoader,
     action: clientUpdateAction,

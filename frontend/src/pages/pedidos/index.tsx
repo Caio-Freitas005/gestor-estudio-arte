@@ -1,66 +1,93 @@
+import { VisibilityOutlined } from "@mui/icons-material";
+import { useState } from "react";
+import { useLoaderData, Link, useNavigate } from "react-router";
+import { Edit, ReceiptLong } from "@mui/icons-material";
+import { PedidoPublic, StatusPedido } from "../../types/pedido.types";
+import { ProdutoPublic } from "../../types/produto.types";
+
 import {
-  Typography,
-  Button,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Chip,
+  IconButton,
+  Tooltip,
+  Drawer,
 } from "@mui/material";
-import { useLoaderData, Link } from "react-router";
-import { PedidoPublic, StatusPedido } from "../../types/pedido.types";
 
-function getStatusColor(status: StatusPedido) {
-  switch (status) {
-    case StatusPedido.CONCLUIDO:
-      return "success";
-    case StatusPedido.CANCELADO:
-      return "error";
-    case StatusPedido.EM_PRODUCAO:
-      return "warning";
-    case StatusPedido.PRONTO_RETIRADA:
-      return "info";
-    default:
-      return "default";
-  }
-}
+import PageHeader from "../../components/PageHeader";
+import OrderDetails from "./components/OrderDetails";
+
+export const statusStyles: Record<string, string> = {
+  [StatusPedido.AGUARDANDO_PAGAMENTO]:
+    "!bg-amber-50 !text-amber-700 !border-amber-100",
+  [StatusPedido.AGUARDANDO_ARTE]: "!bg-pink-50 !text-pink-700 !border-pink-200",
+  [StatusPedido.EM_PRODUCAO]: "!bg-blue-50 !text-blue-700 !border-blue-100",
+  [StatusPedido.PRONTO_RETIRADA]:
+    "!bg-purple-50 !text-purple-700 !border-purple-100",
+  [StatusPedido.CONCLUIDO]:
+    "!bg-emerald-50 !text-emerald-700 !border-emerald-100",
+  [StatusPedido.CANCELADO]: "!bg-red-100 !text-red-500 !border-red-200",
+};
 
 function OrdersListPage() {
-  const orders = useLoaderData() as PedidoPublic[];
+  const { orders, products } = useLoaderData() as {
+    orders: PedidoPublic[];
+    products: ProdutoPublic[];
+  };
+
+  const navigate = useNavigate();
+  const [selectedOrder, setSelectedOrder] = useState<PedidoPublic | null>(null);
+
+  const handleOpenDetails = (order: PedidoPublic) => {
+    setSelectedOrder(order);
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedOrder(null);
+  };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
-        <Typography variant="h4" component="h1" className="text-white-800">
-          Pedidos
-        </Typography>
-        <Button
-          component={Link}
-          to="cadastrar"
-          variant="contained"
-          color="primary"
-          disableElevation
-        >
-          Novo Pedido
-        </Button>
-      </div>
+    <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full">
+      <PageHeader
+        title="Gestão de"
+        highlight="Pedidos"
+        subtitle="Fluxo de Produção"
+        buttonLabel="Novo Pedido"
+        buttonTo="cadastrar"
+      ></PageHeader>
 
-      <TableContainer
-        component={Paper}
-        className="shadow-sm border border-gray-200"
-      >
-        <Table sx={{ minWidth: 650 }} aria-label="tabela de pedidos">
-          <TableHead className="bg-gray-50">
+      <TableContainer className="!border-none !shadow-none overflow-hidden rounded-2xl border border-gray-100 bg-white">
+        <Table sx={{ minWidth: 650 }}>
+          <TableHead className="bg-gray-50/50">
             <TableRow>
-              <TableCell className="font-bold">#ID</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>Cliente</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Valor Total</TableCell>
-              <TableCell align="center">Ações</TableCell>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                ID
+              </TableCell>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                Data
+              </TableCell>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                Cliente
+              </TableCell>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                Status
+              </TableCell>
+              <TableCell
+                align="right"
+                className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider"
+              >
+                Total
+              </TableCell>
+              <TableCell
+                align="center"
+                className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider"
+              >
+                Ações
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -69,51 +96,75 @@ function OrdersListPage() {
                 <TableCell
                   colSpan={6}
                   align="center"
-                  className="py-8 text-gray-500"
+                  className="py-20 text-gray-400 italic"
                 >
-                  Nenhum pedido encontrado. Comece criando um!
+                  Nenhum pedido encontrado.
                 </TableCell>
               </TableRow>
             ) : (
               orders.map((order) => (
                 <TableRow
                   key={order.cd_pedido}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  className="hover:bg-gray-50 transition-colors"
+                  className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
                 >
-                  <TableCell component="th" scope="row">
-                    {order.cd_pedido}
-                  </TableCell>
                   <TableCell>
+                    <div className="flex items-center gap-2">
+                      <ReceiptLong
+                        className="text-gray-300 group-hover:text-pink-400 transition-colors"
+                        fontSize="small"
+                      />
+                      <span className="font-bold text-gray-700">
+                        #{order.cd_pedido}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-gray-600 font-medium text-sm">
                     {new Date(order.dt_pedido).toLocaleDateString("pt-BR", {
                       timeZone: "UTC",
                     })}
                   </TableCell>
                   <TableCell>
-                    {order.cliente?.nm_cliente || (
-                      <span className="text-red-400">Cliente Removido</span>
-                    )}
+                    <span className="font-semibold text-gray-800">
+                      {order.cliente?.nm_cliente || (
+                        <span className="text-red-300">Não identificado</span>
+                      )}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <Chip
                       label={order.ds_status}
-                      color={getStatusColor(order.ds_status)}
-                      size="small"
                       variant="outlined"
+                      size="small"
+                      className={`${
+                        statusStyles[order.ds_status] || "!bg-gray-50"
+                      } !font-black !border !text-[9px] !uppercase !tracking-widest !rounded-md`}
                     />
                   </TableCell>
-                  <TableCell align="right" className="font-mono">
-                    R$ {Number(order.vl_total_pedido).toFixed(2)}
+                  <TableCell align="right">
+                    <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 text-sm">
+                      R$ {Number(order.vl_total_pedido).toFixed(2)}
+                    </span>
                   </TableCell>
                   <TableCell align="center">
-                    <Button
-                      size="small"
-                      component={Link}
-                      to={`/pedidos/${order.cd_pedido}`}
-                      variant="outlined"
-                    >
-                      Editar
-                    </Button>
+                    <Tooltip title="Editar Pedido">
+                      <IconButton
+                        component={Link}
+                        to={`/pedidos/${order.cd_pedido}`}
+                        size="small"
+                        className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
+                      >
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Ver Detalhes">
+                      <IconButton
+                        onClick={() => handleOpenDetails(order)}
+                        size="small"
+                        className="opacity-0 group-hover:opacity-100 transition-all !text-blue-600 hover:!bg-pink-100"
+                      >
+                        <VisibilityOutlined />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))
@@ -121,6 +172,26 @@ function OrdersListPage() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Drawer
+        anchor="right"
+        open={Boolean(selectedOrder)}
+        onClose={handleCloseDetails}
+        slotProps={{
+          paper: {
+            className:
+              "!w-full sm:!w-[500px] sm:!rounded-l-2xl !bg-[#FDF2F8] !shadow-2xl !overflow-x-hidden",
+          },
+        }}
+      >
+        {selectedOrder && (
+          <OrderDetails
+            order={selectedOrder}
+            onClose={handleCloseDetails}
+            onEdit={(id) => navigate(`${id}`)}
+            produtos={products}
+          />
+        )}
+      </Drawer>
     </div>
   );
 }

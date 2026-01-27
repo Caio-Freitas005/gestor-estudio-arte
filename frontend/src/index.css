@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+::selection {
+  background: #ec4899; 
+  color: white;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-800 antialiased;
+    
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-pink-400 rounded-full hover:bg-pink-300;
+}
+

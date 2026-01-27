@@ -12,9 +12,31 @@ import {
   Typography,
   Tooltip,
 } from "@mui/material";
-import { Delete, Edit, Save, Cancel, CloudUpload } from "@mui/icons-material";
+import {
+  Edit,
+  Save,
+  Cancel,
+  CloudUpload,
+  DeleteOutline,
+} from "@mui/icons-material";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const UploadButton = ({ onUpload, cd_produto, hasArt }: any) => (
+  <IconButton
+    component="label"
+    size="small"
+    color={hasArt ? "primary" : "default"}
+  >
+    <CloudUpload fontSize="inherit" />
+    <input
+      type="file"
+      hidden
+      accept="image/*"
+      onChange={(e) => onUpload(e.target.files?.[0], cd_produto)}
+    />
+  </IconButton>
+);
 
 function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
   // Estado para saber qual linha está em edição
@@ -32,9 +54,13 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
   };
 
   return (
-    <TableContainer component={Paper} variant="outlined">
+    <TableContainer
+      component={Paper}
+      variant="outlined"
+      style={{ maxWidth: "1050px" }}
+    >
       <Table size="small">
-        <TableHead className="bg-gray-100">
+        <TableHead className="bg-gray-50">
           <TableRow>
             <TableCell>Produto</TableCell>
             <TableCell align="center" width="100">
@@ -67,7 +93,7 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                       <Typography
                         variant="caption"
                         color="textSecondary"
-                        className="italic bg-yellow-50 px-1 rounded w-fit"
+                        className="italic bg-pink-50 px-1 rounded w-fit"
                       >
                         Obs: {item.ds_observacoes_item}
                       </Typography>
@@ -114,7 +140,7 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                 </TableCell>
 
                 <TableCell align="right">
-                  R${" "}
+                  R$
                   {(
                     (isEditing
                       ? editData.vl_unitario_praticado
@@ -141,45 +167,21 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                                 ? item.ds_caminho_arte
                                 : `${API_URL}${item.ds_caminho_arte}`
                             }
-                            className="w-12 h-12 object-cover rounded shadow-sm cursor-zoom-in hover:opacity-80 transition-opacity border"
+                            className="w-16 h-16 object-cover rounded-lg shadow-sm border-2 border-transparent hover:border-pink-400 transition-all cursor-zoom-in"
                           />
                         </Tooltip>
                       </a>
-
-                      <IconButton
-                        component="label"
-                        size="small"
-                        color="primary"
-                      >
-                        <CloudUpload fontSize="inherit" />
-                        <input
-                          type="file"
-                          hidden
-                          accept="image/*"
-                          onChange={(e) =>
-                            onUpload(e.target.files?.[0], item.cd_produto)
-                          }
-                        />
-                      </IconButton>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center gap-1">
-                      <Typography variant="caption" color="textSecondary">
-                        Sem arte
-                      </Typography>
-                      <IconButton component="label" size="small">
-                        <CloudUpload fontSize="inherit" />
-                        <input
-                          type="file"
-                          hidden
-                          accept="image/*"
-                          onChange={(e) =>
-                            onUpload(e.target.files?.[0], item.cd_produto)
-                          }
-                        />
-                      </IconButton>
-                    </div>
+                    <Typography variant="caption" color="textSecondary">
+                      Sem arte
+                    </Typography>
                   )}
+                  <UploadButton
+                    onUpload={onUpload}
+                    cd_produto={item.cd_produto}
+                    hasArt={!!item.ds_caminho_arte}
+                  />
                 </TableCell>
 
                 <TableCell align="center">
@@ -200,17 +202,17 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                     <>
                       <IconButton
                         onClick={() => startEdit(item)}
-                        color="info"
                         size="small"
+                        className="group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
                       >
                         <Edit fontSize="small" />
                       </IconButton>
                       <IconButton
                         onClick={() => onRemove(item.cd_produto)}
-                        color="error"
                         size="small"
+                        className="group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
                       >
-                        <Delete fontSize="small" />
+                        <DeleteOutline fontSize="small" />
                       </IconButton>
                     </>
                   )}

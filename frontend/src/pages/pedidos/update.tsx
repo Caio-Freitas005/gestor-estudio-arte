@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { Typography, Alert } from "@mui/material";
-import OrderForm from "./components/OrderForm";
 import { UpdateLoaderData } from "./orders.data";
+import OrderForm from "./components/OrderForm";
 
 function OrderUpdatePage() {
   const { pedido, clientes, produtos } = useLoaderData() as UpdateLoaderData;
@@ -10,7 +10,7 @@ function OrderUpdatePage() {
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <Typography variant="h4" className="text-gray-800 font-bold">
-          Pedido #{pedido.cd_pedido}
+          Pedido <span className="text-pink-500">#{pedido.cd_pedido}</span>
         </Typography>
         <span className={`px-3 py-1 rounded-full text-sm font-semibold 
           ${pedido.ds_status === 'Concluído' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
