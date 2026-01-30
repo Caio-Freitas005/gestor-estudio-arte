@@ -4,6 +4,7 @@ import { useLoaderData, Link, useNavigate } from "react-router";
 import { Edit, ReceiptLong } from "@mui/icons-material";
 import { PedidoPublic, StatusPedido } from "../../types/pedido.types";
 import { ProdutoPublic } from "../../types/produto.types";
+import { formatDate } from "../../utils/format.utils";
 
 import {
   Table,
@@ -119,9 +120,7 @@ function OrdersListPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-600 font-medium text-sm">
-                    {new Date(order.dt_pedido).toLocaleDateString("pt-BR", {
-                      timeZone: "UTC",
-                    })}
+                    {formatDate(order.dt_pedido)}
                   </TableCell>
                   <TableCell>
                     <span className="font-semibold text-gray-800">

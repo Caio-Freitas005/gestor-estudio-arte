@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ClientePublic } from "../../types/cliente.types";
 import { Link, useLoaderData, useFetcher } from "react-router";
+import { formatPhone,formatDate } from "../../utils/format.utils";
 
 import {
   Table,
@@ -23,16 +24,6 @@ import {
 
 import PageHeader from "../../components/PageHeader";
 import DeleteDialog from "../../components/DeleteDialog";
-
-const formatPhone = (phone: string | undefined): string => {
-  if (!phone) return "";
-  const cleaned = phone.replace(/\D/g, "");
-  const match = cleaned.match(/^(\d{2})(\d{4,5})(\d{4})$/);
-  if (match) {
-    return `(${match[1]}) ${match[2]}-${match[3]}`;
-  }
-  return phone;
-};
 
 function ClientsListPage() {
   const clients = (useLoaderData() as ClientePublic[]) || [];
@@ -136,10 +127,7 @@ function ClientsListPage() {
                   </TableCell>
                   <TableCell className="text-gray-600 font-medium text-sm">
                     {client.dt_nascimento
-                      ? new Date(client.dt_nascimento).toLocaleDateString(
-                          "pt-BR",
-                          { timeZone: "UTC" }
-                        )
+                      ? formatDate(client.dt_nascimento)
                       : "-"}
                   </TableCell>
                   <TableCell align="center">

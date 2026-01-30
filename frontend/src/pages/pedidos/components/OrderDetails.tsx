@@ -1,6 +1,7 @@
 import { PedidoPublic } from "../../../types/pedido.types";
 import { ProdutoPublic } from "../../../types/produto.types";
 import { statusStyles } from "..";
+import { formatPhone, formatDate } from "../../../utils/format.utils";
 
 import {
   Box,
@@ -79,7 +80,7 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
             >
               <LocalPhone sx={{ fontSize: 16 }} />
               <Typography variant="body2">
-                {order.cliente?.cd_telefone || "Sem contato"}
+                {formatPhone(order.cliente?.cd_telefone) || "Sem contato"}
               </Typography>
             </Stack>
 
@@ -92,13 +93,8 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
               >
                 <Cake sx={{ fontSize: 16 }} />
                 <Typography variant="body2" className="!font-medium">
-                  Nascimento:{" "}
-                  {new Date(order.cliente.dt_nascimento).toLocaleDateString(
-                    "pt-BR",
-                    {
-                      timeZone: "UTC",
-                    }
-                  )}
+                  Nascimento:
+                  {formatDate(order.cliente.dt_nascimento)}
                 </Typography>
               </Stack>
             )}
@@ -221,7 +217,7 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
                 variant="body1"
                 className="!text-slate-700 !font-medium"
               >
-                {new Date(order.dt_pedido).toLocaleDateString("pt-BR")}
+                {formatDate(order.dt_pedido)}
               </Typography>
             </Box>
             <Box className="text-right">

@@ -80,7 +80,7 @@ function ProductsListPage() {
             ) : (
               products.map((product) => (
                 <TableRow
-                  key={product.cd_produto}
+                  key={product.id}
                   className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
                 >
                   <TableCell>
@@ -90,24 +90,24 @@ function ProductsListPage() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold text-gray-800 leading-tight">
-                          {product.nm_produto}
+                          {product.nome}
                         </span>
                         <span className="text-[10px] text-gray-400 italic">
-                          {product.ds_produto || "Sem descrição"}
+                          {product.descricao || "Sem descrição"}
                         </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={product.ds_unidade_medida || "UN"}
+                      label={product.unidade_medida || "UN"}
                       size="small"
                       className="!bg-gray-100 !text-gray-600 !font-black !text-[9px] !rounded-md"
                     />
                   </TableCell>
                   <TableCell align="right">
                     <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-50 text-sm">
-                      R$ {Number(product.vl_base).toFixed(2)}
+                      R$ {Number(product.preco_base).toFixed(2)}
                     </span>
                   </TableCell>
                   <TableCell align="center">
@@ -115,7 +115,7 @@ function ProductsListPage() {
                       <Tooltip title="Editar">
                         <IconButton
                           component={Link}
-                          to={`${product.cd_produto}`}
+                          to={`${product.id}`}
                           size="small"
                           className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
                         >
@@ -126,7 +126,7 @@ function ProductsListPage() {
                         <IconButton
                           size="small"
                           className="opacity-0 group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
-                          onClick={() => setDeleteId(product.cd_produto)}
+                          onClick={() => setDeleteId(product.id)}
                         >
                           <DeleteOutline fontSize="small" />
                         </IconButton>
