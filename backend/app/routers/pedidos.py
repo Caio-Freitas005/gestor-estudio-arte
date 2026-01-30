@@ -5,6 +5,7 @@ from fastapi import APIRouter, File, UploadFile, status
 from ..config import SessionDep
 from ..models import (
     ItemPedidoInput,
+    ItemPedidoUpdate,
     Pedido,
     PedidoCreate,
     PedidoPublic,
@@ -47,6 +48,14 @@ async def add_item_to_order(
 ) -> Pedido:
     """Adiciona um novo produto ao pedido e recalcula o total."""
     return pedido_service.add_item(session, pedido_id, item)
+
+
+@router.patch("/{pedido_id}/itens/{produto_id}", response_model=PedidoPublic)
+async def update_item_in_order(
+    pedido_id: int, produto_id: int, item: ItemPedidoUpdate, session: SessionDep
+) -> Pedido:
+    """Atualiza quantidade ou valor de um item específico do pedido."""
+    return pedido_service.update_item(session, pedido_id, produto_id, item)
 
 
 @router.delete("/{pedido_id}/itens/{produto_id}", response_model=PedidoPublic)

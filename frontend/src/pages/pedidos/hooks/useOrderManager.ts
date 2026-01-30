@@ -18,13 +18,6 @@ export function useOrderManager(
     new Map()
   );
 
-  // Sincroniza itens ao editar
-  useEffect(() => {
-    if (!isEditing && defaultValues?.itens) {
-      setLocalItems(defaultValues.itens.map((it) => ({ ...it })));
-    }
-  }, [defaultValues, isEditing]);
-
   const addItem = (newItem: ItemPedidoInput) => {
     if (isEditing) {
       fetcher.submit(
@@ -53,7 +46,7 @@ export function useOrderManager(
 
   const updateItem = (updatedItem: any) => {
     if (isEditing) {
-      submit(
+      fetcher.submit(
         { intent: "update_item", ...updatedItem },
         { method: "post", encType: "application/json" }
       );

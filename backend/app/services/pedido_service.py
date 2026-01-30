@@ -13,6 +13,7 @@ from ..models import (
     Cliente,
     ItemPedido,
     ItemPedidoInput,
+    ItemPedidoUpdate,
     Pedido,
     PedidoCreate,
     PedidoUpdate,
@@ -129,6 +130,26 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         session.commit()
         self.update_total(session, db_pedido)
         return self.get_by_id_detailed(session, pedido_id)
+
+    def update_item(
+        self, session: Session, pedido_id: int, produto_id: int, item: ItemPedidoUpdate
+    ) -> Pedido:
+        """Atualiza a quantidade ou preço de um item e recalcula o total do pedido."""
+        # Busca o item específico (chave composta)
+        db_item = self.get_item_or_404(session, pedido_id, produto_id)
+
+        # Aplica as atualizações parciais
+        item_data = item.model_dump(exclude_unset=True)
+        db_item.sqlmodel_update(item_data)
+
+        session.add(db_item)
+        session.commit()
+
+        # Busca o pedido detalhado para garantir que o total seja recalculado
+        db_pedido = self.get_by_id_detailed(session, pedido_id)
+        self.update_total(session, db_pedido)
+
+        return db_pedido
 
     def remove_item(self, session: Session, pedido_id: int, produto_id: int) -> Pedido:
         """Remove item com trava de segurança para pedido vazio."""
