@@ -3,6 +3,7 @@
 // backend/app/models/item_pedido.py
 
 import { ClientePublic } from "./cliente.types";
+import { ProdutoPublic } from "./produto.types";
 
 export enum StatusPedido {
   AGUARDANDO_PAGAMENTO = "Aguardando Pagamento",
@@ -14,49 +15,50 @@ export enum StatusPedido {
 }
 
 export interface ItemPedidoInput {
-  cd_produto: number;
-  qt_produto: number;
-  ds_observacoes_item?: string | null;
-  ds_caminho_arte?: string | null;
-  vl_unitario_praticado?: number;
+  produto_id: number;
+  quantidade: number;
+  observacoes?: string | null;
+  caminho_arte?: string | null;
+  preco_unitario?: number;
 }
 
 export interface ItemPedidoUpdate {
-  qt_produto?: number;
-  vl_unitario_praticado?: number;
-  ds_observacoes_item?: string | null;
-  ds_caminho_arte?: string | null;
+  quantidade?: number;
+  preco_unitario?: number;
+  observacoes?: string | null;
+  caminho_arte?: string | null;
 }
 
 export interface ItemPedidoPublic {
-  cd_produto: number;
-  qt_produto: number;
-  vl_unitario_praticado: number;
-  ds_observacoes_item?: string | null;
-  ds_caminho_arte?: string | null;
-  vl_total_item?: number;
+  produto_id: number;
+  quantidade: number;
+  preco_unitario: number;
+  observacoes?: string | null;
+  caminho_arte?: string | null;
+  valor_total?: number;
 }
 
 export interface PedidoBase {
-  dt_pedido: string;
-  ds_status: StatusPedido;
-  vl_total_pedido: number;
-  cd_cliente: number;
-  ds_observacoes?: string | null;
+  data_pedido: string;
+  status: StatusPedido;
+  observacoes?: string | null;
+  total: number;
+  cliente_id: number;
 }
 
 export interface PedidoCreate {
-  cd_cliente: number;
-  dt_pedido?: string;
-  ds_status?: StatusPedido;
-  ds_observacoes?: string;
+  cliente_id: number;
+  data_pedido?: string;
+  status?: StatusPedido;
+  observacoes?: string;
   itens: ItemPedidoInput[];
 }
 
 export interface PedidoPublic extends PedidoBase {
-  cd_pedido: number;
+  id: number;
   cliente?: ClientePublic | null;
   itens: ItemPedidoPublic[]; 
+  produtos: ProdutoPublic[];
 }
 
 export interface PedidoUpdate extends Partial<PedidoBase> {

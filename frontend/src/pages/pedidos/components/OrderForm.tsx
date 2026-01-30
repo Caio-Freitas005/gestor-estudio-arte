@@ -15,7 +15,7 @@ interface OrderFormProps {
 }
 
 function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
-  const isEditing = !!defaultValues?.cd_pedido;
+  const isEditing = !!defaultValues?.id;
   const {
     localItems,
     addItem,
@@ -42,14 +42,14 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
         <TextField
           select
           label="Cliente"
-          name="cd_cliente"
-          defaultValue={defaultValues?.cd_cliente || ""}
+          name="cliente_id"
+          defaultValue={defaultValues?.cliente_id || ""}
           size="small"
           required
         >
           {clientes.map((c) => (
-            <MenuItem key={c.cd_cliente} value={c.cd_cliente}>
-              {c.nm_cliente}
+            <MenuItem key={c.id} value={c.id}>
+              {c.nome}
             </MenuItem>
           ))}
         </TextField>
@@ -57,10 +57,10 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
         <TextField
           label="Data"
           type="date"
-          name="dt_pedido"
+          name="data_pedido"
           defaultValue={
-            defaultValues?.dt_pedido
-              ? new Date(defaultValues.dt_pedido).toISOString().split("T")[0]
+            defaultValues?.data_pedido
+              ? new Date(defaultValues.data_pedido).toISOString().split("T")[0]
               : new Date().toISOString().split("T")[0]
           }
           size="small"
@@ -76,8 +76,8 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
         <TextField
           select
           label="Status"
-          name="ds_status"
-          defaultValue={defaultValues?.ds_status || "Aguardando Pagamento"}
+          name="status"
+          defaultValue={defaultValues?.status || "Aguardando Pagamento"}
           size="small"
           required
         >
@@ -90,17 +90,14 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
 
         <TextField
           label="Observações"
-          name="ds_observacoes"
-          defaultValue={defaultValues?.ds_observacoes}
+          name="observacoes"
+          defaultValue={defaultValues?.observacoes}
           size="small"
           multiline
         />
       </FormSection>
 
-      <AddItemRow
-        produtos={produtos}
-        onAdd={addItem}
-      />
+      <AddItemRow produtos={produtos} onAdd={addItem} />
 
       <ItemTable
         items={displayItems}

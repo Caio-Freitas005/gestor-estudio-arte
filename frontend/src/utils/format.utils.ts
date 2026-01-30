@@ -6,10 +6,14 @@ export function formatPhone(phone: string | undefined): string {
     return `(${match[1]}) ${match[2]}-${match[3]}`;
   }
   return phone;
-};
+}
 
 export function formatDate(date: string | undefined): string {
   return new Date(date).toLocaleDateString("pt-BR", {
     timeZone: "UTC",
   });
+}
+
+export function formatNumber(number: number | undefined): any {
+  return Number(number).toFixed(2);
 }

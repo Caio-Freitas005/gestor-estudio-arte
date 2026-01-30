@@ -11,29 +11,29 @@ interface AddItemRowProps {
 
 function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
   const [tempItem, setTempItem] = useState({
-    cd_produto: "" as any,
-    qt_produto: 1,
-    ds_observacoes_item: "",
-    vl_unitario_praticado: 0,
+    produto_id: "" as any,
+    quantidade: 1,
+    observacoes: "",
+    preco_unitario: 0,
   });
 
   const handleProductChange = (id: number) => {
-    const prod = produtos.find((p) => p.cd_produto === id);
+    const prod = produtos.find((p) => p.id === id);
     setTempItem({
       ...tempItem,
-      cd_produto: id,
-      vl_unitario_praticado: prod ? Number(prod.vl_base) : 0,
+      produto_id: id,
+      preco_unitario: prod ? Number(prod.preco_base) : 0,
     });
   };
 
   const submitAdd = () => {
-    if (!tempItem.cd_produto) return;
+    if (!tempItem.produto_id) return;
     onAdd(tempItem as ItemPedidoInput);
     setTempItem({
-      cd_produto: "",
-      qt_produto: 1,
-      ds_observacoes_item: "",
-      vl_unitario_praticado: 0,
+      produto_id: "",
+      quantidade: 1,
+      observacoes: "",
+      preco_unitario: 0,
     });
   };
 
@@ -42,14 +42,14 @@ function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
       <TextField
         select
         label="Produto"
-        value={tempItem.cd_produto}
+        value={tempItem.produto_id}
         onChange={(e) => handleProductChange(Number(e.target.value))}
         size="small"
         sx={{ width: 200 }}
       >
         {produtos.map((p) => (
-          <MenuItem key={p.cd_produto} value={p.cd_produto}>
-            {p.nm_produto}
+          <MenuItem key={p.id} value={p.id}>
+            {p.nome}
           </MenuItem>
         ))}
       </TextField>
@@ -57,9 +57,9 @@ function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
       <TextField
         label="Qtd"
         type="number"
-        value={tempItem.qt_produto}
+        value={tempItem.quantidade}
         onChange={(e) =>
-          setTempItem({ ...tempItem, qt_produto: Number(e.target.value) })
+          setTempItem({ ...tempItem, quantidade: Number(e.target.value) })
         }
         size="small"
         sx={{ width: 80 }}
@@ -68,11 +68,11 @@ function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
       <TextField
         label="Valor Unitário"
         type="number"
-        value={tempItem.vl_unitario_praticado}
+        value={tempItem.preco_unitario}
         onChange={(e) =>
           setTempItem({
             ...tempItem,
-            vl_unitario_praticado: Number(e.target.value),
+            preco_unitario: Number(e.target.value),
           })
         }
         size="small"
@@ -81,9 +81,9 @@ function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
 
       <TextField
         label="Observação"
-        value={tempItem.ds_observacoes_item}
+        value={tempItem.observacoes}
         onChange={(e) =>
-          setTempItem({ ...tempItem, ds_observacoes_item: e.target.value })
+          setTempItem({ ...tempItem, observacoes: e.target.value })
         }
         size="small"
         sx={{ flexGrow: 0.3 }}
@@ -93,7 +93,7 @@ function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
       <Button
         variant="contained"
         onClick={submitAdd}
-        disabled={!tempItem.cd_produto}
+        disabled={!tempItem.produto_id}
       >
         Adicionar
       </Button>

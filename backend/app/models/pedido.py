@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from decimal import Decimal
 from enum import Enum
 from typing import TYPE_CHECKING
@@ -14,10 +14,10 @@ if TYPE_CHECKING:
 
 
 class ItemPedidoInput(SQLModel):
-    cd_produto: int
-    qt_produto: int
-    ds_observacoes_item: str | None = None
-    vl_unitario_praticado: Decimal | None = None
+    produto_id: int
+    quantidade: int
+    observacoes: str | None = None
+    preco_unitario: Decimal | None = None
 
 
 class StatusPedido(str, Enum):
@@ -30,19 +30,19 @@ class StatusPedido(str, Enum):
 
 
 class PedidoBase(SQLModel):
-    dt_pedido: datetime = Field(default_factory=datetime.now)
-    ds_status: str = Field(default=StatusPedido.AGUARDANDO_PAGAMENTO)
-    ds_observacoes: str | None = None
-    vl_total_pedido: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
-    cd_cliente: int = Field(foreign_key="cliente.cd_cliente")
+    data_pedido: date = Field(default_factory=date.today)
+    status: str = Field(default=StatusPedido.AGUARDANDO_PAGAMENTO)
+    observacoes: str | None = None
+    total: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
+    cliente_id: int = Field(foreign_key="cliente.id")
 
 
 class Pedido(PedidoBase, table=True):
-    cd_pedido: int | None = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
 
     cliente: "Cliente" = Relationship(back_populates="pedidos")
 
-    # Acesso à tabela associativa (para ler qt_produto, arte, etc)
+    # Acesso à tabela associativa (para ler quantidade de produto, arte, etc)
     itens: list[ItemPedido] = Relationship(
         back_populates="pedido",
         sa_relationship_kwargs={"cascade": "all, delete-orphan"},
@@ -55,18 +55,18 @@ class Pedido(PedidoBase, table=True):
 
 
 class PedidoCreate(PedidoBase):
-    cd_cliente: int
+    cliente_id: int
     itens: list[ItemPedidoInput] = []
 
 
 class PedidoPublic(PedidoBase):
-    cd_pedido: int
+    id: int
     cliente: ClientePublic | None = None
     itens: list[ItemPedidoPublic] = []
 
 
 class PedidoUpdate(SQLModel):
-    dt_pedido: datetime | None = None
-    ds_status: StatusPedido | None = None
-    ds_observacoes: str | None = None
-    cd_cliente: int | None = None
+    data_pedido: date | None = None
+    status: StatusPedido | None = None
+    observacoes: str | None = None
+    cliente_id: int | None = None

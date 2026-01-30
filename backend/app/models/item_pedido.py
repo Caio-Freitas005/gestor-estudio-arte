@@ -9,15 +9,15 @@ if TYPE_CHECKING:
 
 
 class ItemPedidoBase(SQLModel):
-    qt_produto: int = Field(default=1, ge=1)
-    vl_unitario_praticado: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
-    ds_caminho_arte: str | None = Field(default=None)
-    ds_observacoes_item: str | None = Field(default=None)
-    cd_pedido: int | None = Field(
-        default=None, foreign_key="pedido.cd_pedido", primary_key=True
+    quantidade: int = Field(default=1, ge=1)
+    preco_unitario: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
+    caminho_arte: str | None = Field(default=None)
+    observacoes: str | None = Field(default=None)
+    pedido_id: int | None = Field(
+        default=None, foreign_key="pedido.id", primary_key=True
     )
-    cd_produto: int | None = Field(
-        default=None, foreign_key="produto.cd_produto", primary_key=True
+    produto_id: int | None = Field(
+        default=None, foreign_key="produto.id", primary_key=True
     )
 
 
@@ -33,13 +33,13 @@ class ItemPedidoCreate(ItemPedidoBase):
 
 
 class ItemPedidoPublic(ItemPedidoBase):
-    vl_total_item: Decimal | None = None
+    valor_total: Decimal | None = None
 
 
 class ItemPedidoUpdate(SQLModel):
-    qt_produto: int | None = Field(default=None, ge=1)
-    vl_unitario_praticado: Decimal | None = Field(
+    quantidade: int | None = Field(default=None, ge=1)
+    preco_unitario: Decimal | None = Field(
         default=None, max_digits=10, decimal_places=2
     )
-    ds_caminho_arte: str | None = None
-    ds_observacoes_item: str | None = None
+    caminho_arte: str | None = None
+    observacoes: str | None = None

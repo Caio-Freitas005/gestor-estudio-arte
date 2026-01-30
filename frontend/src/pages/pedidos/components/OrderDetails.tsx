@@ -1,7 +1,11 @@
 import { PedidoPublic } from "../../../types/pedido.types";
 import { ProdutoPublic } from "../../../types/produto.types";
 import { statusStyles } from "..";
-import { formatPhone, formatDate } from "../../../utils/format.utils";
+import {
+  formatPhone,
+  formatDate,
+  formatNumber,
+} from "../../../utils/format.utils";
 
 import {
   Box,
@@ -19,13 +23,18 @@ import FormSection from "../../../components/FormSection";
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface OrderDetailsProps {
-  order: PedidoPublic;
+  pedido: PedidoPublic;
   produtos: ProdutoPublic[];
   onClose: () => void;
   onEdit: (id: number) => void;
 }
 
-function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
+function OrderDetails({
+  pedido,
+  produtos,
+  onClose,
+  onEdit,
+}: OrderDetailsProps) {
   return (
     <Box sx={{ width: "100%", p: 3, bgcolor: "#FDF2F8", minHeight: "100vh" }}>
       <Stack
@@ -39,13 +48,13 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
             <Receipt fontSize="small" />
           </div>
           <Typography variant="h6" className="!font-bold !text-slate-800">
-            Pedido #{order.cd_pedido}
+            Pedido #{pedido.id}
           </Typography>
         </Stack>
         <Stack direction="row" spacing={1}>
           <Tooltip title="Editar Pedido">
             <IconButton
-              onClick={() => onEdit(order.cd_pedido)}
+              onClick={() => onEdit(pedido.id)}
               className="!text-pink-600 hover:!bg-pink-50"
             >
               <Edit />
@@ -58,17 +67,17 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
       </Stack>
 
       <Chip
-        label={order.ds_status}
+        label={pedido.status}
         variant="outlined"
         className={`${
-          statusStyles[order.ds_status] || "!bg-gray-50"
+          statusStyles[pedido.status] || "!bg-gray-50"
         } !font-black !border !text-[10px] !uppercase !tracking-widest !rounded-md !mb-6`}
       />
 
       <Stack spacing={3}>
         <FormSection title="Dados do Cliente">
           <Typography variant="body1" className="!font-bold !text-slate-700">
-            {order.cliente?.nm_cliente || "Cliente não identificado"}
+            {pedido.cliente?.nome || "Cliente não identificado"}
           </Typography>
 
           <Stack spacing={0.5} className="mt-2">
@@ -80,11 +89,11 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
             >
               <LocalPhone sx={{ fontSize: 16 }} />
               <Typography variant="body2">
-                {formatPhone(order.cliente?.cd_telefone) || "Sem contato"}
+                {formatPhone(pedido.cliente?.telefone) || "Sem contato"}
               </Typography>
             </Stack>
 
-            {order.cliente?.dt_nascimento && (
+            {pedido.cliente?.data_nascimento && (
               <Stack
                 direction="row"
                 spacing={1}
@@ -93,8 +102,8 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
               >
                 <Cake sx={{ fontSize: 16 }} />
                 <Typography variant="body2" className="!font-medium">
-                  Nascimento:
-                  {formatDate(order.cliente.dt_nascimento)}
+                  Nascimento: {" "}
+                  {formatDate(pedido.cliente.data_nascimento)}
                 </Typography>
               </Stack>
             )}
@@ -103,13 +112,11 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
 
         <FormSection title="Itens e Observações">
           <div className="flex flex-col">
-            {order.itens.map((item, index) => {
-              const produto = produtos?.find(
-                (p) => p.cd_produto === item.cd_produto
-              );
-              const imgUrl = item.ds_caminho_arte?.startsWith("blob:")
-                ? item.ds_caminho_arte
-                : `${API_URL}${item.ds_caminho_arte}`;
+            {pedido.itens.map((item, index) => {
+              const produto = produtos?.find((p) => p.id === item.produto_id);
+              const imgUrl = item.caminho_arte?.startsWith("blob:")
+                ? item.caminho_arte
+                : `${API_URL}${item.caminho_arte}`;
 
               return (
                 <div
@@ -118,7 +125,7 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
                 >
                   <div className="flex gap-4 items-start">
                     <div className="shrink-0">
-                      {item.ds_caminho_arte ? (
+                      {item.caminho_arte ? (
                         <a
                           href={imgUrl}
                           target="_blank"
@@ -145,17 +152,15 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
                           variant="subtitle1"
                           className="!font-bold !text-slate-800 !leading-tight truncate-multiline"
                         >
-                          {produto?.nm_produto || `Produto #${item.cd_produto}`}
+                          {produto?.nome || `Produto #${item.produto_id}`}
                         </Typography>
 
                         <Typography
                           variant="body1"
                           className="!font-black !text-pink-600 shrink-0"
                         >
-                          R$
-                          {(
-                            item.qt_produto * Number(item.vl_unitario_praticado)
-                          ).toFixed(2)}
+                          R${" "}
+                          {formatNumber(item.quantidade * item.preco_unitario)}
                         </Typography>
                       </div>
 
@@ -163,13 +168,13 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
                         variant="body1"
                         className="!text-slate-500 !mt-2"
                       >
-                        {item.qt_produto} unid. x R$
-                        {Number(item.vl_unitario_praticado).toFixed(2)}
+                        {item.quantidade} unid. x R${" "}
+                        {formatNumber(item.preco_unitario)}
                       </Typography>
                     </div>
                   </div>
 
-                  {item.ds_observacoes_item && (
+                  {item.observacoes && (
                     <div className="mt-3 bg-white p-3 rounded-xl border border-pink-100 shadow-sm w-full overflow-hidden">
                       <Typography
                         variant="caption"
@@ -181,7 +186,7 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
                         variant="body2"
                         className="!text-slate-700 !italic !whitespace-pre-wrap !break-words"
                       >
-                        {item.ds_observacoes_item}
+                        {item.observacoes}
                       </Typography>
                     </div>
                   )}
@@ -196,7 +201,7 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
             variant="body2"
             className="!text-slate-600 !mb-4 !whitespace-pre-wrap !break-words"
           >
-            {order.ds_observacoes || "Nenhuma observação geral."}
+            {pedido.observacoes || "Nenhuma observação geral."}
           </Typography>
 
           <Divider className="!my-4" />
@@ -217,7 +222,7 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
                 variant="body1"
                 className="!text-slate-700 !font-medium"
               >
-                {formatDate(order.dt_pedido)}
+                {formatDate(pedido.data_pedido)}
               </Typography>
             </Box>
             <Box className="text-right">
@@ -228,7 +233,7 @@ function OrderDetails({ order, produtos, onClose, onEdit }: OrderDetailsProps) {
                 Valor Total
               </Typography>
               <Typography variant="h5" className="!font-black !text-pink-600">
-                R$ {Number(order.vl_total_pedido).toFixed(2)}
+                R$ {formatNumber(pedido.total)}
               </Typography>
             </Box>
           </Stack>

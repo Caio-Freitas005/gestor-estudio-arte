@@ -36,17 +36,17 @@ export function useOrderManager(
     }
   };
 
-  const removeItem = (cd_produto: number) => {
+  const removeItem = (produto_id: number) => {
     if (isEditing) {
       if (confirm("Deseja remover este item do pedido?")) {
         fetcher.submit(
-          { intent: "remove_item", cd_produto },
+          { intent: "remove_item", produto_id },
           { method: "post", encType: "application/json" }
         );
       }
     } else {
       setLocalItems((prev) =>
-        prev.filter((it) => it.cd_produto !== cd_produto)
+        prev.filter((it) => it.produto_id !== produto_id)
       );
     }
   };
@@ -60,7 +60,7 @@ export function useOrderManager(
     } else {
       setLocalItems((prev) =>
         prev.map((it) =>
-          it.cd_produto === updatedItem.cd_produto ? updatedItem : it
+          it.produto_id === updatedItem.produto_id ? updatedItem : it
         )
       );
     }
@@ -70,7 +70,7 @@ export function useOrderManager(
     const headerData = cleanFormData<any>(formData);
     if (isEditing) {
       submit(
-        { ...headerData, cd_cliente: Number(headerData.cd_cliente) },
+        { ...headerData, cliente_id: Number(headerData.cliente_id) },
         { method: "post", encType: "application/json" }
       );
     } else {
@@ -79,8 +79,8 @@ export function useOrderManager(
         "orderData",
         JSON.stringify({
           ...headerData,
-          cd_cliente: Number(headerData.cd_cliente),
-          itens: localItems.map(({ ds_caminho_arte, ...rest }) => rest),
+          cliente_id: Number(headerData.cliente_id),
+          itens: localItems.map(({ caminho_arte, ...rest }) => rest),
         })
       );
       pendingFiles.forEach((file, id) => finalData.append(`file_${id}`, file));
@@ -88,22 +88,22 @@ export function useOrderManager(
     }
   };
 
-  const handleUpload = (file: File, cd_produto: number) => {
+  const handleUpload = (file: File, produto_id: number) => {
     if (isEditing) {
       const fd = new FormData();
       fd.append("file", file);
       fetcher.submit(fd, {
         method: "post",
-        action: `/pedidos/${defaultValues?.cd_pedido}/itens/${cd_produto}/upload-arte`,
+        action: `/pedidos/${defaultValues?.id}/itens/${produto_id}/upload-arte`,
         encType: "multipart/form-data",
       });
     } else {
       const previewUrl = URL.createObjectURL(file);
-      setPendingFiles(new Map(pendingFiles.set(cd_produto, file)));
+      setPendingFiles(new Map(pendingFiles.set(produto_id, file)));
       setLocalItems((prev) =>
         prev.map((it) =>
-          it.cd_produto === cd_produto
-            ? { ...it, ds_caminho_arte: previewUrl }
+          it.produto_id === produto_id
+            ? { ...it, caminho_arte: previewUrl }
             : it
         )
       );

@@ -21,22 +21,22 @@ async def get_all_clients(session: SessionDep) -> Sequence[Cliente]:
     return cliente_service.get_all(session)
 
 
-@router.get("/{cd_cliente}", response_model=ClientePublic)
-async def get_client_by_id(cd_cliente: int, session: SessionDep) -> Cliente:
+@router.get("/{id}", response_model=ClientePublic)
+async def get_client_by_id(id: int, session: SessionDep) -> Cliente:
     """Busca um cliente por ID se existir"""
-    return cliente_service.get_or_404(session, cd_cliente)
+    return cliente_service.get_or_404(session, id)
 
 
-@router.patch("/{cd_cliente}", response_model=ClientePublic)
+@router.patch("/{id}", response_model=ClientePublic)
 async def update_client(
-    cd_cliente: int, cliente: ClienteUpdate, session: SessionDep
+    id: int, cliente: ClienteUpdate, session: SessionDep
 ) -> Cliente:
     """Atualiza dados de um cliente de forma parcial."""
-    return cliente_service.update(session, cd_cliente, cliente)
+    return cliente_service.update(session, id, cliente)
 
 
-@router.delete("/{cd_cliente}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_client(cd_cliente: int, session: SessionDep):
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_client(id: int, session: SessionDep):
     """Remove um cliente."""
-    cliente_service.delete(session, cd_cliente)
+    cliente_service.delete(session, id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

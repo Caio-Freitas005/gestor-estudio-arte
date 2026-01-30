@@ -4,7 +4,7 @@ import { useLoaderData, Link, useNavigate } from "react-router";
 import { Edit, ReceiptLong } from "@mui/icons-material";
 import { PedidoPublic, StatusPedido } from "../../types/pedido.types";
 import { ProdutoPublic } from "../../types/produto.types";
-import { formatDate } from "../../utils/format.utils";
+import { formatDate, formatNumber } from "../../utils/format.utils";
 
 import {
   Table,
@@ -35,16 +35,16 @@ export const statusStyles: Record<string, string> = {
 };
 
 function OrdersListPage() {
-  const { orders, products } = useLoaderData() as {
-    orders: PedidoPublic[];
-    products: ProdutoPublic[];
+  const { pedidos, produtos } = useLoaderData() as {
+    pedidos: PedidoPublic[];
+    produtos: ProdutoPublic[];
   };
 
   const navigate = useNavigate();
   const [selectedOrder, setSelectedOrder] = useState<PedidoPublic | null>(null);
 
-  const handleOpenDetails = (order: PedidoPublic) => {
-    setSelectedOrder(order);
+  const handleOpenDetails = (pedido: PedidoPublic) => {
+    setSelectedOrder(pedido);
   };
 
   const handleCloseDetails = () => {
@@ -92,7 +92,7 @@ function OrdersListPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.length === 0 ? (
+            {pedidos.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -103,9 +103,9 @@ function OrdersListPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map((order) => (
+              pedidos.map((pedido) => (
                 <TableRow
-                  key={order.cd_pedido}
+                  key={pedido.id}
                   className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
                 >
                   <TableCell>
@@ -115,40 +115,40 @@ function OrdersListPage() {
                         fontSize="small"
                       />
                       <span className="font-bold text-gray-700">
-                        #{order.cd_pedido}
+                        #{pedido.id}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-600 font-medium text-sm">
-                    {formatDate(order.dt_pedido)}
+                    {formatDate(pedido.data_pedido)}
                   </TableCell>
                   <TableCell>
                     <span className="font-semibold text-gray-800">
-                      {order.cliente?.nm_cliente || (
+                      {pedido.cliente?.nome || (
                         <span className="text-red-300">Não identificado</span>
                       )}
                     </span>
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={order.ds_status}
+                      label={pedido.status}
                       variant="outlined"
                       size="small"
                       className={`${
-                        statusStyles[order.ds_status] || "!bg-gray-50"
+                        statusStyles[pedido.status] || "!bg-gray-50"
                       } !font-black !border !text-[9px] !uppercase !tracking-widest !rounded-md`}
                     />
                   </TableCell>
                   <TableCell align="right">
                     <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 text-sm">
-                      R$ {Number(order.vl_total_pedido).toFixed(2)}
+                      R$ {formatNumber(pedido.total)}
                     </span>
                   </TableCell>
                   <TableCell align="center">
                     <Tooltip title="Editar Pedido">
                       <IconButton
                         component={Link}
-                        to={`/pedidos/${order.cd_pedido}`}
+                        to={`/pedidos/${pedido.id}`}
                         size="small"
                         className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
                       >
@@ -157,7 +157,7 @@ function OrdersListPage() {
                     </Tooltip>
                     <Tooltip title="Ver Detalhes">
                       <IconButton
-                        onClick={() => handleOpenDetails(order)}
+                        onClick={() => handleOpenDetails(pedido)}
                         size="small"
                         className="opacity-0 group-hover:opacity-100 transition-all !text-blue-600 hover:!bg-pink-100"
                       >
@@ -184,10 +184,10 @@ function OrdersListPage() {
       >
         {selectedOrder && (
           <OrderDetails
-            order={selectedOrder}
+            pedido={selectedOrder}
             onClose={handleCloseDetails}
             onEdit={(id) => navigate(`${id}`)}
-            produtos={products}
+            produtos={produtos}
           />
         )}
       </Drawer>

@@ -7,12 +7,12 @@ import { ProdutoPublic } from "../../types/produto.types";
 import { PedidoPublic, PedidoCreate } from "../../types/pedido.types";
 
 export async function ordersListLoader() {
-  const [orders, products] = await Promise.all([
+  const [pedidos, produtos] = await Promise.all([
     ordersService.getAll(),
     productsService.getAll()
   ]);
 
-  return { orders, products };
+  return { pedidos, produtos };
 }
 
 export type CreateLoaderData = {
@@ -42,7 +42,7 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
     // Percorre o FormData em busca de arquivos pendentes (file_ID)
     for (const [key, value] of formData.entries()) {
       if (key.startsWith("file_") && value instanceof File) {
-        const cd_produto = Number(key.split("_")[1]);
+        const produto_id = Number(key.split("_")[1]);
 
         // Cria um FormData temporário para cada upload
         const fileFormData = new FormData();
@@ -50,8 +50,8 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
 
         // Faz o upload de cada arte vinculando ao novo pedido
         await ordersService.uploadArt(
-          newOrder.cd_pedido,
-          cd_produto,
+          newOrder.id,
+          produto_id,
           fileFormData
         );
       }
@@ -93,9 +93,9 @@ const itemUpdateHandlers: Record<
 > = {
   add_item: (id, payload) => ordersService.addItem(id, payload),
   remove_item: (id, payload) =>
-    ordersService.removeItem(id, payload.cd_produto),
+    ordersService.removeItem(id, payload.produto_id),
   update_item: (id, payload) =>
-    ordersService.updateItem(id, payload.cd_produto, payload),
+    ordersService.updateItem(id, payload.produto_id, payload),
 };
 
 export async function orderUpdateAction({
@@ -103,7 +103,7 @@ export async function orderUpdateAction({
   params,
 }: ActionFunctionArgs) {
   if (!params.id) throw new Error("ID inválido");
-  const cd_pedido = Number(params.id);
+  const id = Number(params.id);
 
   const data = await request.json();
   const { intent, ...payload } = data;
@@ -113,12 +113,12 @@ export async function orderUpdateAction({
     const handler = itemUpdateHandlers[intent];
 
     if (handler) {
-      await handler(cd_pedido, payload);
+      await handler(id, payload);
       return { success: true }; // Retorno para o fetcher não recarregar a página inteira
     }
 
     // Caso não haja intenção específica, é a atualização do cabeçalho do pedido
-    await ordersService.update(cd_pedido, payload);
+    await ordersService.update(id, payload);
     return redirect("/pedidos");
   } catch (err) {
     console.error("Erro na action de pedido:", err);
@@ -130,7 +130,7 @@ export async function orderUploadArtAction({ request, params }) {
   const formData = await request.formData();
   return await ordersService.uploadArt(
     Number(params.id), // 'id' vem da rota pai (:id)
-    Number(params.cd_produto),
+    Number(params.produto_id),
     formData
   );
 }

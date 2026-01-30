@@ -35,8 +35,8 @@ export const orderRoutes = [
         action: orderUpdateAction,
       },
       {
-        path: "itens/:cd_produto/upload-arte",
-        action: orderUploadArtAction
+        path: "itens/:produto_id/upload-arte",
+        action: orderUploadArtAction,
       },
     ],
   },

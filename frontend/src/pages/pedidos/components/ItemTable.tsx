@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { formatNumber } from "../../../utils/format.utils";
+
 import {
   Table,
   TableBody,
@@ -12,6 +14,7 @@ import {
   Typography,
   Tooltip,
 } from "@mui/material";
+
 import {
   Edit,
   Save,
@@ -22,7 +25,7 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const UploadButton = ({ onUpload, cd_produto, hasArt }: any) => (
+const UploadButton = ({ onUpload, produto_id, hasArt }: any) => (
   <IconButton
     component="label"
     size="small"
@@ -33,7 +36,7 @@ const UploadButton = ({ onUpload, cd_produto, hasArt }: any) => (
       type="file"
       hidden
       accept="image/*"
-      onChange={(e) => onUpload(e.target.files?.[0], cd_produto)}
+      onChange={(e) => onUpload(e.target.files?.[0], produto_id)}
     />
   </IconButton>
 );
@@ -44,7 +47,7 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
   const [editData, setEditData] = useState<any>(null);
 
   const startEdit = (item: any) => {
-    setEditId(item.cd_produto);
+    setEditId(item.produto_id);
     setEditData({ ...item });
   };
 
@@ -76,26 +79,26 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
         </TableHead>
         <TableBody>
           {items.map((item: any) => {
-            const isEditing = editId === item.cd_produto;
+            const isEditing = editId === item.produto_id;
             const produto = produtos?.find(
-              (p: any) => p.cd_produto === item.cd_produto
+              (p: any) => p.id === item.produto_id
             );
 
             return (
-              <TableRow key={item.cd_produto}>
+              <TableRow key={item.produto_id}>
                 <TableCell>
                   <div className="flex flex-col">
                     <Typography variant="body2" className="font-medium">
-                      {produto?.nm_produto}
+                      {produto?.nome}
                     </Typography>
 
-                    {item.ds_observacoes_item && (
+                    {item.observacoes && (
                       <Typography
                         variant="caption"
                         color="textSecondary"
                         className="italic bg-pink-50 px-1 rounded w-fit"
                       >
-                        Obs: {item.ds_observacoes_item}
+                        Obs: {item.observacoes}
                       </Typography>
                     )}
                   </div>
@@ -107,16 +110,16 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                       type="number"
                       size="small"
                       variant="standard"
-                      value={editData.qt_produto}
+                      value={editData.quantidade}
                       onChange={(e) =>
                         setEditData({
                           ...editData,
-                          qt_produto: Number(e.target.value),
+                          quantidade: Number(e.target.value),
                         })
                       }
                     />
                   ) : (
-                    item.qt_produto
+                    item.quantidade
                   )}
                 </TableCell>
 
@@ -126,36 +129,36 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                       type="number"
                       size="small"
                       variant="standard"
-                      value={editData.vl_unitario_praticado}
+                      value={editData.preco_unitario}
                       onChange={(e) =>
                         setEditData({
                           ...editData,
-                          vl_unitario_praticado: Number(e.target.value),
+                          preco_unitario: Number(e.target.value),
                         })
                       }
                     />
                   ) : (
-                    `R$ ${Number(item.vl_unitario_praticado).toFixed(2)}`
+                    `R$ ${formatNumber(item.preco_unitario)}`
                   )}
                 </TableCell>
 
                 <TableCell align="right">
                   R$
-                  {(
+                  {formatNumber(
                     (isEditing
-                      ? editData.vl_unitario_praticado
-                      : item.vl_unitario_praticado) *
-                    (isEditing ? editData.qt_produto : item.qt_produto)
-                  ).toFixed(2)}
+                      ? editData.preco_unitario
+                      : item.preco_unitario) *
+                      (isEditing ? editData.quantidade : item.quantidade)
+                  )}
                 </TableCell>
                 <TableCell align="center">
-                  {item.ds_caminho_arte ? (
+                  {item.caminho_arte ? (
                     <div className="flex flex-col items-center gap-1">
                       <a
                         href={
-                          item.ds_caminho_arte.startsWith("blob:")
-                            ? item.ds_caminho_arte
-                            : `${API_URL}${item.ds_caminho_arte}`
+                          item.caminho_arte.startsWith("blob:")
+                            ? item.caminho_arte
+                            : `${API_URL}${item.caminho_arte}`
                         }
                         target="_blank"
                         rel="noreferrer"
@@ -163,9 +166,9 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                         <Tooltip title="Clique para ampliar">
                           <img
                             src={
-                              item.ds_caminho_arte.startsWith("blob:")
-                                ? item.ds_caminho_arte
-                                : `${API_URL}${item.ds_caminho_arte}`
+                              item.caminho_arte.startsWith("blob:")
+                                ? item.caminho_arte
+                                : `${API_URL}${item.caminho_arte}`
                             }
                             className="w-16 h-16 object-cover rounded-lg shadow-sm border-2 border-transparent hover:border-pink-400 transition-all cursor-zoom-in"
                           />
@@ -179,8 +182,8 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                   )}
                   <UploadButton
                     onUpload={onUpload}
-                    cd_produto={item.cd_produto}
-                    hasArt={!!item.ds_caminho_arte}
+                    produto_id={item.produto_id}
+                    hasArt={!!item.caminho_arte}
                   />
                 </TableCell>
 
@@ -208,7 +211,7 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
                         <Edit fontSize="small" />
                       </IconButton>
                       <IconButton
-                        onClick={() => onRemove(item.cd_produto)}
+                        onClick={() => onRemove(item.produto_id)}
                         size="small"
                         className="group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
                       >

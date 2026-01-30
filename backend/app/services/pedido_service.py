@@ -27,40 +27,40 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
 
     def _prepare_item(self, session: Session, item: ItemPedidoInput) -> ItemPedido:
         """Lógica centralizada para validar produto e definir preço."""
-        produto = session.get(Produto, item.cd_produto)
+        produto = session.get(Produto, item.produto_id)
         if not produto:
             raise HTTPException(
                 status_code=404,
-                detail=f"Produto com ID {item.cd_produto} não encontrado.",
+                detail=f"Produto com ID {item.produto_id} não encontrado.",
             )
 
         # Se não houver valor praticado no input, usa o valor base do produto
         preco = (
-            item.vl_unitario_praticado
-            if item.vl_unitario_praticado is not None
-            else produto.vl_base
+            item.preco_unitario
+            if item.preco_unitario is not None
+            else produto.preco_base
         )
 
         return ItemPedido(
-            cd_produto=item.cd_produto,
-            qt_produto=item.qt_produto,
-            ds_observacoes_item=item.ds_observacoes_item,
-            vl_unitario_praticado=preco,
+            produto_id=item.produto_id,
+            quantidade=item.quantidade,
+            observacoes=item.observacoes,
+            preco_unitario=preco,
         )
 
     def get_all_detailed(self, session: Session) -> Sequence[Pedido]:
         """Busca todos os pedidos com cliente e itens carregados."""
         query = select(Pedido).options(
-            joinedload(Pedido.cliente), # type: ignore
+            joinedload(Pedido.cliente),  # type: ignore
             joinedload(Pedido.itens),  # type: ignore
         )
         return session.exec(query).unique().all()
 
-    def get_by_id_detailed(self, session: Session, cd_pedido: int) -> Pedido:
+    def get_by_id_detailed(self, session: Session, pedido_id: int) -> Pedido:
         """Busca um pedido específico com detalhes ou lança 404."""
         query = (
             select(Pedido)
-            .where(Pedido.cd_pedido == cd_pedido)
+            .where(Pedido.id == pedido_id)
             .options(joinedload(Pedido.cliente), joinedload(Pedido.itens))  # type: ignore
         )
         db_pedido = session.exec(query).unique().first()
@@ -70,7 +70,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
 
     def create(self, session: Session, obj: PedidoCreate) -> Pedido:
         """Cria pedido com validação de cliente, produtos e cálculo de total."""
-        if not session.get(Cliente, obj.cd_cliente):
+        if not session.get(Cliente, obj.cliente_id):
             raise HTTPException(status_code=404, detail="Cliente não encontrado")
 
         if not obj.itens:
@@ -79,10 +79,10 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         # Consolida itens duplicados no input inicial
         itens_dict = {}
         for item in obj.itens:
-            if item.cd_produto in itens_dict:
-                itens_dict[item.cd_produto].qt_produto += item.qt_produto  # type: ignore
+            if item.produto_id in itens_dict:
+                itens_dict[item.produto_id].quantidade += item.quantidade  # type: ignore
             else:
-                itens_dict[item.cd_produto] = item
+                itens_dict[item.produto_id] = item
 
         db_pedido = Pedido.model_validate(obj.model_dump(exclude={"itens"}))
 
@@ -101,46 +101,45 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
     def update_total(self, session: Session, pedido: Pedido):
         """Recalcula o valor total do pedido."""
         total = sum(
-            (item.vl_unitario_praticado * Decimal(item.qt_produto))
-            for item in pedido.itens
+            (item.preco_unitario * Decimal(item.quantidade)) for item in pedido.itens
         )
-        pedido.vl_total_pedido = total  # type: ignore
+        pedido.total = total  # type: ignore
         session.add(pedido)
         session.commit()
 
     def add_item(
-        self, session: Session, cd_pedido: int, item: ItemPedidoInput
+        self, session: Session, pedido_id: int, item: ItemPedidoInput
     ) -> Pedido:
         """Adiciona ou incrementa item no pedido e atualiza total."""
-        db_pedido = self.get_or_404(session, cd_pedido)
-        item_existente = session.get(ItemPedido, (cd_pedido, item.cd_produto))
+        db_pedido = self.get_or_404(session, pedido_id)
+        item_existente = session.get(ItemPedido, (pedido_id, item.produto_id))
 
         if item_existente:
             # Apenas incrementa se já existir
-            item_existente.qt_produto += item.qt_produto
+            item_existente.quantidade += item.quantidade
             # Se o usuário enviou um novo valor unitário, atualiza também
-            if item.vl_unitario_praticado is not None:
-                item_existente.vl_unitario_praticado = item.vl_unitario_praticado
+            if item.preco_unitario is not None:
+                item_existente.preco_unitario = item.preco_unitario
         else:
             # Usa o método auxiliar para criar o novo objeto ItemPedido
             novo_item = self._prepare_item(session, item)
-            novo_item.cd_pedido = cd_pedido
+            novo_item.pedido_id = pedido_id
             session.add(novo_item)
 
         session.commit()
         self.update_total(session, db_pedido)
-        return self.get_by_id_detailed(session, cd_pedido)
+        return self.get_by_id_detailed(session, pedido_id)
 
-    def remove_item(self, session: Session, cd_pedido: int, cd_produto: int) -> Pedido:
+    def remove_item(self, session: Session, pedido_id: int, produto_id: int) -> Pedido:
         """Remove item com trava de segurança para pedido vazio."""
-        db_pedido = self.get_by_id_detailed(session, cd_pedido)
+        db_pedido = self.get_by_id_detailed(session, pedido_id)
 
         if len(db_pedido.itens) <= 1:
             raise HTTPException(
                 status_code=400, detail="O pedido não pode ficar vazio."
             )
 
-        db_item = session.get(ItemPedido, (cd_pedido, cd_produto))
+        db_item = session.get(ItemPedido, (pedido_id, produto_id))
         if not db_item:
             raise HTTPException(status_code=404, detail="Item não encontrado")
 
@@ -150,16 +149,16 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         return db_pedido
 
     def get_item_or_404(
-        self, session: Session, cd_pedido: int, cd_produto: int
+        self, session: Session, pedido_id: int, produto_id: int
     ) -> ItemPedido:
         """Busca item específico por chave composta."""
-        db_item = session.get(ItemPedido, (cd_pedido, cd_produto))
+        db_item = session.get(ItemPedido, (pedido_id, produto_id))
         if not db_item:
             raise HTTPException(status_code=404, detail="Item do pedido não encontrado")
         return db_item
 
     def process_art_image(
-        self, file: UploadFile, cd_pedido: int, cd_produto: int
+        self, file: UploadFile, pedido_id: int, produto_id: int
     ) -> str:
         """Processa e salva imagem, garantindo que tenha formatos permitidos"""
         try:
@@ -169,7 +168,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
                 raise HTTPException(status_code=400, detail="Formato não suportado.")
 
             img = ImageOps.exif_transpose(img)
-            file_name = f"art_ped_{cd_pedido}_prod_{cd_produto}_{uuid4().hex}.webp"
+            file_name = f"art_ped_{pedido_id}_prod_{produto_id}_{uuid4().hex}.webp"
             file_path = ARTES_DIR / file_name
             img.save(str(file_path), "WEBP", quality=95)
             return f"/uploads/artes/{file_name}"

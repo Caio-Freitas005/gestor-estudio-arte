@@ -10,14 +10,14 @@ if TYPE_CHECKING:
 
 
 class ProdutoBase(SQLModel):
-    nm_produto: str
-    ds_produto: str | None = None
-    vl_base: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
-    ds_unidade_medida: str | None = Field(default=None, max_length=20)
+    nome: str
+    descricao: str | None = None
+    preco_base: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
+    unidade_medida: str | None = Field(default=None, max_length=20)
 
 
 class Produto(ProdutoBase, table=True):
-    cd_produto: int | None = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
 
     # Relacionamento direto com a tabela de ligação
     itens_pedido: list[ItemPedido] = Relationship(back_populates="produto")
@@ -33,10 +33,10 @@ class ProdutoCreate(ProdutoBase):
 
 
 class ProdutoPublic(ProdutoBase):
-    cd_produto: int
+    id: int
 
 
 class ProdutoUpdate(SQLModel):
-    nm_produto: str | None = None
-    ds_produto: str | None = None
-    vl_base: Decimal | None = None
+    nome: str | None = None
+    descricao: str | None = None
+    preco_base: Decimal | None = None

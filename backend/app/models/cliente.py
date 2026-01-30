@@ -8,15 +8,15 @@ if TYPE_CHECKING:
 
 
 class ClienteBase(SQLModel):
-    nm_cliente: str = Field(index=True)
-    cd_telefone: str | None = Field(default=None, max_length=11)
-    nm_email: str | None = Field(default=None, max_length=100, unique=True)
-    dt_nascimento: date | None = None
-    ds_observacoes: str | None = None
+    nome: str = Field(index=True)
+    telefone: str | None = Field(default=None, max_length=11)
+    email: str | None = Field(default=None, max_length=100, unique=True)
+    data_nascimento: date | None = None
+    observacoes: str | None = None
 
 
 class Cliente(ClienteBase, table=True):
-    cd_cliente: int | None = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     # Relacionamento um para muitos com pedidos
     pedidos: list["Pedido"] = Relationship(back_populates="cliente")
 
@@ -26,12 +26,12 @@ class ClienteCreate(ClienteBase):
 
 
 class ClientePublic(ClienteBase):
-    cd_cliente: int
+    id: int
 
 
 class ClienteUpdate(SQLModel):
-    nm_cliente: str | None = None
-    cd_telefone: str | None = Field(default=None, max_length=11)
-    nm_email: str | None = Field(default=None, max_length=100)
-    dt_nascimento: date | None = None
-    ds_observacoes: str | None = None
+    nome: str | None = None
+    telefone: str | None = Field(default=None, max_length=11)
+    email: str | None = Field(default=None, max_length=100)
+    data_nascimento: date | None = None
+    observacoes: str | None = None

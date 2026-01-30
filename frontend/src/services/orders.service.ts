@@ -13,24 +13,24 @@ const basePath = "pedidos";
 export const ordersService = {
   ...createCrudService<PedidoPublic, PedidoCreate, PedidoUpdate>(basePath),
 
-  addItem: async (cd_pedido: number, item: ItemPedidoInput) => {
-    const response = await apiBase.post(`${basePath}/${cd_pedido}/itens`, item);
+  addItem: async (pedido_id: number, item: ItemPedidoInput) => {
+    const response = await apiBase.post(`${basePath}/${pedido_id}/itens`, item);
     return response.data;
   },
 
-  updateItem: async (cd_pedido: number, cd_produto: number, item: ItemPedidoUpdate) => {
-    const response = await apiBase.patch(`${basePath}/${cd_pedido}/itens/${cd_produto}`, item);
+  updateItem: async (pedido_id: number, produto_id: number, item: ItemPedidoUpdate) => {
+    const response = await apiBase.patch(`${basePath}/${pedido_id}/itens/${produto_id}`, item);
     return response.data;
   },
 
-  removeItem: async (cd_pedido: number, cd_produto: number) => {
-    const response = await apiBase.delete(`${basePath}/${cd_pedido}/itens/${cd_produto}`);
+  removeItem: async (pedido_id: number, produto_id: number) => {
+    const response = await apiBase.delete(`${basePath}/${pedido_id}/itens/${produto_id}`);
     return response.data;
   },
 
-  uploadArt: async (cd_pedido: number, cd_produto: number, formData: FormData) => {
+  uploadArt: async (pedido_id: number, produto_id: number, formData: FormData) => {
     const response = await apiBase.post(
-      `${basePath}/${cd_pedido}/itens/${cd_produto}/upload-arte`,
+      `${basePath}/${pedido_id}/itens/${produto_id}/upload-arte`,
       formData,
     );
     return response.data;

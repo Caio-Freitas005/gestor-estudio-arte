@@ -11,7 +11,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
-  const data = defaultValues || ({} as ClientePublic);
+  const cliente = defaultValues || ({} as ClientePublic);
 
   return (
     <Form method="post" className="flex flex-col gap-8 max-w-4xl">
@@ -21,17 +21,17 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
       >
         <TextField
           label="Nome do Cliente"
-          name="nm_cliente"
+          name="nome"
           required
-          defaultValue={data.nm_cliente}
+          defaultValue={cliente.nome}
           variant="outlined"
           size="small"
           fullWidth
         />
         <TextField
           label="Telefone"
-          name="cd_telefone"
-          defaultValue={data.cd_telefone ?? ""}
+          name="telefone"
+          defaultValue={cliente.telefone ?? ""}
           variant="outlined"
           size="small"
           slotProps={{ htmlInput: { maxLength: 15 } }}
@@ -39,9 +39,9 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         />
         <TextField
           label="Email"
-          name="nm_email"
+          name="email"
           type="email"
-          defaultValue={data.nm_email ?? ""}
+          defaultValue={cliente.email ?? ""}
           variant="outlined"
           size="small"
           fullWidth
@@ -54,9 +54,9 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
       >
         <TextField
           label="Data de Nascimento"
-          name="dt_nascimento"
+          name="data_nascimento"
           type="date"
-          defaultValue={data.dt_nascimento ?? ""}
+          defaultValue={cliente.data_nascimento ?? ""}
           variant="outlined"
           size="small"
           fullWidth
@@ -64,8 +64,8 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         />
         <TextField
           label="Observações"
-          name="ds_observacoes"
-          defaultValue={data.ds_observacoes ?? ""}
+          name="observacoes"
+          defaultValue={cliente.observacoes ?? ""}
           variant="outlined"
           size="small"
           multiline

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ClientePublic } from "../../types/cliente.types";
 import { Link, useLoaderData, useFetcher } from "react-router";
-import { formatPhone,formatDate } from "../../utils/format.utils";
+import { formatPhone, formatDate } from "../../utils/format.utils";
 
 import {
   Table,
@@ -26,7 +26,7 @@ import PageHeader from "../../components/PageHeader";
 import DeleteDialog from "../../components/DeleteDialog";
 
 function ClientsListPage() {
-  const clients = (useLoaderData() as ClientePublic[]) || [];
+  const clientes = (useLoaderData() as ClientePublic[]) || [];
   const fetcher = useFetcher();
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -46,7 +46,7 @@ function ClientsListPage() {
         title="Meus"
         highlight="Clientes"
         subtitle="Relacionamento e Contato"
-        buttonLabel="Novo CLiente"
+        buttonLabel="Novo Cliente"
         buttonTo="cadastrar"
       ></PageHeader>
 
@@ -63,6 +63,9 @@ function ClientsListPage() {
               <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
                 Nascimento
               </TableCell>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                Observações
+              </TableCell>
               <TableCell
                 align="center"
                 className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider"
@@ -72,7 +75,7 @@ function ClientsListPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {clients.length === 0 ? (
+            {clientes.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={4}
@@ -83,9 +86,9 @@ function ClientsListPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              clients.map((client) => (
+              clientes.map((cliente) => (
                 <TableRow
-                  key={client.cd_cliente}
+                  key={cliente.id}
                   className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
                 >
                   <TableCell>
@@ -95,47 +98,50 @@ function ClientsListPage() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold text-gray-800 leading-tight">
-                          {client.nm_cliente}
+                          {cliente.nome}
                         </span>
                         <span className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">
-                          ID #{client.cd_cliente}
+                          ID #{cliente.id}
                         </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      {client.cd_telefone && (
+                      {cliente.telefone && (
                         <div className="flex items-center text-sm text-gray-600 font-medium">
                           <WhatsApp
                             fontSize="inherit"
                             className="me-2 text-green-500"
                           />
-                          {formatPhone(client.cd_telefone)}
+                          {formatPhone(cliente.telefone)}
                         </div>
                       )}
-                      {client.nm_email && (
+                      {cliente.email && (
                         <div className="flex items-center text-sm text-gray-600 italic">
                           <Email
                             fontSize="inherit"
                             className="me-2 text-pink-400"
                           />
-                          {client.nm_email}
+                          {cliente.email}
                         </div>
                       )}
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-600 font-medium text-sm">
-                    {client.dt_nascimento
-                      ? formatDate(client.dt_nascimento)
+                    {cliente.data_nascimento
+                      ? formatDate(cliente.data_nascimento)
                       : "-"}
+                  </TableCell>
+                  <TableCell className="text-gray-600 font-medium !whitespace-pre-wrap !break-words text-sm">
+                    {cliente.observacoes}
                   </TableCell>
                   <TableCell align="center">
                     <div className="flex justify-center gap-1">
                       <Tooltip title="Editar">
                         <IconButton
                           component={Link}
-                          to={`${client.cd_cliente}`}
+                          to={`${cliente.id}`}
                           size="small"
                           className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
                         >
@@ -146,7 +152,7 @@ function ClientsListPage() {
                         <IconButton
                           size="small"
                           className="opacity-0 group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
-                          onClick={() => setDeleteId(client.cd_cliente)}
+                          onClick={() => setDeleteId(cliente.id)}
                         >
                           <DeleteOutline fontSize="small" />
                         </IconButton>
@@ -164,7 +170,7 @@ function ClientsListPage() {
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         title="Excluir Cliente"
-        content="Tem certeza que deseja remover esse cliente? Essa ação não pode ser desfeita."
+        content="Tem certeza que deseja remover esse clientee? Essa ação não pode ser desfeita."
         onConfirm={confirmDelete}
       ></DeleteDialog>
     </div>
