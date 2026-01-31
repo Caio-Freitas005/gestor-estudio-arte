@@ -3,11 +3,13 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel  # type: ignore
 
+from .base import TimestampMixin
+
 if TYPE_CHECKING:
     from .pedido import Pedido
 
 
-class ClienteBase(SQLModel):
+class ClienteBase(TimestampMixin, SQLModel):
     nome: str = Field(index=True)
     telefone: str | None = Field(default=None, max_length=11)
     email: str | None = Field(default=None, max_length=100, unique=True)

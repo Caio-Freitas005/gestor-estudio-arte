@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel  # type: ignore
 
+from .base import TimestampMixin
 from .cliente import ClientePublic
 from .item_pedido import ItemPedido, ItemPedidoPublic
 
@@ -29,7 +30,7 @@ class StatusPedido(str, Enum):
     CANCELADO = "Cancelado"
 
 
-class PedidoBase(SQLModel):
+class PedidoBase(TimestampMixin, SQLModel):
     data_pedido: date = Field(default_factory=date.today)
     status: str = Field(default=StatusPedido.AGUARDANDO_PAGAMENTO)
     observacoes: str | None = None

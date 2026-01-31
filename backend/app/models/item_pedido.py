@@ -3,12 +3,14 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel  # type:ignore
 
+from .base import TimestampMixin
+
 if TYPE_CHECKING:
     from .pedido import Pedido
     from .produto import Produto
 
 
-class ItemPedidoBase(SQLModel):
+class ItemPedidoBase(TimestampMixin, SQLModel):
     quantidade: int = Field(default=1, ge=1)
     preco_unitario: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
     caminho_arte: str | None = Field(default=None)
