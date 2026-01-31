@@ -64,6 +64,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             .where(Pedido.id == pedido_id)
             .options(joinedload(Pedido.cliente), joinedload(Pedido.itens))  # type: ignore
         )
+
         db_pedido = session.exec(query).unique().first()
         if not db_pedido:
             raise HTTPException(status_code=404, detail="Pedido não encontrado")
@@ -118,6 +119,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         if item_existente:
             # Apenas incrementa se já existir
             item_existente.quantidade += item.quantidade
+
             # Se o usuário enviou um novo valor unitário, atualiza também
             if item.preco_unitario is not None:
                 item_existente.preco_unitario = item.preco_unitario

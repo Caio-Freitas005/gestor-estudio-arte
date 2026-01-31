@@ -39,13 +39,12 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         session.refresh(db_obj)
         return db_obj
 
-    def update(
-        self, session: Session, id: Any, obj: UpdateSchemaType
-    ) -> ModelType:
+    def update(self, session: Session, id: Any, obj: UpdateSchemaType) -> ModelType:
         """Aplica atualizações parciais (PATCH) de forma genérica."""
         db_obj = self.get_or_404(session, id)
         obj_data = obj.model_dump(exclude_unset=True)
         db_obj.sqlmodel_update(obj_data)
+
         session.add(db_obj)
         session.commit()
         session.refresh(db_obj)
