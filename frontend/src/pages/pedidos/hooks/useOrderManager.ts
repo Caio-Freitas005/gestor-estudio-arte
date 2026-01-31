@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSubmit, useFetcher } from "react-router";
 import { ItemPedidoInput, PedidoPublic } from "../../../types/pedido.types";
 import { cleanFormData } from "../../../utils/form.utils";
