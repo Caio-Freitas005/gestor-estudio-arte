@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { formatNumber } from "../../../utils/format.utils";
+import { ItemPedidoInput, ItemPedidoPublic } from "../../../types/pedido.types";
+import { ProdutoPublic } from "../../../types/produto.types";
 
 import {
   Table,
@@ -41,7 +43,21 @@ const UploadButton = ({ onUpload, produto_id, hasArt }: any) => (
   </IconButton>
 );
 
-function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
+interface ItemTableProps {
+  items: ItemPedidoPublic[] | ItemPedidoInput[];
+  produtos: ProdutoPublic[];
+  onUpload: (file: File, produto_id: number) => void;
+  onRemove: (produto_id: number) => void;
+  onUpdate: (updatedItem: any) => void;
+}
+
+function ItemTable({
+  items,
+  produtos,
+  onUpload,
+  onRemove,
+  onUpdate,
+}: ItemTableProps) {
   // Estado para saber qual linha está em edição
   const [editId, setEditId] = useState<number | null>(null);
   const [editData, setEditData] = useState<any>(null);
@@ -78,11 +94,9 @@ function ItemTable({ items, produtos, onUpload, onRemove, onUpdate }: any) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {items.map((item: any) => {
+          {items.map((item) => {
             const isEditing = editId === item.produto_id;
-            const produto = produtos?.find(
-              (p: any) => p.id === item.produto_id
-            );
+            const produto = produtos?.find((p) => p.id === item.produto_id);
 
             return (
               <TableRow key={item.produto_id}>
