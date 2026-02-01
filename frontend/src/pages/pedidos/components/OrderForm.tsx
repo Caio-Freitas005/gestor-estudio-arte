@@ -1,6 +1,7 @@
 import { Form } from "react-router";
 import { Button, MenuItem, TextField } from "@mui/material";
 import { useOrderManager } from "../hooks/useOrderManager";
+import { formatDateForInput } from "../../../utils/format.utils";
 import { PedidoPublic, StatusPedido } from "../../../types/pedido.types";
 import { ClientePublic } from "../../../types/cliente.types";
 import { ProdutoPublic } from "../../../types/produto.types";
@@ -58,11 +59,7 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
           label="Data"
           type="date"
           name="data_pedido"
-          defaultValue={
-            defaultValues?.data_pedido
-              ? new Date(defaultValues.data_pedido).toISOString().split("T")[0]
-              : new Date().toISOString().split("T")[0]
-          }
+          defaultValue={formatDateForInput(defaultValues?.data_pedido)}
           size="small"
           required
           slotProps={{ inputLabel: { shrink: true } }}
