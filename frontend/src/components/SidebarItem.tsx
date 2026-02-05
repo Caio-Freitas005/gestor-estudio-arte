@@ -10,15 +10,17 @@ interface SubItem {
 }
 
 interface SidebarItemProps {
+  to?: string;
   label: string;
-  icon: React.ReactNode; 
-  activePath: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  subItems: SubItem[];
+  icon: React.ReactNode;
+  activePath?: string;
+  isOpen?: boolean;
+  onToggle?: () => void;
+  subItems?: SubItem[];
 }
 
 function SidebarItem({
+  to,
   label,
   icon,
   activePath,
@@ -27,7 +29,15 @@ function SidebarItem({
   subItems,
 }: SidebarItemProps) {
   const location = useLocation();
-  const isCurrentPath = location.pathname.includes(activePath);
+
+  // Verifica se o caminho atual coincide com o activePath ou com o "to" direto
+  const isCurrentPath = activePath
+    ? location.pathname.includes(activePath)
+    : to === "/"
+    ? location.pathname === "/"
+    : to
+    ? location.pathname.includes(to)
+    : false;
 
   const activeClass =
     "flex items-center p-3 text-pink-600 bg-pink-50 rounded-lg border-r-4 border-pink-500 group transition-all font-bold";
@@ -40,6 +50,24 @@ function SidebarItem({
         ? "text-pink-600 font-bold bg-pink-50/50"
         : "text-gray-500 hover:text-pink-500 hover:bg-pink-50/30"
     }`;
+
+  if (!subItems || subItems.length === 0) {
+    return (
+      <li>
+        <NavLink
+          to={to || "/"}
+          className={({ isActive }) => (isActive ? activeClass : inactiveClass)}
+        >
+          <div className="flex items-center">
+            <span className="flex items-center !text-lg text-current">
+              {icon}
+            </span>
+            <span className="ms-3">{label}</span>
+          </div>
+        </NavLink>
+      </li>
+    );
+  }
 
   return (
     <li>
@@ -62,7 +90,7 @@ function SidebarItem({
 
       <Collapse in={isOpen || isCurrentPath} timeout="auto">
         <ul className="py-2 space-y-1">
-          {subItems.map((item) => (
+          {subItems?.map((item) => (
             <li key={item.to}>
               <NavLink to={item.to} end={item.end} className={subItemClass}>
                 <span className="me-2 flex items-center !text-lg text-current">

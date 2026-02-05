@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { Outlet } from "react-router";
-import { ListAlt, AddCircleOutline } from "@mui/icons-material";
+import { Link, Outlet } from "react-router";
+import {
+  ListAlt,
+  AddCircleOutline,
+  DashboardOutlined,
+} from "@mui/icons-material";
 import SidebarItem from "./components/SidebarItem";
 
 function App() {
@@ -15,15 +19,36 @@ function App() {
       <aside className="fixed top-0 left-0 z-40 w-64 h-screen sm:translate-x-0">
         <div className="h-full px-4 py-6 overflow-y-auto bg-white border-r border-gray-200 shadow-sm">
           <div className="mb-10 px-4">
-            <h1 className="text-2xl font-black tracking-tight text-gray-800">
-              GAPM<span className="text-pink-500">.</span>
-              <span className="block text-xs font-medium text-gray-400 uppercase tracking-widest">
-                Gestor Ateliê
-              </span>
-            </h1>
+            <Link to="/">
+              <h1 className="text-2xl font-black tracking-tight text-gray-800">
+                GAPM<span className="text-pink-500">.</span>
+                <span className="block text-xs font-medium text-gray-400 uppercase tracking-widest">
+                  Gestor Ateliê
+                </span>
+              </h1>
+            </Link>
           </div>
 
           <ul className="space-y-2 font-medium">
+            <SidebarItem
+              to="/"
+              label="Dashboard"
+              icon={
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 3h7v9H3V3zM14 3h7v5h-7V3zM14 11h7v10h-7V11zM3 15h7v6H3v-6z"
+                  />
+                </svg>
+              }
+            />
             <SidebarItem
               label="Pedidos"
               activePath="/pedidos"

@@ -5,8 +5,8 @@ interface PageHeaderProps {
   title: string;
   highlight: string;
   subtitle: string;
-  buttonLabel: string;
-  buttonTo: string;
+  buttonLabel?: string;
+  buttonTo?: string;
 }
 
 function PageHeader({ title, highlight, subtitle, buttonLabel, buttonTo }: PageHeaderProps) {
@@ -20,15 +20,18 @@ function PageHeader({ title, highlight, subtitle, buttonLabel, buttonTo }: PageH
           {subtitle}
         </Typography>
       </div>
-      <Button
-        component={Link}
-        to={buttonTo}
-        variant="contained"
-        className="!bg-pink-500 !font-bold !rounded-xl shadow-md px-6 py-2"
-        disableElevation
-      >
-        {buttonLabel}
-      </Button>
+
+      {buttonLabel && buttonTo && (
+        <Button
+            component={Link}
+            to={buttonTo}
+            variant="contained"
+            className="!bg-pink-500 !font-bold !rounded-xl shadow-md px-6 py-2"
+            disableElevation
+        >
+            {buttonLabel}
+        </Button>
+      )}
     </div>
   );
 }

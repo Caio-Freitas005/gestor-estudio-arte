@@ -13,6 +13,7 @@ import App from "./App";
 import { clientRoutes } from "./pages/clientes/routes";
 import { productRoutes } from "./pages/produtos/routes";
 import { orderRoutes } from "./pages/pedidos/routes";
+import { dashboardRoutes } from "./pages/dashboard/routes";
 
 const theme = createTheme({
   palette: {
@@ -45,7 +46,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      { path: "/", element: <Navigate to="/pedidos" replace /> },
+      ...dashboardRoutes,
       {
         path: "/clientes",
         children: clientRoutes,
