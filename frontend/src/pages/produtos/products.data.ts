@@ -1,15 +1,21 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "react-router";
 import { productsService } from "../../services/products.service";
 import { cleanFormData } from "../../utils/form.utils";
+import { getCommonParams } from "../../utils/loader.utils";
 import {
   ProdutoCreate,
   ProdutoPublic,
   ProdutoUpdate,
 } from "../../types/produto.types";
 
-export const productsListLoader = () => productsService.getAll();
+export async function productsListLoader({ request }: LoaderFunctionArgs) {
+  const params = getCommonParams(request, ["min_preco", "max_preco"]);
+  const produtos = await productsService.getAll(params)
 
-export async function productCreateAction({ request }: { request: Request }) {
+  return { produtos };
+}
+
+export async function productCreateAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const dataToSend = cleanFormData<ProdutoCreate>(formData);
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLoaderData, useFetcher } from "react-router";
 import { DeleteOutline, Edit, SellOutlined } from "@mui/icons-material";
-import { ProdutoPublic } from "../../types/produto.types";
+import { ProdutoPaginated } from "../../types/produto.types";
 
 import {
   Table,
@@ -16,9 +16,14 @@ import {
 } from "@mui/material";
 import PageHeader from "../../components/PageHeader";
 import DeleteDialog from "../../components/DeleteDialog";
+import AppPagination from "../../components/AppPagination";
+import Searchbar from "../../components/Searchbar";
+import RangeFilter from "../../components/RangeFilter";
 
 function ProductsListPage() {
-  const products = (useLoaderData() as ProdutoPublic[]) || [];
+  const { produtos } = useLoaderData() as {
+    produtos: ProdutoPaginated;
+  };
   const fetcher = useFetcher();
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -41,6 +46,10 @@ function ProductsListPage() {
         buttonLabel="Novo Produto"
         buttonTo="cadastrar"
       ></PageHeader>
+
+      <Searchbar placeholder="Buscar por nome, descrição ou unidade de medida">
+        <RangeFilter label="Preço" paramMin="min_preco" paramMax="max_preco" />
+      </Searchbar>
 
       <TableContainer className="!border-none !shadow-none overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <Table sx={{ minWidth: 650 }}>
@@ -67,7 +76,7 @@ function ProductsListPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.length === 0 ? (
+            {produtos.dados.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={4}
@@ -78,9 +87,9 @@ function ProductsListPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              products.map((product) => (
+              produtos.dados.map((produto) => (
                 <TableRow
-                  key={product.id}
+                  key={produto.id}
                   className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
                 >
                   <TableCell>
@@ -90,24 +99,24 @@ function ProductsListPage() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold text-gray-800 leading-tight">
-                          {product.nome}
+                          {produto.nome}
                         </span>
                         <span className="text-[10px] text-gray-400 italic">
-                          {product.descricao || "Sem descrição"}
+                          {produto.descricao || "Sem descrição"}
                         </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={product.unidade_medida || "UN"}
+                      label={produto.unidade_medida || "UN"}
                       size="small"
                       className="!bg-gray-100 !text-gray-600 !font-black !text-[9px] !rounded-md"
                     />
                   </TableCell>
                   <TableCell align="right">
                     <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-50 text-sm">
-                      R$ {Number(product.preco_base).toFixed(2)}
+                      R$ {Number(produto.preco_base).toFixed(2)}
                     </span>
                   </TableCell>
                   <TableCell align="center">
@@ -115,7 +124,7 @@ function ProductsListPage() {
                       <Tooltip title="Editar">
                         <IconButton
                           component={Link}
-                          to={`${product.id}`}
+                          to={`${produto.id}`}
                           size="small"
                           className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
                         >
@@ -126,7 +135,7 @@ function ProductsListPage() {
                         <IconButton
                           size="small"
                           className="opacity-0 group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
-                          onClick={() => setDeleteId(product.id)}
+                          onClick={() => setDeleteId(produto.id)}
                         >
                           <DeleteOutline fontSize="small" />
                         </IconButton>
@@ -138,6 +147,7 @@ function ProductsListPage() {
             )}
           </TableBody>
         </Table>
+        <AppPagination total={produtos.total} />
       </TableContainer>
 
       <DeleteDialog
