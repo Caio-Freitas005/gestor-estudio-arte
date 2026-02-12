@@ -1,3 +1,5 @@
+from datetime import date
+from decimal import Decimal
 from typing import Sequence
 
 from fastapi import APIRouter, File, UploadFile, status
@@ -9,7 +11,9 @@ from ..models import (
     Pedido,
     PedidoCreate,
     PedidoPublic,
+    PedidoPublicPaginated,
     PedidoUpdate,
+    StatusPedido,
 )
 from ..services import pedido_service
 
@@ -22,10 +26,28 @@ async def create_order(pedido: PedidoCreate, session: SessionDep) -> Pedido:
     return pedido_service.create(session, pedido)
 
 
-@router.get("/", response_model=list[PedidoPublic])
-async def get_all_orders(session: SessionDep) -> Sequence[Pedido]:
-    """Lista todos os pedidos com detalhes de cliente e itens."""
-    return pedido_service.get_all_detailed(session)
+@router.get("/", response_model=PedidoPublicPaginated)
+async def get_all_orders(
+    session: SessionDep,
+    q: str | None = None,
+    status: StatusPedido | None = None,
+    data_pedido: date | None = None,
+    min_total: Decimal | None = None,
+    max_total: Decimal | None = None,
+    skip: int = 0,
+    limit: int = 10,
+) -> dict[str, Sequence[Pedido] | int]:
+    """Retorna a lista de pedidos com paginação e filtros de busca por cliente, status, data de início e valor total do pedido."""
+    return pedido_service.get_all_detailed(
+        session,
+        q=q,
+        status=status,
+        data_pedido=data_pedido,
+        min_total=min_total,
+        max_total=max_total,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.get("/{pedido_id}", response_model=PedidoPublic)

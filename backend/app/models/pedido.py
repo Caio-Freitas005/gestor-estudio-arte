@@ -31,10 +31,10 @@ class StatusPedido(str, Enum):
 
 
 class PedidoBase(TimestampMixin, SQLModel):
-    data_pedido: date = Field(default_factory=date.today)
-    status: str = Field(default=StatusPedido.AGUARDANDO_PAGAMENTO)
+    data_pedido: date = Field(default_factory=date.today, index=True)
+    status: str = Field(default=StatusPedido.AGUARDANDO_PAGAMENTO, index=True)
     observacoes: str | None = None
-    total: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
+    total: Decimal = Field(default=0.0, max_digits=10, decimal_places=2, index=True)
     cliente_id: int = Field(foreign_key="cliente.id")
 
 
@@ -64,6 +64,11 @@ class PedidoPublic(PedidoBase):
     id: int
     cliente: ClientePublic | None = None
     itens: list[ItemPedidoPublic] = []
+
+
+class PedidoPublicPaginated(SQLModel):
+    dados: list[PedidoPublic]
+    total: int
 
 
 class PedidoUpdate(SQLModel):

@@ -1,10 +1,12 @@
 import io
+from datetime import date
 from decimal import Decimal
 from typing import Sequence
 from uuid import uuid4
 
 from fastapi import HTTPException, UploadFile
 from PIL import Image, ImageOps
+from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 from sqlmodel import Session, select
 
@@ -15,6 +17,7 @@ from ..models import (
     ItemPedidoInput,
     ItemPedidoUpdate,
     Pedido,
+    StatusPedido,
     PedidoCreate,
     PedidoUpdate,
     Produto,
@@ -49,13 +52,62 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             preco_unitario=preco,
         )
 
-    def get_all_detailed(self, session: Session) -> Sequence[Pedido]:
-        """Busca todos os pedidos com cliente e itens carregados."""
-        query = select(Pedido).options(
-            joinedload(Pedido.cliente),  # type: ignore
-            joinedload(Pedido.itens),  # type: ignore
+    def get_all_detailed(
+        self,
+        session: Session,
+        q: str | None = None,
+        status: StatusPedido | None = None,
+        data_pedido: date | None = None,
+        min_total: Decimal | None = None, 
+        max_total: Decimal | None = None, 
+        skip: int = 0,
+        limit: int = 10,
+    ) -> dict[str, Sequence[Pedido] | int]:
+        """Busca todos os pedidos com cliente e itens carregados, com paginação e permitindo filtros"""
+        query = select(Pedido).join(
+            Cliente
+        )  # Join para permitir busca pelo nome do cliente
+
+        # Filtro de busca global (nome do cliente ou observação do pedido)
+        if q:
+            query = query.where(
+                or_(
+                    Cliente.nome.ilike(f"%{q}%"), # type: ignore
+                    Pedido.observacoes.ilike(f"%{q}%") # type: ignore
+                )
+            )
+
+        # Filtro de status
+        if status:
+            query = query.where(Pedido.status == status)
+
+        # Filtro de data de início (futuramente terá data de conclusão)
+        if data_pedido:
+            query = query.where(Pedido.data_pedido == data_pedido)
+
+        # Filtro de valor mínimo
+        if min_total is not None:
+            query = query.where(Pedido.total >= min_total)
+
+        # Filtro de valor máximo
+        if max_total is not None:
+            query = query.where(Pedido.total <= max_total)
+
+        count_query = select(func.count()).select_from(query.subquery())
+        total = session.exec(count_query).one()
+
+        query = (
+            query.options(
+                joinedload(Pedido.cliente),  # type: ignore
+                joinedload(Pedido.itens),  # type: ignore
+            )
+            .offset(skip)
+            .limit(limit)
         )
-        return session.exec(query).unique().all()
+
+        results = session.exec(query).unique().all()
+
+        return {"dados": results, "total": total}
 
     def get_by_id_detailed(self, session: Session, pedido_id: int) -> Pedido:
         """Busca um pedido específico com detalhes ou lança 404."""

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class ClienteBase(TimestampMixin, SQLModel):
     nome: str = Field(index=True)
-    telefone: str | None = Field(default=None, max_length=11)
+    telefone: str | None = Field(default=None, max_length=11, index=True)
     email: str | None = Field(default=None, max_length=100, unique=True)
     data_nascimento: date | None = None
     observacoes: str | None = None
@@ -29,6 +29,11 @@ class ClienteCreate(ClienteBase):
 
 class ClientePublic(ClienteBase):
     id: int
+
+
+class ClientePublicPaginated(SQLModel):
+    dados: list[ClientePublic]
+    total: int
 
 
 class ClienteUpdate(SQLModel):

@@ -1,6 +1,7 @@
 from typing import Any, Generic, Sequence, Type, TypeVar
 
 from fastapi import HTTPException, status
+from sqlalchemy import func, or_
 from sqlmodel import Session, SQLModel, select
 
 # Define tipos genéricos para a model e para os schemas de criação e atualização
@@ -26,10 +27,35 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
         return db_obj
 
-    def get_all(self, session: Session) -> Sequence[ModelType]:
-        """Retorna todos os registros da tabela."""
-        statement = select(self.model)
-        return session.exec(statement).all()
+    def get_all(
+        self,
+        session: Session,
+        q: str | None = None,
+        skip: int = 0,
+        limit: int = 10,
+        search_fields: list[str] | None = None,
+    ) -> dict[str, Sequence[ModelType] | int]:
+        """Retorna todos os registros da tabela paginados e filtrados."""
+        query = select(self.model)
+
+        # Aplica busca se houver 'q' e campos definidos
+        if q and search_fields:
+            filters = [
+                getattr(self.model, field).ilike(f"%{q}%") for field in search_fields
+            ]
+            query = query.where(
+                or_(*filters)
+            )  # Desempacota condições LIKE e executa query com OR para cada condição
+
+        # Conta total antes de paginar
+        count_query = select(func.count()).select_from(query.subquery())
+        total = session.exec(count_query).one()
+
+        # Aplica e executa paginação
+        query = query.offset(skip).limit(limit)
+        results = session.exec(query).all()
+
+        return {"dados": results, "total": total}
 
     def create(self, session: Session, obj: CreateSchemaType) -> ModelType:
         """Cria, comita e atualiza o objeto no banco."""

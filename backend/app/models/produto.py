@@ -11,10 +11,12 @@ if TYPE_CHECKING:
 
 
 class ProdutoBase(TimestampMixin, SQLModel):
-    nome: str
+    nome: str = Field(index=True)
     descricao: str | None = None
-    preco_base: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
-    unidade_medida: str | None = Field(default=None, max_length=20)
+    preco_base: Decimal = Field(
+        default=0.0, max_digits=10, decimal_places=2, index=True
+    )
+    unidade_medida: str | None = Field(default=None, max_length=20, index=True)
 
 
 class Produto(ProdutoBase, table=True):
@@ -35,6 +37,11 @@ class ProdutoCreate(ProdutoBase):
 
 class ProdutoPublic(ProdutoBase):
     id: int
+
+
+class ProdutoPublicPaginated(SQLModel):
+    dados: list[ProdutoPublic]
+    total: int
 
 
 class ProdutoUpdate(SQLModel):
