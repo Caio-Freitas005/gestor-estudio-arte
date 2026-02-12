@@ -17,7 +17,7 @@ origin = os.getenv("FRONT_URL")
 # Cria o banco apenas uma vez, se ainda não existir
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Iniciando e criando o banco de dados...")
+    print("Verificando integridade do banco de dados...")
     create_db_and_tables()
     yield
     print("Encerrando...")
