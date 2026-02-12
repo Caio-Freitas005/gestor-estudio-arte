@@ -47,4 +47,5 @@ class ProdutoPublicPaginated(SQLModel):
 class ProdutoUpdate(SQLModel):
     nome: str | None = None
     descricao: str | None = None
-    preco_base: Decimal | None = None
+    preco_base: Decimal | None = Field(default=None, max_digits=10, decimal_places=2)
+    unidade_medida: str | None = Field(default=None, max_length=20)
