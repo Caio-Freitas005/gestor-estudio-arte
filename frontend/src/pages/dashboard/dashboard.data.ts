@@ -1,12 +1,17 @@
 import { ordersService } from "../../services/orders.service";
 import { clientsService } from "../../services/clients.service";
 import { StatusPedido } from "../../types/pedido.types";
+import { PedidoPaginated } from "../../types/pedido.types";
+import { ClientePaginated } from "../../types/cliente.types";
 
 export async function dashboardLoader() {
-  const [pedidos, clientes] = await Promise.all([
-    ordersService.getAll(),
-    clientsService.getAll(),
-  ]);
+  const [pedidosResp, clientesResp] = await Promise.all([
+    ordersService.getAll({ limit: 1000 }),
+    clientsService.getAll({ limit: 1000 }),
+  ]) as [PedidoPaginated, ClientePaginated];
+
+  const pedidos = pedidosResp.dados;
+  const clientes = clientesResp.dados;
 
   const mesAtual = new Date().getMonth() + 1;
 
