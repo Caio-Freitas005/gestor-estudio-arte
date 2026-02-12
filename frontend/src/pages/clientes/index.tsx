@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ClientePublic } from "../../types/cliente.types";
+import { ClientePaginated } from "../../types/cliente.types";
 import { Link, useLoaderData, useFetcher } from "react-router";
 import { formatPhone, formatDate } from "../../utils/format.utils";
 
@@ -24,9 +24,14 @@ import {
 
 import PageHeader from "../../components/PageHeader";
 import DeleteDialog from "../../components/DeleteDialog";
+import AppPagination from "../../components/AppPagination";
+import Searchbar from "../../components/Searchbar";
 
 function ClientsListPage() {
-  const clientes = (useLoaderData() as ClientePublic[]) || [];
+  const { clientes } = useLoaderData() as {
+    clientes: ClientePaginated;
+  };
+
   const fetcher = useFetcher();
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -49,6 +54,8 @@ function ClientsListPage() {
         buttonLabel="Novo Cliente"
         buttonTo="cadastrar"
       ></PageHeader>
+
+      <Searchbar placeholder="Buscar por nome, email ou telefone" />
 
       <TableContainer className="!border-none !shadow-none overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <Table sx={{ minWidth: 650 }}>
@@ -75,10 +82,10 @@ function ClientsListPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {clientes.length === 0 ? (
+            {clientes.dados.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   align="center"
                   className="py-20 text-gray-400 italic"
                 >
@@ -86,7 +93,7 @@ function ClientsListPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              clientes.map((cliente) => (
+              clientes.dados.map((cliente) => (
                 <TableRow
                   key={cliente.id}
                   className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
@@ -164,13 +171,14 @@ function ClientsListPage() {
             )}
           </TableBody>
         </Table>
+        <AppPagination total={clientes.total} />
       </TableContainer>
 
       <DeleteDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         title="Excluir Cliente"
-        content="Tem certeza que deseja remover esse clientee? Essa ação não pode ser desfeita."
+        content="Tem certeza que deseja remover esse cliente? Essa ação não pode ser desfeita."
         onConfirm={confirmDelete}
       ></DeleteDialog>
     </div>

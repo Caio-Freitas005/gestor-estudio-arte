@@ -1,13 +1,19 @@
 import { LoaderFunctionArgs, ActionFunctionArgs, redirect } from "react-router";
 import { clientsService } from "../../services/clients.service";
 import { cleanFormData } from "../../utils/form.utils";
+import { getCommonParams } from "../../utils/loader.utils";
 import {
   ClienteCreate,
   ClienteUpdate,
   ClientePublic,
 } from "../../types/cliente.types";
 
-export const clientsListLoader = () => clientsService.getAll();
+export async function clientsListLoader({ request }: LoaderFunctionArgs) {
+  const params = getCommonParams(request);
+  const clientes = await clientsService.getAll(params);
+
+  return { clientes };
+}
 
 export async function clientLoader({
   params,
@@ -26,7 +32,7 @@ export async function clientLoader({
 }
 
 // Essa action será chamada pelo <Form> do ClientForm.jsx
-export async function clientCreateAction({ request }: { request: Request }) {
+export async function clientCreateAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const dataToSend = cleanFormData<ClienteCreate>(formData);
 
