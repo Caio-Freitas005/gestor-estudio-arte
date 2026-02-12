@@ -4,6 +4,7 @@
 
 import { ClientePublic } from "./cliente.types";
 import { ProdutoPublic } from "./produto.types";
+import { PaginatedResponse } from "./common.types";
 
 export enum StatusPedido {
   AGUARDANDO_PAGAMENTO = "Aguardando Pagamento",
@@ -60,6 +61,8 @@ export interface PedidoPublic extends PedidoBase {
   itens: ItemPedidoPublic[]; 
   produtos: ProdutoPublic[];
 }
+
+export type PedidoPaginated = PaginatedResponse<PedidoPublic>;
 
 export interface PedidoUpdate extends Partial<PedidoBase> {
   //
