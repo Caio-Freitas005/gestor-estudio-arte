@@ -1,9 +1,10 @@
 from datetime import date
 from decimal import Decimal
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from sqlmodel import Field, Relationship, SQLModel  # type: ignore
+from sqlalchemy import event
+from sqlmodel import Field, Relationship, SQLModel
 
 from .base import TimestampMixin
 from .cliente import ClientePublic
@@ -32,6 +33,7 @@ class StatusPedido(str, Enum):
 
 class PedidoBase(TimestampMixin, SQLModel):
     data_pedido: date = Field(default_factory=date.today, index=True)
+    data_conclusao: date | None = Field(default=None, index=True)
     status: str = Field(default=StatusPedido.AGUARDANDO_PAGAMENTO, index=True)
     observacoes: str | None = None
     total: Decimal = Field(default=0.0, max_digits=10, decimal_places=2, index=True)
@@ -53,6 +55,24 @@ class Pedido(PedidoBase, table=True):
     produtos: list["Produto"] = Relationship(
         back_populates="pedidos", link_model=ItemPedido
     )
+
+
+@event.listens_for(Pedido.status, "set", named=True)
+def ao_mudar_status(target: "Pedido", value: Any, oldvalue: Any, **_: Any) -> None:
+    """
+    Atualiza automaticamente a data_conclusao com base na mudança do status.
+    """
+    # Verifica se o valor mudou para não rodar lógica desnecessária
+    if value == oldvalue:
+        return
+
+    # Se mudar para CONCLUIDO, define hoje
+    if value == StatusPedido.CONCLUIDO:
+        target.data_conclusao = date.today()
+
+    # Se o status anterior era CONCLUIDO e mudou para outro, limpa a data
+    elif oldvalue == StatusPedido.CONCLUIDO:
+        target.data_conclusao = None
 
 
 class PedidoCreate(PedidoBase):

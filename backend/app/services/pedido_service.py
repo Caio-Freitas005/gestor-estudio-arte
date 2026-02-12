@@ -58,8 +58,9 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         q: str | None = None,
         status: StatusPedido | None = None,
         data_pedido: date | None = None,
-        min_total: Decimal | None = None, 
-        max_total: Decimal | None = None, 
+        data_conclusao: date | None = None,
+        min_total: Decimal | None = None,
+        max_total: Decimal | None = None,
         skip: int = 0,
         limit: int = 10,
     ) -> dict[str, Sequence[Pedido] | int]:
@@ -72,8 +73,8 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         if q:
             query = query.where(
                 or_(
-                    Cliente.nome.ilike(f"%{q}%"), # type: ignore
-                    Pedido.observacoes.ilike(f"%{q}%") # type: ignore
+                    Cliente.nome.ilike(f"%{q}%"),  # type: ignore
+                    Pedido.observacoes.ilike(f"%{q}%"),  # type: ignore
                 )
             )
 
@@ -81,9 +82,13 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         if status:
             query = query.where(Pedido.status == status)
 
-        # Filtro de data de início (futuramente terá data de conclusão)
+        # Filtro de data de início
         if data_pedido:
             query = query.where(Pedido.data_pedido == data_pedido)
+
+        # Filtro de data de conclusão
+        if data_conclusao:
+            query = query.where(Pedido.data_conclusao == data_conclusao)
 
         # Filtro de valor mínimo
         if min_total is not None:
