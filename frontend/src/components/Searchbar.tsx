@@ -8,7 +8,7 @@ interface SearchHeaderProps {
   children?: ReactNode;
 }
 
-function Searchbar({ placeholder = "Buscar...", children}: SearchHeaderProps) {
+function Searchbar({ placeholder = "Buscar...", children }: SearchHeaderProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const urlQuery = searchParams.get("q") || "";
 
@@ -40,28 +40,26 @@ function Searchbar({ placeholder = "Buscar...", children}: SearchHeaderProps) {
     <div className="flex flex-col lg:flex-row gap-4 p-4">
       {/*Campo de busca global*/}
       <div className="flex-grow">
-      <TextField
-        size="small"
-        placeholder={placeholder}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full max-w-md"
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search fontSize="small" className="text-gray-400" />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+        <TextField
+          size="small"
+          placeholder={placeholder}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full max-w-md"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search fontSize="small" className="text-gray-400" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
       </div>
 
       {/* Container de Filtros Específicos */}
-      <div className="flex flex-wrap items-center gap-3">
-        {children}
-      </div>
+      <div className="flex flex-shrink-0 items-center gap-3">{children}</div>
     </div>
   );
 }
