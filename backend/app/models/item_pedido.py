@@ -13,8 +13,8 @@ if TYPE_CHECKING:
 class ItemPedidoBase(TimestampMixin, SQLModel):
     quantidade: int = Field(default=1, ge=1)
     preco_unitario: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
-    caminho_arte: str | None = Field(default=None)
-    observacoes: str | None = Field(default=None)
+    caminho_arte: str | None = None
+    observacoes: str | None = None
     pedido_id: int | None = Field(
         default=None, foreign_key="pedido.id", primary_key=True
     )
