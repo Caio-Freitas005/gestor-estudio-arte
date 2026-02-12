@@ -48,7 +48,7 @@ function RangeFilter({ label, paramMin, paramMax }: RangeFilterProps) {
         type="number"
         value={min}
         onChange={(e) => setMin(e.target.value)}
-        sx={{ width: 120, }}
+        sx={{ width: 90, }}
       />
       <TextField
         size="small"
@@ -56,7 +56,7 @@ function RangeFilter({ label, paramMin, paramMax }: RangeFilterProps) {
         type="number"
         value={max}
         onChange={(e) => setMax(e.target.value)}
-        sx={{ width: 120, }}
+        sx={{ width: 90, }}
       />
     </div>
   );
