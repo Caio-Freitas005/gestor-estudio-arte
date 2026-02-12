@@ -38,7 +38,7 @@ function DashboardPage() {
       <PageHeader
         title="Painel de"
         highlight="Visualização"
-        subtitle={`Seu ateliê agora ${formatDate(String(new Date()))}`}
+        subtitle={`Seu ateliê hoje ${formatDate(String(new Date()))}`}
       />
 
       {/* Grid de Estatísticas Principais */}
