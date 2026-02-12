@@ -2,7 +2,7 @@ import { VisibilityOutlined } from "@mui/icons-material";
 import { useState } from "react";
 import { useLoaderData, Link, useNavigate } from "react-router";
 import { Edit, ReceiptLong } from "@mui/icons-material";
-import { PedidoPublic, StatusPedido } from "../../types/pedido.types";
+import { PedidoPaginated, PedidoPublic, StatusPedido } from "../../types/pedido.types";
 import { ProdutoPublic } from "../../types/produto.types";
 import { formatDate, formatNumber } from "../../utils/format.utils";
 
@@ -21,6 +21,11 @@ import {
 
 import PageHeader from "../../components/PageHeader";
 import OrderDetails from "./components/OrderDetails";
+import StatusFilter from "./components/StatusFilter";
+import RangeFilter from "../../components/RangeFilter";
+import Searchbar from "../../components/Searchbar";
+import AppPagination from "../../components/AppPagination";
+import DateFilter from "./components/DateFilter";
 
 export const statusStyles: Record<string, string> = {
   [StatusPedido.AGUARDANDO_PAGAMENTO]:
@@ -36,7 +41,7 @@ export const statusStyles: Record<string, string> = {
 
 function OrdersListPage() {
   const { pedidos, produtos } = useLoaderData() as {
-    pedidos: PedidoPublic[];
+    pedidos: PedidoPaginated; 
     produtos: ProdutoPublic[];
   };
 
@@ -60,6 +65,12 @@ function OrdersListPage() {
         buttonLabel="Novo Pedido"
         buttonTo="cadastrar"
       ></PageHeader>
+
+      <Searchbar placeholder="Buscar por cliente ou observação">
+        <DateFilter />
+        <StatusFilter />
+        <RangeFilter label="Total" paramMin="min_total" paramMax="max_total" />
+      </Searchbar>
 
       <TableContainer className="!border-none !shadow-none overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <Table sx={{ minWidth: 650 }}>
@@ -92,7 +103,7 @@ function OrdersListPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {pedidos.length === 0 ? (
+            {pedidos.dados.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -103,7 +114,7 @@ function OrdersListPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              pedidos.map((pedido) => (
+              pedidos.dados.map((pedido) => (
                 <TableRow
                   key={pedido.id}
                   className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
@@ -170,6 +181,7 @@ function OrdersListPage() {
             )}
           </TableBody>
         </Table>
+        <AppPagination total={pedidos.total}/>
       </TableContainer>
       <Drawer
         anchor="right"

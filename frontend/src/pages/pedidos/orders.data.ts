@@ -5,14 +5,26 @@ import { productsService } from "../../services/products.service";
 import { ClientePublic } from "../../types/cliente.types";
 import { ProdutoPublic } from "../../types/produto.types";
 import { PedidoPublic, PedidoCreate } from "../../types/pedido.types";
+import { getCommonParams } from "../../utils/loader.utils";
 
-export async function ordersListLoader() {
-  const [pedidos, produtos] = await Promise.all([
-    ordersService.getAll(),
-    productsService.getAll()
+export async function ordersListLoader({ request }: LoaderFunctionArgs) {
+  const params = getCommonParams(request, [
+    "status",
+    "data_pedido",
+    "min_total",
+    "max_total",
   ]);
 
-  return { pedidos, produtos };
+  const [pedidos, produtos] = await Promise.all([
+    ordersService.getAll(params), // O objeto 'params' já tem q, status, skip, limit, etc.
+    productsService.getAll(),
+  ]);
+
+  // Retorna 'pedidos' como objeto (para a tabela) e 'produtos' como array (para filtros/modais)
+  return {
+    pedidos,
+    produtos: produtos.dados,
+  };
 }
 
 export type CreateLoaderData = {
@@ -25,7 +37,11 @@ export async function orderCreateLoader(): Promise<CreateLoaderData> {
     clientsService.getAll(),
     productsService.getAll(),
   ]);
-  return { clientes, produtos };
+
+  return {
+    clientes: clientes.dados,
+    produtos: produtos.dados,
+  };
 }
 
 export async function orderCreateAction({ request }: ActionFunctionArgs) {
@@ -49,11 +65,7 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
         fileFormData.append("file", value);
 
         // Faz o upload de cada arte vinculando ao novo pedido
-        await ordersService.uploadArt(
-          newOrder.id,
-          produto_id,
-          fileFormData
-        );
+        await ordersService.uploadArt(newOrder.id, produto_id, fileFormData);
       }
     }
 
@@ -78,12 +90,16 @@ export async function orderUpdateLoader({
   }
 
   const [pedido, clientes, produtos] = await Promise.all([
-    ordersService.getById(params.id),
+    ordersService.getById(Number(params.id)),
     clientsService.getAll(),
     productsService.getAll(),
   ]);
 
-  return { pedido, clientes, produtos };
+  return {
+    pedido,
+    clientes: clientes.dados,
+    produtos: produtos.dados,
+  };
 }
 
 // Define os handlers para cada ação específica de itens
@@ -126,11 +142,14 @@ export async function orderUpdateAction({
   }
 }
 
-export async function orderUploadArtAction({ request, params }) {
+export async function orderUploadArtAction({
+  request,
+  params,
+}: ActionFunctionArgs) {
   const formData = await request.formData();
   return await ordersService.uploadArt(
     Number(params.id), // 'id' vem da rota pai (:id)
     Number(params.produto_id),
-    formData
+    formData,
   );
 }
