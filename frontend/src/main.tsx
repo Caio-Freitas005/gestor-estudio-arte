@@ -38,6 +38,15 @@ const theme = createTheme({
         },
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#ec4899",
+          },
+        },
+      },
+    },
   },
 });
 
@@ -70,5 +79,5 @@ createRoot(document.getElementById("root")!).render(
         <RouterProvider router={router} />
       </ThemeProvider>
     </StyledEngineProvider>
-  </StrictMode>
+  </StrictMode>,
 );
