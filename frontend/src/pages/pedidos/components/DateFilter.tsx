@@ -1,15 +1,23 @@
 import { useSearchParams } from "react-router";
 import { TextField } from "@mui/material";
 
-function DateFilter() {
+interface DateFilterProps {
+  label: string;
+  param: string;
+}
+
+function DateFilter({ label, param }: DateFilterProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const date = searchParams.get("data_pedido") || "";
+  const date = searchParams.get(param) || "";
 
   const handleChange = (val: string) => {
     setSearchParams((prev) => {
-      if (val) prev.set("data_pedido", val);
-      else prev.delete("data_pedido");
-      
+      if (val) {
+        prev.set(param, val);
+      } else {
+        prev.delete(param);
+      }
+
       prev.set("page", "0"); // Sempre reseta a página ao filtrar
       return prev;
     });
@@ -17,7 +25,7 @@ function DateFilter() {
 
   return (
     <TextField
-      label="Data"
+      label={label}
       type="date"
       size="small"
       value={date}

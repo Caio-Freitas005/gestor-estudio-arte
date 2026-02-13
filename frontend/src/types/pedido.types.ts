@@ -41,6 +41,7 @@ export interface ItemPedidoPublic {
 
 export interface PedidoBase {
   data_pedido: string;
+  data_conclusao?: string | null;
   status: StatusPedido;
   observacoes?: string | null;
   total: number;

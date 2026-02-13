@@ -2,7 +2,11 @@ import { VisibilityOutlined } from "@mui/icons-material";
 import { useState } from "react";
 import { useLoaderData, Link, useNavigate } from "react-router";
 import { Edit, ReceiptLong } from "@mui/icons-material";
-import { PedidoPaginated, PedidoPublic, StatusPedido } from "../../types/pedido.types";
+import {
+  PedidoPaginated,
+  PedidoPublic,
+  StatusPedido,
+} from "../../types/pedido.types";
 import { ProdutoPublic } from "../../types/produto.types";
 import { formatDate, formatNumber } from "../../utils/format.utils";
 
@@ -41,7 +45,7 @@ export const statusStyles: Record<string, string> = {
 
 function OrdersListPage() {
   const { pedidos, produtos } = useLoaderData() as {
-    pedidos: PedidoPaginated; 
+    pedidos: PedidoPaginated;
     produtos: ProdutoPublic[];
   };
 
@@ -67,7 +71,8 @@ function OrdersListPage() {
       ></PageHeader>
 
       <Searchbar placeholder="Buscar por cliente ou observação">
-        <DateFilter />
+        <DateFilter label="Pedido" param="data_pedido" />
+        <DateFilter label="Conclusão" param="data_conclusao" />
         <StatusFilter />
         <RangeFilter label="Total" paramMin="min_total" paramMax="max_total" />
       </Searchbar>
@@ -81,6 +86,9 @@ function OrdersListPage() {
               </TableCell>
               <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
                 Data
+              </TableCell>
+              <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
+                Data de Conclusão
               </TableCell>
               <TableCell className="!font-bold text-gray-400 !text-[10px] !uppercase !tracking-wider">
                 Cliente
@@ -133,6 +141,11 @@ function OrdersListPage() {
                   <TableCell className="text-gray-600 font-medium text-sm">
                     {formatDate(pedido.data_pedido)}
                   </TableCell>
+                  <TableCell className="text-gray-600 font-medium text-sm">
+                    {pedido.data_conclusao
+                      ? formatDate(pedido.data_conclusao)
+                      : "-"}
+                  </TableCell>
                   <TableCell>
                     <span className="font-semibold text-gray-800">
                       {pedido.cliente?.nome || (
@@ -181,7 +194,7 @@ function OrdersListPage() {
             )}
           </TableBody>
         </Table>
-        <AppPagination total={pedidos.total}/>
+        <AppPagination total={pedidos.total} />
       </TableContainer>
       <Drawer
         anchor="right"

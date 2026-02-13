@@ -102,8 +102,7 @@ function OrderDetails({
               >
                 <Cake sx={{ fontSize: 16 }} />
                 <Typography variant="body2" className="!font-medium">
-                  Nascimento: {" "}
-                  {formatDate(pedido.cliente.data_nascimento)}
+                  Nascimento: {formatDate(pedido.cliente.data_nascimento)}
                 </Typography>
               </Stack>
             )}
@@ -152,7 +151,7 @@ function OrderDetails({
                           variant="subtitle1"
                           className="!font-bold !text-slate-800 !leading-tight truncate-multiline"
                         >
-                          {produto?.nome || `Produto #${item.produto_id}`}
+                          {produto.nome}
                         </Typography>
 
                         <Typography
@@ -225,6 +224,22 @@ function OrderDetails({
                 {formatDate(pedido.data_pedido)}
               </Typography>
             </Box>
+            {pedido.data_conclusao && (
+              <Box>
+                <Typography
+                  variant="caption"
+                  className="!text-slate-400 !uppercase !font-bold"
+                >
+                  Data de Conclusão
+                </Typography>
+                <Typography
+                  variant="body1"
+                  className="!text-slate-700 !font-medium"
+                >
+                  {formatDate(pedido.data_conclusao)}
+                </Typography>
+              </Box>
+            )}
             <Box className="text-right">
               <Typography
                 variant="caption"

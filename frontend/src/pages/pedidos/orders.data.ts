@@ -11,6 +11,7 @@ export async function ordersListLoader({ request }: LoaderFunctionArgs) {
   const params = getCommonParams(request, [
     "status",
     "data_pedido",
+    "data_conclusao",
     "min_total",
     "max_total",
   ]);
