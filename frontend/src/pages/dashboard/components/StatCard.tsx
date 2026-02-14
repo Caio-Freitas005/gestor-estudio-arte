@@ -1,4 +1,3 @@
-// src/pages/dashboard/components/StatCard.tsx
 import { Paper, Typography } from "@mui/material";
 
 interface StatCardProps {

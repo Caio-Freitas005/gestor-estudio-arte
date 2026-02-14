@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Link, Outlet } from "react-router";
-import {
-  ListAlt,
-  AddCircleOutline,
-  DashboardOutlined,
-} from "@mui/icons-material";
+import { ListAlt, AddCircleOutline } from "@mui/icons-material";
 import SidebarItem from "./components/SidebarItem";
 
 function App() {
