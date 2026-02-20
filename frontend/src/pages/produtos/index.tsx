@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLoaderData, useFetcher } from "react-router";
 import { DeleteOutline, Edit, SellOutlined } from "@mui/icons-material";
 import { ProdutoPaginated } from "../../types/produto.types";
+import { formatNumber } from "../../utils/format.utils";
 
 import {
   Table,
@@ -14,6 +15,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
+
 import PageHeader from "../../components/PageHeader";
 import DeleteDialog from "../../components/DeleteDialog";
 import AppPagination from "../../components/AppPagination";
@@ -116,7 +118,7 @@ function ProductsListPage() {
                   </TableCell>
                   <TableCell align="right">
                     <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-50 text-sm">
-                      R$ {Number(produto.preco_base).toFixed(2)}
+                      R$ {formatNumber(produto.preco_base)}
                     </span>
                   </TableCell>
                   <TableCell align="center">
