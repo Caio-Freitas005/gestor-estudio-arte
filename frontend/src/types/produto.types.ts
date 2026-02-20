@@ -6,7 +6,7 @@ import { PaginatedResponse } from "./common.types";
 interface ProdutoBase {
   nome: string;
   descricao?: string | null;
-  preco_base?: string | null;
+  preco_base?: number | null;
   unidade_medida?: string | null;
 }
 

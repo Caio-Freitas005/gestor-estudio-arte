@@ -45,6 +45,7 @@ export interface PedidoBase {
   status: StatusPedido;
   observacoes?: string | null;
   total: number;
+  desconto?: number;
   cliente_id: number;
 }
 
@@ -54,6 +55,7 @@ export interface PedidoCreate {
   status?: StatusPedido;
   observacoes?: string;
   itens: ItemPedidoInput[];
+  desconto?: number;
 }
 
 export interface PedidoPublic extends PedidoBase {
