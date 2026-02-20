@@ -1,6 +1,7 @@
 import { useLoaderData } from "react-router";
 import { Typography, Alert } from "@mui/material";
 import { UpdateLoaderData } from "./orders.data";
+import { formatNumber } from "../../utils/format.utils";
 import OrderForm from "./components/OrderForm";
 
 function OrderUpdatePage() {
@@ -20,7 +21,7 @@ function OrderUpdatePage() {
 
       <Alert severity="info" className="shadow-sm border border-blue-100 bg-blue-50">
         Editando pedido de <strong>{pedido.cliente?.nome}</strong>. 
-        Valor total atual: <strong>R$ {Number(pedido.total).toFixed(2)}</strong>
+        Valor total atual: <strong>R$ {formatNumber(pedido.total)}</strong>
       </Alert>
 
       <OrderForm 
