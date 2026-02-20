@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "react-router";
 import { productsService } from "../../services/products.service";
-import { cleanFormData } from "../../utils/form.utils";
+import { cleanFormData, parseBrazilianNumber } from "../../utils/form.utils";
 import { getCommonParams } from "../../utils/loader.utils";
 import {
   ProdutoCreate,
@@ -10,17 +10,19 @@ import {
 
 export async function productsListLoader({ request }: LoaderFunctionArgs) {
   const params = getCommonParams(request, ["min_preco", "max_preco"]);
-  const produtos = await productsService.getAll(params)
+  const produtos = await productsService.getAll(params);
 
   return { produtos };
 }
 
 export async function productCreateAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const dataToSend = cleanFormData<ProdutoCreate>(formData);
+  const data = cleanFormData<ProdutoCreate>(formData);
+  
+  data.preco_base = parseBrazilianNumber(data.preco_base);
 
   try {
-    await productsService.create(dataToSend);
+    await productsService.create(data);
     return redirect("/produtos");
   } catch (err) {
     console.error(err);
@@ -54,10 +56,12 @@ export async function productUpdateAction({
   }
 
   const formData = await request.formData();
-  const dataToSend = cleanFormData<ProdutoUpdate>(formData);
+  const data = cleanFormData<ProdutoUpdate>(formData);
+
+  data.preco_base = parseBrazilianNumber(data.preco_base);
 
   try {
-    await productsService.update(params.id, dataToSend);
+    await productsService.update(params.id, data);
     return redirect("/produtos");
   } catch (err) {
     console.error(err);

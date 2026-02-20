@@ -1,5 +1,7 @@
 import { Form, useNavigation } from "react-router";
 import { Button, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import { formatBrazilianInput, parseBrazilianNumber } from "../../../utils/form.utils";
 import { ProdutoPublic } from "../../../types/produto.types";
 import FormSection from "../../../components/FormSection";
 
@@ -12,6 +14,16 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
   const isSubmitting = navigation.state === "submitting";
 
   const produto = defaultValues || ({} as ProdutoPublic);
+
+  const [precoInput, setPrecoInput] = useState<string>(
+    formatBrazilianInput(defaultValues?.preco_base || 0)
+  );
+
+  useEffect(() => {
+    if (defaultValues?.preco_base !== undefined) {
+      setPrecoInput(formatBrazilianInput(defaultValues.preco_base));
+    }
+  }, [defaultValues]);
 
   return (
     <Form method="post" className="flex flex-col gap-8 max-w-4xl">
@@ -49,7 +61,14 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
           label="Preço Base (R$)"
           name="preco_base"
           required
-          defaultValue={produto.preco_base ?? ""}
+          type="text" 
+          value={precoInput}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (/^[0-9]*[.,]?[0-9]*$/.test(val) || val === "") {
+              setPrecoInput(val);
+            }
+          }}
           variant="outlined"
           size="small"
           fullWidth
