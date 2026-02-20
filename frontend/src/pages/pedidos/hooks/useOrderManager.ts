@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useSubmit, useFetcher } from "react-router";
 import { ItemPedidoInput, PedidoPublic } from "../../../types/pedido.types";
-import { cleanFormData } from "../../../utils/form.utils";
+import { cleanFormData, parseBrazilianNumber } from "../../../utils/form.utils";
 
 export function useOrderManager(
   defaultValues?: PedidoPublic,
-  isEditing?: boolean
+  isEditing?: boolean,
 ) {
   const submit = useSubmit();
   const fetcher = useFetcher();
@@ -15,14 +15,14 @@ export function useOrderManager(
 
   // Estado para arquivos que esperam a criação do pedido
   const [pendingFiles, setPendingFiles] = useState<Map<number, File>>(
-    new Map()
+    new Map(),
   );
 
   const addItem = (newItem: ItemPedidoInput) => {
     if (isEditing) {
       fetcher.submit(
         { intent: "add_item", ...newItem },
-        { method: "post", encType: "application/json" }
+        { method: "post", encType: "application/json" },
       );
     } else {
       setLocalItems((prev) => [...prev, newItem]);
@@ -34,12 +34,12 @@ export function useOrderManager(
       if (confirm("Deseja remover este item do pedido?")) {
         fetcher.submit(
           { intent: "remove_item", produto_id },
-          { method: "post", encType: "application/json" }
+          { method: "post", encType: "application/json" },
         );
       }
     } else {
       setLocalItems((prev) =>
-        prev.filter((it) => it.produto_id !== produto_id)
+        prev.filter((it) => it.produto_id !== produto_id),
       );
     }
   };
@@ -48,33 +48,37 @@ export function useOrderManager(
     if (isEditing) {
       fetcher.submit(
         { intent: "update_item", ...updatedItem },
-        { method: "post", encType: "application/json" }
+        { method: "post", encType: "application/json" },
       );
     } else {
       setLocalItems((prev) =>
         prev.map((it) =>
-          it.produto_id === updatedItem.produto_id ? updatedItem : it
-        )
+          it.produto_id === updatedItem.produto_id ? updatedItem : it,
+        ),
       );
     }
   };
 
   const saveOrder = (formData: FormData) => {
     const headerData = cleanFormData<any>(formData);
+
+    // Cria o objeto base com as conversões necessárias
+    const processedData = {
+      ...headerData,
+      cliente_id: Number(headerData.cliente_id),
+      desconto: parseBrazilianNumber(headerData.desconto)
+    };
+
     if (isEditing) {
-      submit(
-        { ...headerData, cliente_id: Number(headerData.cliente_id) },
-        { method: "post", encType: "application/json" }
-      );
+      submit(processedData, { method: "post", encType: "application/json" });
     } else {
       const finalData = new FormData();
       finalData.append(
         "orderData",
         JSON.stringify({
-          ...headerData,
-          cliente_id: Number(headerData.cliente_id),
+          ...processedData,
           itens: localItems.map(({ caminho_arte, ...rest }) => rest),
-        })
+        }),
       );
       pendingFiles.forEach((file, id) => finalData.append(`file_${id}`, file));
       submit(finalData, { method: "post", encType: "multipart/form-data" });
@@ -97,8 +101,8 @@ export function useOrderManager(
         prev.map((it) =>
           it.produto_id === produto_id
             ? { ...it, caminho_arte: previewUrl }
-            : it
-        )
+            : it,
+        ),
       );
     }
   };
