@@ -35,6 +35,14 @@ function OrderDetails({
   onClose,
   onEdit,
 }: OrderDetailsProps) {
+  // Calcula o Subtotal somando os itens
+  const subtotal = pedido.itens.reduce((acc, item) => {
+    return acc + item.quantidade * item.preco_unitario;
+  }, 0);
+
+  // Garante que o desconto é tratado como número (caso venha null/undefined)
+  const desconto = pedido.desconto || 0;
+
   return (
     <Box sx={{ width: "100%", p: 3, bgcolor: "#FDF2F8", minHeight: "100vh" }}>
       <Stack
@@ -210,46 +218,69 @@ function OrderDetails({
             justifyContent="space-between"
             alignItems="flex-end"
           >
-            <Box>
-              <Typography
-                variant="caption"
-                className="!text-slate-400 !uppercase !font-bold"
-              >
-                Data do Pedido
-              </Typography>
-              <Typography
-                variant="body1"
-                className="!text-slate-700 !font-medium"
-              >
-                {formatDate(pedido.data_pedido)}
-              </Typography>
-            </Box>
-            {pedido.data_conclusao && (
+            <Stack spacing={2}>
               <Box>
                 <Typography
                   variant="caption"
                   className="!text-slate-400 !uppercase !font-bold"
                 >
-                  Data de Conclusão
+                  Data do Pedido
                 </Typography>
                 <Typography
                   variant="body1"
                   className="!text-slate-700 !font-medium"
                 >
-                  {formatDate(pedido.data_conclusao)}
+                  {formatDate(pedido.data_pedido)}
                 </Typography>
               </Box>
-            )}
+              {pedido.data_conclusao && (
+                <Box>
+                  <Typography
+                    variant="caption"
+                    className="!text-slate-400 !uppercase !font-bold"
+                  >
+                    Data de Conclusão
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    className="!text-slate-700 !font-medium"
+                  >
+                    {formatDate(pedido.data_conclusao)}
+                  </Typography>
+                </Box>
+              )}
+            </Stack>
+
             <Box className="text-right">
-              <Typography
-                variant="caption"
-                className="!text-pink-400 !uppercase !font-bold"
-              >
-                Valor Total
-              </Typography>
-              <Typography variant="h5" className="!font-black !text-pink-600">
-                R$ {formatNumber(pedido.total)}
-              </Typography>
+              <Stack spacing={0.5} alignItems="flex-end">
+                <Typography variant="body2" className="!text-slate-500">
+                  Subtotal: R$ {formatNumber(subtotal)}
+                </Typography>
+
+                {desconto > 0 && (
+                  <Typography
+                    variant="body2"
+                    className="!text-red-500 !font-bold"
+                  >
+                    Desconto: - R$ {formatNumber(desconto)}
+                  </Typography>
+                )}
+
+                <Box className="mt-2">
+                  <Typography
+                    variant="caption"
+                    className="!text-pink-400 !uppercase !font-bold block"
+                  >
+                    Valor Total
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    className="!font-black !text-pink-600"
+                  >
+                    R$ {formatNumber(pedido.total)}
+                  </Typography>
+                </Box>
+              </Stack>
             </Box>
           </Stack>
         </FormSection>
