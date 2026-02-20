@@ -63,7 +63,13 @@ async def update_order(
     pedido_id: int, pedido: PedidoUpdate, session: SessionDep
 ) -> Pedido:
     """Atualiza dados básicos do pedido."""
-    return pedido_service.update(session, pedido_id, pedido)
+    db_pedido = pedido_service.get_or_404(session, pedido_id)
+    
+    pedido_atualizado = pedido_service.update_and_recalculate(
+        session, db_pedido=db_pedido, obj=pedido
+    )
+
+    return pedido_atualizado
 
 
 @router.post("/{pedido_id}/itens", response_model=PedidoPublic)

@@ -17,10 +17,10 @@ from ..models import (
     ItemPedidoInput,
     ItemPedidoUpdate,
     Pedido,
-    StatusPedido,
     PedidoCreate,
     PedidoUpdate,
     Produto,
+    StatusPedido,
 )
 from .base_service import BaseService
 
@@ -137,11 +137,35 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
 
         # Consolida itens duplicados no input inicial
         itens_dict = {}
+        subtotal_previsto = Decimal(0.0)
+
         for item in obj.itens:
+            # Busca produto para saber o preço (caso não informado)
+            produto = session.get(Produto, item.produto_id)
+            if not produto:
+                raise HTTPException(
+                    status_code=404, detail=f"Produto {item.produto_id} não encontrado"
+                )
+
+            preco = (
+                item.preco_unitario
+                if item.preco_unitario is not None
+                else produto.preco_base
+            )
+            subtotal_previsto += Decimal(item.quantidade) * preco
+
+            # Lógica de consolidação
             if item.produto_id in itens_dict:
                 itens_dict[item.produto_id].quantidade += item.quantidade  # type: ignore
             else:
                 itens_dict[item.produto_id] = item
+
+        desconto = obj.desconto if obj.desconto else Decimal(0.0)
+        if desconto > subtotal_previsto:
+            raise HTTPException(
+                status_code=400,
+                detail=f"O desconto (R$ {desconto}) não pode ser maior que o subtotal (R$ {subtotal_previsto}).",
+            )
 
         db_pedido = Pedido.model_validate(obj.model_dump(exclude={"itens"}))
 
@@ -159,12 +183,55 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
 
     def update_total(self, session: Session, pedido: Pedido):
         """Recalcula o valor total do pedido."""
-        total = sum(
+        # Calcula subtotal dos itens
+        subtotal = sum(
             (item.preco_unitario * Decimal(item.quantidade)) for item in pedido.itens
         )
+
+        # Obtém desconto, garantindo que não seja None
+        desconto = pedido.desconto if pedido.desconto else Decimal(0.0)
+
+        # Total líquido
+        total = subtotal - desconto
+
+        if total < 0:
+            total = Decimal(0.0)
+
         pedido.total = total  # type: ignore
         session.add(pedido)
         session.commit()
+
+    def update_and_recalculate(
+        self, session: Session, db_pedido: Pedido, obj: PedidoUpdate
+    ) -> Pedido:
+        """Atualiza, recalcula e valida se o novo desconto é compatível com o subtotal atual."""
+
+        # Se o usuário está tentando alterar o desconto
+        if obj.desconto is not None:
+            # Calcula o subtotal atual do pedido existente no banco
+            subtotal_atual = sum(
+                (item.preco_unitario * Decimal(item.quantidade))
+                for item in db_pedido.itens
+            )
+
+            if obj.desconto > subtotal_atual:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"O desconto (R$ {obj.desconto}) não pode ser maior que o subtotal atual do pedido (R$ {subtotal_atual}).",
+                )
+
+        # Aplica as mudanças do schema
+        update_data = obj.model_dump(exclude_unset=True)
+        db_pedido.sqlmodel_update(update_data)
+
+        session.add(db_pedido)
+        session.commit()
+        session.refresh(db_pedido)
+
+        # Força o recálculo do total (caso o desconto tenha mudado)
+        self.update_total(session, db_pedido)
+
+        return db_pedido
 
     def add_item(
         self, session: Session, pedido_id: int, item: ItemPedidoInput
