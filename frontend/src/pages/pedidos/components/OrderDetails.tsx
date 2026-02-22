@@ -121,9 +121,7 @@ function OrderDetails({
           <div className="flex flex-col">
             {pedido.itens.map((item, index) => {
               const produto = produtos?.find((p) => p.id === item.produto_id);
-              const imgUrl = item.caminho_arte?.startsWith("blob:")
-                ? item.caminho_arte
-                : `${API_URL}${item.caminho_arte}`;
+              const imgUrl = `${API_URL}${item.caminho_arte}`;
 
               return (
                 <div

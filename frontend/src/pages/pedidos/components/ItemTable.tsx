@@ -97,6 +97,9 @@ function ItemTable({
           {items.map((item) => {
             const isEditing = editId === item.produto_id;
             const produto = produtos?.find((p) => p.id === item.produto_id);
+            const imgUrl = item.caminho_arte?.startsWith("blob:")
+              ? item.caminho_arte
+              : `${API_URL}${item.caminho_arte}`;
 
             return (
               <TableRow key={item.produto_id}>
@@ -162,28 +165,16 @@ function ItemTable({
                     (isEditing
                       ? editData.preco_unitario
                       : item.preco_unitario) *
-                      (isEditing ? editData.quantidade : item.quantidade)
+                      (isEditing ? editData.quantidade : item.quantidade),
                   )}
                 </TableCell>
                 <TableCell align="center">
                   {item.caminho_arte ? (
                     <div className="flex flex-col items-center gap-1">
-                      <a
-                        href={
-                          item.caminho_arte.startsWith("blob:")
-                            ? item.caminho_arte
-                            : `${API_URL}${item.caminho_arte}`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                      <a href={imgUrl} target="_blank" rel="noreferrer">
                         <Tooltip title="Clique para ampliar">
                           <img
-                            src={
-                              item.caminho_arte.startsWith("blob:")
-                                ? item.caminho_arte
-                                : `${API_URL}${item.caminho_arte}`
-                            }
+                            src={imgUrl}
                             className="w-16 h-16 object-cover rounded-lg shadow-sm border-2 border-transparent hover:border-pink-400 transition-all cursor-zoom-in"
                           />
                         </Tooltip>
