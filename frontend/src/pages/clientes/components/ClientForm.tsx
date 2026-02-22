@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form, useNavigation } from "react-router";
 import { formatPhoneInput } from "../../../utils/form.utils";
 import { Button, TextField } from "@mui/material";

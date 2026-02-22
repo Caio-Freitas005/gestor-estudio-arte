@@ -1,6 +1,6 @@
 import { Form, useNavigation } from "react-router";
 import { Button, TextField } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { formatBrazilianInput, parseBrazilianNumber } from "../../../utils/form.utils";
 import { ProdutoPublic } from "../../../types/produto.types";
 import FormSection from "../../../components/FormSection";

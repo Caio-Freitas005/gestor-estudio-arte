@@ -1,5 +1,5 @@
 import { Form } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { formatBrazilianInput, parseBrazilianNumber } from "../../../utils/form.utils"
 import { useOrderManager } from "../hooks/useOrderManager";
 import { formatDateForInput } from "../../../utils/form.utils"
