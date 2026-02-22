@@ -16,6 +16,7 @@ from ..models import (
     StatusPedido,
 )
 from ..services import pedido_service
+from ..utils.imagem import process_art_image
 
 router = APIRouter(prefix="/pedidos", tags=["pedidos"])
 
@@ -64,7 +65,7 @@ async def update_order(
 ) -> Pedido:
     """Atualiza dados básicos do pedido."""
     db_pedido = pedido_service.get_or_404(session, pedido_id)
-    
+
     pedido_atualizado = pedido_service.update_and_recalculate(
         session, db_pedido=db_pedido, obj=pedido
     )
@@ -101,13 +102,10 @@ async def upload_item_art(
     pedido_id: int, produto_id: int, session: SessionDep, file: UploadFile = File(...)
 ) -> Pedido:
     """Processa o upload da arte e vincula ao item do pedido."""
-    # Processa e salva o caminho no banco de dados
-    caminho_relativo = pedido_service.process_art_image(file, pedido_id, produto_id)
+    # Processa a imagem e retorna seu caminho de arquivo
+    caminho_arte = process_art_image(file, pedido_id, produto_id)
 
-    # Atualiza o registro no banco de dados
-    db_item = pedido_service.get_item_or_404(session, pedido_id, produto_id)
-    db_item.caminho_arte = caminho_relativo
-    session.add(db_item)
-    session.commit()
-
-    return pedido_service.get_by_id_detailed(session, pedido_id)
+    # Salva o caminho no banco
+    return pedido_service.update_item_art_path(
+        session, pedido_id, produto_id, caminho_arte
+    )

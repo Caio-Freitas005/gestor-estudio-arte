@@ -1,16 +1,12 @@
-import io
 from datetime import date
 from decimal import Decimal
-from typing import Sequence
-from uuid import uuid4
+from typing import Literal, Sequence
 
-from fastapi import HTTPException, UploadFile
-from PIL import Image, ImageOps
+from fastapi import HTTPException
 from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 from sqlmodel import Session, select
 
-from ..config import ARTES_DIR
 from ..models import (
     Cliente,
     ItemPedido,
@@ -29,28 +25,46 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
     def __init__(self):
         super().__init__(Pedido)
 
-    def _prepare_item(self, session: Session, item: ItemPedidoInput) -> ItemPedido:
+    def _get_item_price(
+        self, session: Session, produto_id: int, preco_input: Decimal | None
+    ) -> Decimal:
         """Lógica centralizada para validar produto e definir preço."""
-        produto = session.get(Produto, item.produto_id)
+        # Se não houver valor praticado no input, usa o valor base do produto
+        if preco_input is not None:
+            return preco_input
+
+        produto = session.get(Produto, produto_id)
         if not produto:
             raise HTTPException(
                 status_code=404,
-                detail=f"Produto com ID {item.produto_id} não encontrado.",
+                detail=f"Produto com ID {produto_id} não encontrado.",
+            )
+        return produto.preco_base
+
+    def _validate_discount(
+        self, subtotal: Decimal | Literal[0], desconto: Decimal | None
+    ):
+        """Valida se o novo desconto é compatível com o subtotal atual."""
+        desc_val = desconto or Decimal("0.0")
+        if desc_val > subtotal:
+            raise HTTPException(
+                status_code=400,
+                detail=f"O desconto (R$ {desc_val}) não pode ser maior que o subtotal (R$ {subtotal}).",
             )
 
-        # Se não houver valor praticado no input, usa o valor base do produto
-        preco = (
-            item.preco_unitario
-            if item.preco_unitario is not None
-            else produto.preco_base
+    def _recalculate_totals(self, pedido: Pedido):
+        """Recalcula o valor total do pedido. (Apenas em memória, previne múltiplos commits)"""
+        # Calcula subtotal dos itens
+        subtotal = sum(
+            (Decimal(item.preco_unitario) * Decimal(item.quantidade))
+            for item in pedido.itens
         )
 
-        return ItemPedido(
-            produto_id=item.produto_id,
-            quantidade=item.quantidade,
-            observacoes=item.observacoes,
-            preco_unitario=preco,
-        )
+        # Obtém desconto, garantindo que não seja None
+        desconto = pedido.desconto or Decimal("0.0")
+
+        # Total líquido (garantindo precisão Decimal e evitando valores negativos)
+        pedido.total = max(Decimal("0.0"), subtotal - desconto)  # type: ignore
 
     def get_all_detailed(
         self,
@@ -136,144 +150,129 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             raise HTTPException(status_code=400, detail="O pedido não pode ser vazio.")
 
         # Consolida itens duplicados no input inicial
-        itens_dict = {}
-        subtotal_previsto = Decimal(0.0)
+        itens_dict: dict[int, ItemPedido] = {}
+        subtotal_previsto = Decimal("0.0")
 
         for item in obj.itens:
-            # Busca produto para saber o preço (caso não informado)
-            produto = session.get(Produto, item.produto_id)
-            if not produto:
-                raise HTTPException(
-                    status_code=404, detail=f"Produto {item.produto_id} não encontrado"
-                )
-
-            preco = (
-                item.preco_unitario
-                if item.preco_unitario is not None
-                else produto.preco_base
-            )
+            # Lógica centralizada para validar produto e definir preço
+            preco = self._get_item_price(session, item.produto_id, item.preco_unitario)
             subtotal_previsto += Decimal(item.quantidade) * preco
 
             # Lógica de consolidação
             if item.produto_id in itens_dict:
                 itens_dict[item.produto_id].quantidade += item.quantidade  # type: ignore
             else:
-                itens_dict[item.produto_id] = item
+                itens_dict[item.produto_id] = ItemPedido(
+                    produto_id=item.produto_id,
+                    quantidade=item.quantidade,
+                    observacoes=item.observacoes,
+                    preco_unitario=preco,
+                )
 
-        desconto = obj.desconto if obj.desconto else Decimal(0.0)
-        if desconto > subtotal_previsto:
-            raise HTTPException(
-                status_code=400,
-                detail=f"O desconto (R$ {desconto}) não pode ser maior que o subtotal (R$ {subtotal_previsto}).",
-            )
+        self._validate_discount(subtotal_previsto, obj.desconto)
 
         db_pedido = Pedido.model_validate(obj.model_dump(exclude={"itens"}))
 
-        # Usa o _prepare_item para cada item consolidado
-        for item_input in itens_dict.values():  # type: ignore
-            novo_item = self._prepare_item(session, item_input)  # type: ignore
+        # Associa os itens consolidados ao pedido
+        for novo_item in itens_dict.values():
             db_pedido.itens.append(novo_item)
 
-        session.add(db_pedido)
-        session.commit()
-
         # Recalcula o total final (garantindo precisão Decimal)
-        self.update_total(session, db_pedido)
-        return db_pedido
-
-    def update_total(self, session: Session, pedido: Pedido):
-        """Recalcula o valor total do pedido."""
-        # Calcula subtotal dos itens
-        subtotal = sum(
-            (item.preco_unitario * Decimal(item.quantidade)) for item in pedido.itens
-        )
-
-        # Obtém desconto, garantindo que não seja None
-        desconto = pedido.desconto if pedido.desconto else Decimal(0.0)
-
-        # Total líquido
-        total = subtotal - desconto
-
-        if total < 0:
-            total = Decimal(0.0)
-
-        pedido.total = total  # type: ignore
-        session.add(pedido)
-        session.commit()
-
-    def update_and_recalculate(
-        self, session: Session, db_pedido: Pedido, obj: PedidoUpdate
-    ) -> Pedido:
-        """Atualiza, recalcula e valida se o novo desconto é compatível com o subtotal atual."""
-
-        # Se o usuário está tentando alterar o desconto
-        if obj.desconto is not None:
-            # Calcula o subtotal atual do pedido existente no banco
-            subtotal_atual = sum(
-                (item.preco_unitario * Decimal(item.quantidade))
-                for item in db_pedido.itens
-            )
-
-            if obj.desconto > subtotal_atual:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"O desconto (R$ {obj.desconto}) não pode ser maior que o subtotal atual do pedido (R$ {subtotal_atual}).",
-                )
-
-        # Aplica as mudanças do schema
-        update_data = obj.model_dump(exclude_unset=True)
-        db_pedido.sqlmodel_update(update_data)
+        self._recalculate_totals(db_pedido)
 
         session.add(db_pedido)
         session.commit()
         session.refresh(db_pedido)
 
+        return db_pedido
+
+    def update_and_recalculate(
+        self, session: Session, db_pedido: Pedido, obj: PedidoUpdate
+    ) -> Pedido:
+        """Atualiza, recalcula e valida se o novo desconto é compatível com o subtotal atual."""
+        # Se o usuário está tentando alterar o desconto
+        if obj.desconto is not None:
+            # Calcula o subtotal atual do pedido existente no banco
+            subtotal_atual = sum(
+                (Decimal(item.preco_unitario) * Decimal(item.quantidade))
+                for item in db_pedido.itens
+            )
+            self._validate_discount(subtotal_atual, obj.desconto)
+
+        # Aplica as mudanças do schema
+        update_data = obj.model_dump(exclude_unset=True)
+        db_pedido.sqlmodel_update(update_data)
+
         # Força o recálculo do total (caso o desconto tenha mudado)
-        self.update_total(session, db_pedido)
+        self._recalculate_totals(db_pedido)
+
+        session.add(db_pedido)
+        session.commit()
+        session.refresh(db_pedido)
 
         return db_pedido
+
+    def get_item_or_404(
+        self, session: Session, pedido_id: int, produto_id: int
+    ) -> ItemPedido:
+        """Busca item específico por chave composta."""
+        db_item = session.get(ItemPedido, (pedido_id, produto_id))
+        if not db_item:
+            raise HTTPException(status_code=404, detail="Item do pedido não encontrado")
+        return db_item
 
     def add_item(
         self, session: Session, pedido_id: int, item: ItemPedidoInput
     ) -> Pedido:
         """Adiciona ou incrementa item no pedido e atualiza total."""
-        db_pedido = self.get_or_404(session, pedido_id)
-        item_existente = session.get(ItemPedido, (pedido_id, item.produto_id))
+        db_pedido = self.get_by_id_detailed(session, pedido_id)
+
+        item_existente = next(
+            (i for i in db_pedido.itens if i.produto_id == item.produto_id), None
+        )
+        preco = self._get_item_price(session, item.produto_id, item.preco_unitario)
 
         if item_existente:
             # Apenas incrementa se já existir
             item_existente.quantidade += item.quantidade
-
             # Se o usuário enviou um novo valor unitário, atualiza também
             if item.preco_unitario is not None:
                 item_existente.preco_unitario = item.preco_unitario
         else:
-            # Usa o método auxiliar para criar o novo objeto ItemPedido
-            novo_item = self._prepare_item(session, item)
-            novo_item.pedido_id = pedido_id
-            session.add(novo_item)
+            novo_item = ItemPedido(
+                pedido_id=pedido_id,
+                produto_id=item.produto_id,
+                quantidade=item.quantidade,
+                observacoes=item.observacoes,
+                preco_unitario=preco,
+            )
+            db_pedido.itens.append(novo_item)
 
+        self._recalculate_totals(db_pedido)
+
+        session.add(db_pedido)
         session.commit()
-        self.update_total(session, db_pedido)
-        return self.get_by_id_detailed(session, pedido_id)
+        return db_pedido
 
     def update_item(
         self, session: Session, pedido_id: int, produto_id: int, item: ItemPedidoUpdate
     ) -> Pedido:
         """Atualiza a quantidade ou preço de um item e recalcula o total do pedido."""
-        # Busca o item específico (chave composta)
-        db_item = self.get_item_or_404(session, pedido_id, produto_id)
+        db_pedido = self.get_by_id_detailed(session, pedido_id)
+
+        # Busca o item específico 
+        db_item = next((i for i in db_pedido.itens if i.produto_id == produto_id), None)
+        if not db_item:
+            raise HTTPException(status_code=404, detail="Item do pedido não encontrado")
 
         # Aplica as atualizações parciais
-        item_data = item.model_dump(exclude_unset=True)
-        db_item.sqlmodel_update(item_data)
-
-        session.add(db_item)
-        session.commit()
+        db_item.sqlmodel_update(item.model_dump(exclude_unset=True))
 
         # Busca o pedido detalhado para garantir que o total seja recalculado
-        db_pedido = self.get_by_id_detailed(session, pedido_id)
-        self.update_total(session, db_pedido)
+        self._recalculate_totals(db_pedido)
+
+        session.add(db_pedido)
+        session.commit()
 
         return db_pedido
 
@@ -286,41 +285,29 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
                 status_code=400, detail="O pedido não pode ficar vazio."
             )
 
-        db_item = session.get(ItemPedido, (pedido_id, produto_id))
+        db_item = next((i for i in db_pedido.itens if i.produto_id == produto_id), None)
         if not db_item:
             raise HTTPException(status_code=404, detail="Item não encontrado")
 
+        db_pedido.itens.remove(db_item)
         session.delete(db_item)
+
+        self._recalculate_totals(db_pedido)
+        session.add(db_pedido)
         session.commit()
-        self.update_total(session, db_pedido)
         return db_pedido
 
-    def get_item_or_404(
-        self, session: Session, pedido_id: int, produto_id: int
-    ) -> ItemPedido:
-        """Busca item específico por chave composta."""
-        db_item = session.get(ItemPedido, (pedido_id, produto_id))
-        if not db_item:
-            raise HTTPException(status_code=404, detail="Item do pedido não encontrado")
-        return db_item
+    def update_item_art_path(
+        self, session: Session, pedido_id: int, produto_id: int, caminho_arte: str
+    ) -> Pedido:
+        """Atualiza o caminho da arte de um item específico."""
+        db_item = self.get_item_or_404(session, pedido_id, produto_id)
+        db_item.caminho_arte = caminho_arte
 
-    def process_art_image(
-        self, file: UploadFile, pedido_id: int, produto_id: int
-    ) -> str:
-        """Processa e salva imagem, garantindo que tenha formatos permitidos"""
-        try:
-            content = file.file.read()
-            img = Image.open(io.BytesIO(content))
-            if img.format not in ["PNG", "JPG", "JPEG", "WEBP"]:
-                raise HTTPException(status_code=400, detail="Formato não suportado.")
+        session.add(db_item)
+        session.commit()
 
-            img = ImageOps.exif_transpose(img)
-            file_name = f"art_ped_{pedido_id}_prod_{produto_id}_{uuid4().hex}.webp"
-            file_path = ARTES_DIR / file_name
-            img.save(str(file_path), "WEBP", quality=95)
-            return f"/uploads/artes/{file_name}"
-        except Exception:
-            raise HTTPException(status_code=400, detail="Erro ao processar imagem.")
+        return self.get_by_id_detailed(session, pedido_id)
 
 
 pedido_service = PedidoService()
