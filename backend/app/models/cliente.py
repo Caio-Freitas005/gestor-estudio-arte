@@ -1,6 +1,7 @@
 from datetime import date
 from typing import TYPE_CHECKING
 
+from pydantic import EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlmodel import Field, Relationship, SQLModel  # type: ignore
 
@@ -18,7 +19,7 @@ class TelefoneBR(PhoneNumber):
 class ClienteBase(TimestampMixin, SQLModel):
     nome: str = Field(index=True)
     telefone: TelefoneBR | None = Field(default=None, max_length=20, index=True)
-    email: str | None = Field(default=None, max_length=100, unique=True)
+    email: EmailStr | None = Field(default=None, max_length=100, unique=True)
     data_nascimento: date | None = None
     observacoes: str | None = None
 
