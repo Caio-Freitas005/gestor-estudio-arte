@@ -12,7 +12,6 @@ from .item_pedido import ItemPedido, ItemPedidoPublic
 
 if TYPE_CHECKING:
     from .cliente import Cliente
-    from .produto import Produto
 
 
 class ItemPedidoInput(SQLModel):
@@ -50,11 +49,6 @@ class Pedido(PedidoBase, table=True):
     itens: list[ItemPedido] = Relationship(
         back_populates="pedido",
         sa_relationship_kwargs={"cascade": "all, delete-orphan"},
-    )
-
-    # Acesso direto aos produtos
-    produtos: list["Produto"] = Relationship(
-        back_populates="pedidos", link_model=ItemPedido
     )
 
 

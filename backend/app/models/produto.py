@@ -1,13 +1,9 @@
 from decimal import Decimal
-from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel  # type: ignore
 
 from .base import TimestampMixin
 from .item_pedido import ItemPedido
-
-if TYPE_CHECKING:
-    from .pedido import Pedido
 
 
 class ProdutoBase(TimestampMixin, SQLModel):
@@ -24,11 +20,6 @@ class Produto(ProdutoBase, table=True):
 
     # Relacionamento direto com a tabela de ligação
     itens_pedido: list[ItemPedido] = Relationship(back_populates="produto")
-
-    # Relacionamento Many-to-Many com Pedidos
-    pedidos: list["Pedido"] = Relationship(
-        back_populates="produtos", link_model=ItemPedido
-    )
 
 
 class ProdutoCreate(ProdutoBase):
