@@ -2,7 +2,8 @@ import { Form } from "react-router";
 import { useEffect, useState } from "react";
 import { formatBrazilianInput, parseBrazilianNumber } from "../../../utils/form.utils"
 import { useOrderManager } from "../hooks/useOrderManager";
-import { formatDateForInput, formatNumber } from "../../../utils/format.utils";
+import { formatDateForInput } from "../../../utils/form.utils"
+import { formatNumber } from "../../../utils/format.utils";
 import { PedidoPublic, StatusPedido } from "../../../types/pedido.types";
 import { ClientePublic } from "../../../types/cliente.types";
 import { ProdutoPublic } from "../../../types/produto.types";
