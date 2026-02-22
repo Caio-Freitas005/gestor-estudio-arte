@@ -6,6 +6,7 @@ import { ClientePublic } from "../../types/cliente.types";
 import { ProdutoPublic } from "../../types/produto.types";
 import { PedidoPublic, PedidoCreate } from "../../types/pedido.types";
 import { getCommonParams } from "../../utils/loader.utils";
+import { FILE_UPLOAD_PREFIX } from "../../utils/constants";
 
 export async function ordersListLoader({ request }: LoaderFunctionArgs) {
   const params = getCommonParams(request, [
@@ -56,10 +57,11 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
   try {
     const newOrder = await ordersService.create(data);
 
-    // Percorre o FormData em busca de arquivos pendentes (file_ID)
+    // Percorre o FormData em busca de arquivos pendentes (Prefixo_ID)
     for (const [key, value] of formData.entries()) {
-      if (key.startsWith("file_") && value instanceof File) {
-        const produto_id = Number(key.split("_")[1]);
+      if (key.startsWith(FILE_UPLOAD_PREFIX) && value instanceof File) {
+        // Extrai apenas o id, retirando o prefixo por completo
+        const produto_id = Number(key.substring(FILE_UPLOAD_PREFIX.length));
 
         // Cria um FormData temporário para cada upload
         const fileFormData = new FormData();

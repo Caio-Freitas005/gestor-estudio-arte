@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSubmit, useFetcher } from "react-router";
 import { ItemPedidoInput, PedidoPublic } from "../../../types/pedido.types";
 import { cleanFormData, parseBrazilianNumber } from "../../../utils/form.utils";
+import { FILE_UPLOAD_PREFIX } from "../../../utils/constants";
 
 export function useOrderManager(
   defaultValues?: PedidoPublic,
@@ -66,7 +67,7 @@ export function useOrderManager(
     const processedData = {
       ...headerData,
       cliente_id: Number(headerData.cliente_id),
-      desconto: parseBrazilianNumber(headerData.desconto)
+      desconto: parseBrazilianNumber(headerData.desconto),
     };
 
     if (isEditing) {
@@ -80,7 +81,11 @@ export function useOrderManager(
           itens: localItems.map(({ caminho_arte, ...rest }) => rest),
         }),
       );
-      pendingFiles.forEach((file, id) => finalData.append(`file_${id}`, file));
+
+      pendingFiles.forEach((file, id) =>
+        finalData.append(`${FILE_UPLOAD_PREFIX}${id}`, file),
+      );
+      
       submit(finalData, { method: "post", encType: "multipart/form-data" });
     }
   };
