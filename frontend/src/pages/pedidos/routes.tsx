@@ -29,12 +29,6 @@ export const orderRoutes = [
     action: orderUpdateAction,
     children: [
       {
-        index: true,
-        element: <OrderUpdatePage />,
-        loader: orderUpdateLoader,
-        action: orderUpdateAction,
-      },
-      {
         path: "itens/:produto_id/upload-arte",
         action: orderUploadArtAction,
       },

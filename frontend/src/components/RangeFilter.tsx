@@ -10,12 +10,20 @@ interface RangeFilterProps {
 
 function RangeFilter({ label, paramMin, paramMax }: RangeFilterProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  // Estado local para evitar múltiplas requisições durante a digitação
-  const [min, setMin] = useState(searchParams.get(paramMin) || "");
-  const [max, setMax] = useState(searchParams.get(paramMax) || "");
+
+  const currentMin = searchParams.get(paramMin) || "";
+  const currentMax = searchParams.get(paramMax) || "";
+
+  // Estado local
+  const [min, setMin] = useState(currentMin);
+  const [max, setMax] = useState(currentMax);
 
   useEffect(() => {
+    // Só faz update se os valores realmente mudaram
+    if (min === currentMin && max === currentMax) {
+      return;
+    }
+
     const handler = setTimeout(() => {
       setSearchParams((prev) => {
         // Atualiza Mínimo
@@ -26,20 +34,20 @@ function RangeFilter({ label, paramMin, paramMax }: RangeFilterProps) {
         if (max) prev.set(paramMax, max);
         else prev.delete(paramMax);
 
-        // Se houve mudança nos filtros, volta para a primeira página
-        if (min !== (searchParams.get(paramMin) || "") || max !== (searchParams.get(paramMax) || "")) {
-          prev.set("page", "0");
-        }
+        prev.set("page", "0");
         return prev;
       });
     }, 600);
 
     return () => clearTimeout(handler);
-  }, [min, max, paramMin, paramMax, setSearchParams, searchParams]);
+  }, [min, max, currentMin, currentMax, paramMin, paramMax, setSearchParams]);
 
   return (
     <div className="flex items-center gap-2 px-3">
-      <Typography variant="caption" className="font-bold text-gray-400 uppercase tracking-tight">
+      <Typography
+        variant="caption"
+        className="font-bold text-gray-400 uppercase tracking-tight"
+      >
         {label}
       </Typography>
       <TextField
@@ -48,7 +56,7 @@ function RangeFilter({ label, paramMin, paramMax }: RangeFilterProps) {
         type="number"
         value={min}
         onChange={(e) => setMin(e.target.value)}
-        sx={{ width: 90, }}
+        sx={{ width: 90 }}
       />
       <TextField
         size="small"
@@ -56,7 +64,7 @@ function RangeFilter({ label, paramMin, paramMax }: RangeFilterProps) {
         type="number"
         value={max}
         onChange={(e) => setMax(e.target.value)}
-        sx={{ width: 90, }}
+        sx={{ width: 90 }}
       />
     </div>
   );
