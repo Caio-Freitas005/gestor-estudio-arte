@@ -1,8 +1,9 @@
+import { useEffect, useState } from "react";
 import { Form, useNavigation } from "react-router";
+import { formatPhoneInput } from "../../../utils/form.utils";
 import { Button, TextField } from "@mui/material";
 import { ClientePublic } from "../../../types/cliente.types";
 import FormSection from "../../../components/FormSection";
-
 interface ClienteFormProps {
   defaultValues?: ClientePublic;
 }
@@ -12,6 +13,18 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
   const isSubmitting = navigation.state === "submitting";
 
   const cliente = defaultValues || ({} as ClientePublic);
+
+  // Estado para controlar o que é visto no input
+  const [telefoneInput, setTelefoneInput] = useState<string>(
+    formatPhoneInput(cliente.telefone)
+  );
+
+  // Sincroniza caso o formulário seja recarregado com novos defaultValues
+  useEffect(() => {
+    if (defaultValues?.telefone !== undefined) {
+      setTelefoneInput(formatPhoneInput(defaultValues.telefone));
+    }
+  }, [defaultValues]);
 
   return (
     <Form method="post" className="flex flex-col gap-8 max-w-4xl">
@@ -31,10 +44,10 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         <TextField
           label="Telefone"
           name="telefone"
-          defaultValue={cliente.telefone ?? ""}
+          value={telefoneInput}
+          onChange={(e) => setTelefoneInput(formatPhoneInput(e.target.value))}
           variant="outlined"
           size="small"
-          slotProps={{ htmlInput: { maxLength: 15 } }}
           fullWidth
         />
         <TextField

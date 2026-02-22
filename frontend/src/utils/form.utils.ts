@@ -45,3 +45,27 @@ export const formatBrazilianInput = (value: number | undefined): string => {
   if (value === undefined || value === 0) return "0";
   return value.toString().replace('.', ',');
 };
+
+export function formatPhoneInput(value: string | null | undefined): string {
+  if (!value) return "";
+
+  // Remove tudo o que não for número
+  let v = value.replace(/\D/g, "");
+
+  // Se a string começar com 55 e tiver 12 ou 13 dígitos (veio do banco de dados), arranca o 55
+  if (v.startsWith("55") && v.length >= 12) {
+    v = v.substring(2);
+  }
+
+  // Limita a 11 dígitos e aplica as máscaras
+  v = v.substring(0, 11);
+
+  // Aplica a máscara com base no tamanho
+  if (v.length <= 10) {
+    // Fixo: (XX) XXXX-XXXX
+    return v.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2");
+  } else {
+    // Celular: (XX) XXXXX-XXXX
+    return v.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+  }
+}
