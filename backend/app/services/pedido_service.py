@@ -238,6 +238,9 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             # Se o usuário enviou um novo valor unitário, atualiza também
             if item.preco_unitario is not None:
                 item_existente.preco_unitario = item.preco_unitario
+                
+            if item.observacoes is not None:
+                item_existente.observacoes = item.observacoes
         else:
             novo_item = ItemPedido(
                 pedido_id=pedido_id,
