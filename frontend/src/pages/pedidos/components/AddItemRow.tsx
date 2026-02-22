@@ -9,13 +9,22 @@ interface AddItemRowProps {
   onAdd: (item: ItemPedidoInput) => void;
 }
 
+interface TempItemState {
+  produto_id: number | ""; 
+  quantidade: number; 
+  observacoes: string;
+  preco_unitario: number;
+}
+
+const INITIAL_TEMP_ITEM: TempItemState = {
+  produto_id: "",
+  quantidade: 1,
+  observacoes: "",
+  preco_unitario: 0,
+};
+
 function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
-  const [tempItem, setTempItem] = useState({
-    produto_id: "" as any,
-    quantidade: 1,
-    observacoes: "",
-    preco_unitario: 0,
-  });
+  const [tempItem, setTempItem] = useState<TempItemState>(INITIAL_TEMP_ITEM);
 
   const handleProductChange = (id: number) => {
     const prod = produtos.find((p) => p.id === id);
@@ -29,12 +38,7 @@ function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
   const submitAdd = () => {
     if (!tempItem.produto_id) return;
     onAdd(tempItem as ItemPedidoInput);
-    setTempItem({
-      produto_id: "",
-      quantidade: 1,
-      observacoes: "",
-      preco_unitario: 0,
-    });
+    setTempItem(INITIAL_TEMP_ITEM);
   };
 
   return (
