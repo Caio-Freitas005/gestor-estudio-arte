@@ -60,14 +60,6 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
   const isDescontoInvalido = desconto > subtotal;
   const totalFinal = Math.max(0, subtotal - desconto);
 
-  // Sincroniza se o valor mudar externamente (edição)
-  useEffect(() => {
-    if (defaultValues?.desconto !== undefined) {
-      setDesconto(defaultValues.desconto);
-      setDescontoInput(formatBrazilianInput(defaultValues.desconto));
-    }
-  }, [defaultValues]);
-
   return (
     <Form
       onSubmit={(e) => {

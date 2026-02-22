@@ -25,6 +25,7 @@ function OrderUpdatePage() {
       </Alert>
 
       <OrderForm 
+        key={pedido.id}
         defaultValues={pedido} 
         clientes={clientes} 
         produtos={produtos} 

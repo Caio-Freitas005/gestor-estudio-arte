@@ -19,13 +19,6 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
     formatPhoneInput(cliente.telefone)
   );
 
-  // Sincroniza caso o formulário seja recarregado com novos defaultValues
-  useEffect(() => {
-    if (defaultValues?.telefone !== undefined) {
-      setTelefoneInput(formatPhoneInput(defaultValues.telefone));
-    }
-  }, [defaultValues]);
-
   return (
     <Form method="post" className="flex flex-col gap-8 max-w-4xl">
       <FormSection

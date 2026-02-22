@@ -8,7 +8,7 @@ function ClientUpdatePage() {
   return (
     <div className="flex flex-col gap-6">
       <Typography variant="h4">Editar <span className="text-pink-500">Cliente</span></Typography>
-      <ClientForm defaultValues={clientData} />
+      <ClientForm key={clientData.id} defaultValues={clientData} />
     </div>
   );
 }

@@ -8,7 +8,7 @@ function ProductUpdatePage() {
   return (
     <div className="flex flex-col gap-6">
       <Typography variant="h4">Editar <span className="text-pink-500">Produto</span></Typography>
-      <ProductForm defaultValues={productData} />
+      <ProductForm key={productData.id} defaultValues={productData} />
     </div>
   );
 }

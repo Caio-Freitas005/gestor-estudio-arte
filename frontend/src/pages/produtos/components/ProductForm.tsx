@@ -19,12 +19,6 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
     formatBrazilianInput(defaultValues?.preco_base || 0)
   );
 
-  useEffect(() => {
-    if (defaultValues?.preco_base !== undefined) {
-      setPrecoInput(formatBrazilianInput(defaultValues.preco_base));
-    }
-  }, [defaultValues]);
-
   return (
     <Form method="post" className="flex flex-col gap-8 max-w-4xl">
       <FormSection
