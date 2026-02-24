@@ -6,9 +6,8 @@ from .cliente import (
     ClientePublicPaginated,
     ClienteUpdate,
 )
-
+from .dashboard import DashboardResponse, DashboardStats
 from .item_pedido import ItemPedido, ItemPedidoPublic, ItemPedidoUpdate
-
 from .pedido import (
     ItemPedidoInput,
     Pedido,
@@ -48,4 +47,6 @@ __all__ = [
     "ItemPedidoPublic",
     "ItemPedidoUpdate",
     "ItemPedidoInput",
+    "DashboardResponse",
+    "DashboardStats",
 ]
