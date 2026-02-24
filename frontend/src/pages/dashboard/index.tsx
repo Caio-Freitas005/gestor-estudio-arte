@@ -31,7 +31,7 @@ import FormSection from "../../components/FormSection";
 import StatCard from "./components/StatCard";
 
 function DashboardPage() {
-  const { stats, pedidosRecentes, aniversariantes } = useLoaderData() as any;
+  const { status, pedidosRecentes, aniversariantes } = useLoaderData() as any;
 
   return (
     <div className="flex flex-col gap-8 max-w-6xl mx-auto w-full">
@@ -47,7 +47,7 @@ function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }}>
           <StatCard
             label="Faturamento Total"
-            value={`R$ ${formatNumber(stats.faturamento)}`}
+            value={`R$ ${formatNumber(status.faturamento)}`}
             icon={<TrendingUp sx={{ fontSize: 60 }} />}
             colorClass="text-emerald-600"
           />
@@ -57,7 +57,7 @@ function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }}>
           <StatCard
             label="Pedidos Ativos"
-            value={stats.totalAtivos}
+            value={status.totalAtivos}
             icon={<ShoppingBag sx={{ fontSize: 60 }} />}
             colorClass="text-blue-600"
           />
@@ -67,7 +67,7 @@ function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }}>
           <StatCard
             label="Em Produção"
-            value={stats.emProducao}
+            value={status.emProducao}
             icon={<Handyman sx={{ fontSize: 60 }} />}
             colorClass="text-pink-600"
           />
@@ -77,7 +77,7 @@ function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }}>
           <StatCard
             label="Concluídos"
-            value={stats.concluidos}
+            value={status.concluidos}
             icon={<CheckCircle sx={{ fontSize: 60 }} />}
             colorClass="text-teal-600"
           />
@@ -87,7 +87,7 @@ function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }}>
           <StatCard
             label="Cancelados"
-            value={stats.cancelados}
+            value={status.cancelados}
             icon={<Block sx={{ fontSize: 60 }} />}
             colorClass="text-slate-400"
           />
@@ -207,7 +207,7 @@ function DashboardPage() {
                 </Typography>
               </div>
               <Typography variant="h4" className="!font-black text-amber-700">
-                {stats.aguardandoPagamento}
+                {status.aguardandoPagamento}
               </Typography>
               <Typography variant="caption" className="text-amber-600/80">
                 Pedidos aguardando confirmação financeira
@@ -222,7 +222,7 @@ function DashboardPage() {
                 </Typography>
               </div>
               <Typography variant="h4" className="!font-black text-pink-700">
-                {stats.aguardandoArte}
+                {status.aguardandoArte}
               </Typography>
               <Typography variant="caption" className="text-pink-600/80">
                 Itens que precisam de definição visual
@@ -237,7 +237,7 @@ function DashboardPage() {
                 </Typography>
               </div>
               <Typography variant="h4" className="!font-black text-purple-700">
-                {stats.pronto}
+                {status.pronto}
               </Typography>
               <Typography variant="caption" className="text-purple-600/80">
                 Avisar clientes para buscar
