@@ -1,8 +1,7 @@
-// dashboard/dashboard.data.ts
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function dashboardLoader() {
-  // Pede os dados já calculados ao backend
+  // Pede os dados já calculados no backend
   const response = await fetch(`${API_URL}/dashboard/`);
   
   if (!response.ok) {
