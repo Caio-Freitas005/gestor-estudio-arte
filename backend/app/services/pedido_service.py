@@ -18,6 +18,7 @@ from ..models import (
     Produto,
     StatusPedido,
 )
+from ..utils.imagem import delete_art_image
 from .base_service import BaseService
 
 
@@ -238,7 +239,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             # Se o usuário enviou um novo valor unitário, atualiza também
             if item.preco_unitario is not None:
                 item_existente.preco_unitario = item.preco_unitario
-                
+
             if item.observacoes is not None:
                 item_existente.observacoes = item.observacoes
         else:
@@ -263,7 +264,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         """Atualiza a quantidade ou preço de um item e recalcula o total do pedido."""
         db_pedido = self.get_by_id_detailed(session, pedido_id)
 
-        # Busca o item específico 
+        # Busca o item específico
         db_item = next((i for i in db_pedido.itens if i.produto_id == produto_id), None)
         if not db_item:
             raise HTTPException(status_code=404, detail="Item do pedido não encontrado")
@@ -279,8 +280,31 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
 
         return db_pedido
 
+    def update_item_art_path(
+        self, session: Session, pedido_id: int, produto_id: int, caminho_arte: str
+    ) -> Pedido:
+        """Atualiza o caminho da arte de um item específico e remove a antiga do disco."""
+        db_item = self.get_item_or_404(session, pedido_id, produto_id)
+
+        # Guarda o caminho antigo antes de deletar
+        caminho_antigo = db_item.caminho_arte
+
+        # Atualiza para a imagem nova
+        db_item.caminho_arte = caminho_arte
+        session.add(db_item)
+
+        # Faz o commit primeiro
+        # (se falhar, o arquivo antigo continua salvo no disco, evitando caminhos de imagens já deletadas)
+        session.commit()
+
+        # Só apaga depois de ter salvo os dados
+        if caminho_antigo:
+            delete_art_image(caminho_antigo)
+
+        return self.get_by_id_detailed(session, pedido_id)
+
     def remove_item(self, session: Session, pedido_id: int, produto_id: int) -> Pedido:
-        """Remove item com trava de segurança para pedido vazio."""
+        """Remove item e imagens orfãs."""
         db_pedido = self.get_by_id_detailed(session, pedido_id)
 
         if len(db_pedido.itens) <= 1:
@@ -292,25 +316,23 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         if not db_item:
             raise HTTPException(status_code=404, detail="Item não encontrado")
 
+        # Guarda o caminho antes de deletar
+        caminho_orfao = db_item.caminho_arte
+
+        # Deleta do banco
         db_pedido.itens.remove(db_item)
         session.delete(db_item)
-
         self._recalculate_totals(db_pedido)
         session.add(db_pedido)
+
+        # Faz o commit primeiro
         session.commit()
+
+        # Só apaga depois de ter salvo os dados
+        if caminho_orfao:
+            delete_art_image(caminho_orfao)
+
         return db_pedido
-
-    def update_item_art_path(
-        self, session: Session, pedido_id: int, produto_id: int, caminho_arte: str
-    ) -> Pedido:
-        """Atualiza o caminho da arte de um item específico."""
-        db_item = self.get_item_or_404(session, pedido_id, produto_id)
-        db_item.caminho_arte = caminho_arte
-
-        session.add(db_item)
-        session.commit()
-
-        return self.get_by_id_detailed(session, pedido_id)
 
 
 pedido_service = PedidoService()
