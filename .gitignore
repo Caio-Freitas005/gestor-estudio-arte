@@ -7,10 +7,7 @@ wheels/
 *.db
 *db.
 .env
-*.webp
-*.png
-*.jpg
-*.jpeg
+artes/
 
 logs
 *.log
@@ -19,6 +16,7 @@ frontend/npm-debug.log*
 frontend/node_modules
 frontend/dist-ssr
 *.dist/*
+dist/
 *.local
 
 *.vscode/*
