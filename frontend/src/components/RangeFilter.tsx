@@ -19,6 +19,11 @@ function RangeFilter({ label, paramMin, paramMax }: RangeFilterProps) {
   const [max, setMax] = useState(currentMax);
 
   useEffect(() => {
+    setMin(currentMin);
+    setMax(currentMax);
+  }, [currentMin, currentMax]);
+
+  useEffect(() => {
     // Só faz update se os valores realmente mudaram
     if (min === currentMin && max === currentMax) {
       return;
