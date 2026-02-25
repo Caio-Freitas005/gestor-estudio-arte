@@ -10,6 +10,7 @@ DB_DIR = BASE_DIR
 UPLOAD_DIR = BASE_DIR / "uploads"
 ARTES_DIR = UPLOAD_DIR / "artes"
 ARTES_DIR.mkdir(parents=True, exist_ok=True)
+FRONTEND_DIST_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 
 db_name = "gestor.db"
 db_path = DB_DIR / db_name
