@@ -44,5 +44,4 @@ class ItemPedidoUpdate(SQLModel):
     preco_unitario: Decimal | None = Field(
         default=None, max_digits=10, decimal_places=2, ge=0
     )
-    caminho_arte: str | None = None
     observacoes: str | None = None
