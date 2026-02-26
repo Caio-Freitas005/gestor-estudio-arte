@@ -2,11 +2,19 @@ import { LoaderFunctionArgs, ActionFunctionArgs, redirect } from "react-router";
 import { ordersService } from "../../services/orders.service";
 import { clientsService } from "../../services/clients.service";
 import { productsService } from "../../services/products.service";
-import { ClientePublic } from "../../types/cliente.types";
-import { ProdutoPublic } from "../../types/produto.types";
 import { PedidoPublic, PedidoCreate } from "../../types/pedido.types";
 import { getCommonParams } from "../../utils/loader.utils";
 import { FILE_UPLOAD_PREFIX } from "../../utils/constants";
+
+export async function searchClientsForAutocomplete(query: string) {
+  const res = await clientsService.getAll({ q: query, limit: 10 });
+  return res.dados;
+}
+
+export async function searchProductsForAutocomplete(query: string) {
+  const res = await productsService.getAll({ q: query, limit: 10 });
+  return res.dados;
+}
 
 export async function ordersListLoader({ request }: LoaderFunctionArgs) {
   const params = getCommonParams(request, [
@@ -29,21 +37,49 @@ export async function ordersListLoader({ request }: LoaderFunctionArgs) {
   };
 }
 
-export type CreateLoaderData = {
-  clientes: ClientePublic[];
-  produtos: ProdutoPublic[];
+export type UpdateLoaderData = {
+  pedido: PedidoPublic;
 };
 
-export async function orderCreateLoader(): Promise<CreateLoaderData> {
-  const [clientes, produtos] = await Promise.all([
-    clientsService.getAll(),
-    productsService.getAll(),
-  ]);
+// O UpdateLoader agora só busca o pedido
+export async function orderUpdateLoader({
+  params,
+}: LoaderFunctionArgs): Promise<UpdateLoaderData> {
+  if (!params.id) {
+    throw new Error("ID do pedido não encontrado.");
+  }
 
-  return {
-    clientes: clientes.dados,
-    produtos: produtos.dados,
-  };
+  const pedido = await ordersService.getById(Number(params.id));
+
+  return { pedido };
+}
+
+export async function orderUpdateAction({
+  request,
+  params,
+}: ActionFunctionArgs) {
+  if (!params.id) throw new Error("ID inválido");
+  const id = Number(params.id);
+
+  const data = await request.json();
+  const { intent, ...payload } = data;
+
+  try {
+    // Tenta encontrar um handler para a intenção (add, remove, update item)
+    const handler = itemUpdateHandlers[intent];
+
+    if (handler) {
+      await handler(id, payload);
+      return { success: true }; // Retorno para o fetcher não recarregar a página inteira
+    }
+
+    // Caso não haja intenção específica, é a atualização do cabeçalho do pedido
+    await ordersService.update(id, payload);
+    return redirect("/pedidos");
+  } catch (err) {
+    console.error("Erro na action de pedido:", err);
+    return { error: "Falha ao processar operação" };
+  }
 }
 
 export async function orderCreateAction({ request }: ActionFunctionArgs) {
@@ -79,32 +115,6 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
   }
 }
 
-export type UpdateLoaderData = {
-  pedido: PedidoPublic;
-  clientes: ClientePublic[];
-  produtos: ProdutoPublic[];
-};
-
-export async function orderUpdateLoader({
-  params,
-}: LoaderFunctionArgs): Promise<UpdateLoaderData> {
-  if (!params.id) {
-    throw new Error("ID do pedido não encontrado.");
-  }
-
-  const [pedido, clientes, produtos] = await Promise.all([
-    ordersService.getById(Number(params.id)),
-    clientsService.getAll(),
-    productsService.getAll(),
-  ]);
-
-  return {
-    pedido,
-    clientes: clientes.dados,
-    produtos: produtos.dados,
-  };
-}
-
 // Define os handlers para cada ação específica de itens
 const itemUpdateHandlers: Record<
   string,
@@ -116,34 +126,6 @@ const itemUpdateHandlers: Record<
   update_item: (id, payload) =>
     ordersService.updateItem(id, payload.produto_id, payload),
 };
-
-export async function orderUpdateAction({
-  request,
-  params,
-}: ActionFunctionArgs) {
-  if (!params.id) throw new Error("ID inválido");
-  const id = Number(params.id);
-
-  const data = await request.json();
-  const { intent, ...payload } = data;
-
-  try {
-    // Tenta encontrar um handler para a intenção (add, remove, update item)
-    const handler = itemUpdateHandlers[intent];
-
-    if (handler) {
-      await handler(id, payload);
-      return { success: true }; // Retorno para o fetcher não recarregar a página inteira
-    }
-
-    // Caso não haja intenção específica, é a atualização do cabeçalho do pedido
-    await ordersService.update(id, payload);
-    return redirect("/pedidos");
-  } catch (err) {
-    console.error("Erro na action de pedido:", err);
-    return { error: "Falha ao processar operação" };
-  }
-}
 
 export async function orderUploadArtAction({
   request,

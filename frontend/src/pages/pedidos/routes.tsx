@@ -3,7 +3,6 @@ import OrderCreatePage from "./create";
 import OrderUpdatePage from "./update";
 import {
   orderCreateAction,
-  orderCreateLoader,
   ordersListLoader,
   orderUpdateAction,
   orderUpdateLoader,
@@ -20,7 +19,6 @@ export const orderRoutes = [
     path: "cadastrar",
     element: <OrderCreatePage />,
     action: orderCreateAction,
-    loader: orderCreateLoader,
   },
   {
     path: ":id",
