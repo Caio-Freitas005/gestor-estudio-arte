@@ -135,10 +135,18 @@ export async function orderUploadArtAction({
   request,
   params,
 }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  return await ordersService.uploadArt(
-    Number(params.id), // 'id' vem da rota pai (:id)
-    Number(params.produto_id),
-    formData,
-  );
+  try {
+    const formData = await request.formData();
+    await ordersService.uploadArt(
+      Number(params.id), // 'id' vem da rota pai (:id)
+      Number(params.produto_id),
+      formData,
+    );
+    return { success: true };
+  } catch (err) {
+    return {
+      error:
+        "Formato de arquivo inválido e/ou imagem muito grande ou corrompida.",
+    };
+  }
 }
