@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSubmit, useFetcher } from "react-router";
 import { ItemPedidoInput, PedidoPublic } from "../../../types/pedido.types";
 import { cleanFormData, parseBrazilianNumber } from "../../../utils/form.utils";
@@ -10,6 +10,17 @@ export function useOrderManager(
 ) {
   const submit = useSubmit();
   const fetcher = useFetcher();
+
+  // "Ouve" as respostas do servidor em segundo plano (na edição)
+  useEffect(() => {
+    // fetcher.state === "idle" significa que a requisição já terminou
+    if (fetcher.state === "idle" && fetcher.data) {
+      if (fetcher.data.error) {
+        // Mostra o erro que veio da orderUploadArtAction
+        alert(`Erro: ${fetcher.data.error}`);
+      }
+    }
+  }, [fetcher.state, fetcher.data]);
 
   // Estado para novos itens (criação)
   const [localItems, setLocalItems] = useState<ItemPedidoInput[]>([]);
