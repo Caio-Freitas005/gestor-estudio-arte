@@ -241,7 +241,8 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             if item.preco_unitario is not None:
                 item_existente.preco_unitario = item.preco_unitario
 
-            if item.observacoes is not None:
+            # Se veio uma observação nova, substitui a antiga. Se veio vazia, ignora e mantém a antiga.
+            if item.observacoes:
                 item_existente.observacoes = item.observacoes
         else:
             novo_item = ItemPedido(
