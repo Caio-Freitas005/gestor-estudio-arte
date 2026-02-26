@@ -2,6 +2,7 @@ from typing import Any, Generic, Sequence, Type, TypeVar
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, or_
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, SQLModel, select
 
 # Define tipos genéricos para a model e para os schemas de criação e atualização
@@ -36,6 +37,11 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         search_fields: list[str] | None = None,
     ) -> dict[str, Sequence[ModelType] | int]:
         """Retorna todos os registros da tabela paginados e filtrados."""
+
+        # Trava de segurança para desempenho
+        if limit > 100:
+            limit = 100
+
         query = select(self.model)
 
         # Aplica busca se houver 'q' e campos definidos
@@ -59,11 +65,21 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def create(self, session: Session, obj: CreateSchemaType) -> ModelType:
         """Cria, comita e atualiza o objeto no banco."""
-        db_obj = self.model.model_validate(obj)
-        session.add(db_obj)
-        session.commit()
-        session.refresh(db_obj)
-        return db_obj
+        try:
+            db_obj = self.model.model_validate(obj)
+            session.add(db_obj)
+            session.commit()
+            session.refresh(db_obj)
+            return db_obj
+        except IntegrityError:
+            session.rollback()
+            # Descobre qual entidade falhou para dar a mensagem correta
+            if self.model.__name__ == "Cliente":
+                msg = "Já existe um cliente cadastrado com esse e-mail."
+            else:
+                msg = "Dados duplicados ou inválidos para esta operação."
+
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
 
     def update(self, session: Session, id: Any, obj: UpdateSchemaType) -> ModelType:
         """Aplica atualizações parciais (PATCH) de forma genérica."""
@@ -71,13 +87,29 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         obj_data = obj.model_dump(exclude_unset=True)
         db_obj.sqlmodel_update(obj_data)
 
-        session.add(db_obj)
-        session.commit()
-        session.refresh(db_obj)
-        return db_obj
+        try:
+            session.add(db_obj)
+            session.commit()
+            session.refresh(db_obj)
+            return db_obj
+        except IntegrityError:
+            session.rollback()
+            if self.model.__name__ == "Cliente":
+                msg = "Já existe um cliente cadastrado com este e-mail."
+            else:
+                msg = "Dados duplicados ou inválidos para esta operação."
+
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
 
     def delete(self, session: Session, id: Any) -> None:
         """Remove um registro pelo ID."""
         db_obj = self.get_or_404(session, id)
-        session.delete(db_obj)
-        session.commit()
+        try:
+            session.delete(db_obj)
+            session.commit()
+        except IntegrityError:
+            session.rollback()  # Desfaz a operação
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Não é possível excluir esse registro, pois ele já está vinculado a um ou mais pedidos.",
+            )
