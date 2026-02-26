@@ -35,7 +35,7 @@ class PedidoBase(TimestampMixin, SQLModel):
     data_conclusao: date | None = Field(default=None, index=True)
     status: str = Field(default=StatusPedido.AGUARDANDO_PAGAMENTO, index=True)
     observacoes: str | None = None
-    desconto: Decimal = Field(default=0.0, max_digits=10, decimal_places=2, ge=0)
+    desconto: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
     total: Decimal = Field(default=0.0, max_digits=10, decimal_places=2, index=True)
     cliente_id: int = Field(foreign_key="cliente.id")
 
@@ -91,6 +91,4 @@ class PedidoUpdate(SQLModel):
     status: StatusPedido | None = None
     observacoes: str | None = None
     cliente_id: int | None = None
-    desconto: Decimal | None = Field(
-        default=None, max_digits=10, decimal_places=2, ge=0
-    )
+    desconto: Decimal | None = Field(default=None, max_digits=10, decimal_places=2)
