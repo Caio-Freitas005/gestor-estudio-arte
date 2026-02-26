@@ -26,21 +26,21 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
     def __init__(self):
         super().__init__(Pedido)
 
-    def _get_item_price(
+    def _get_product_info(
         self, session: Session, produto_id: int, preco_input: Decimal | None
-    ) -> Decimal:
-        """Lógica centralizada para validar produto e definir preço."""
-        # Se não houver valor praticado no input, usa o valor base do produto
-        if preco_input is not None:
-            return preco_input
-
+    ) -> tuple[Decimal, str]:
+        """Busca, valida, define preço e pega nome do produto."""
         produto = session.get(Produto, produto_id)
         if not produto:
             raise HTTPException(
                 status_code=404,
                 detail=f"Produto com ID {produto_id} não encontrado.",
             )
-        return produto.preco_base
+        
+        # Se não houver valor praticado no input, usa o valor base do produto
+        preco = preco_input if preco_input is not None else produto.preco_base
+
+        return preco, produto.nome
 
     def _validate_discount(
         self, subtotal: Decimal | Literal[0], desconto: Decimal | None
@@ -156,7 +156,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
 
         for item in obj.itens:
             # Lógica centralizada para validar produto e definir preço
-            preco = self._get_item_price(session, item.produto_id, item.preco_unitario)
+            preco, nome = self._get_product_info(session, item.produto_id, item.preco_unitario)
             subtotal_previsto += Decimal(item.quantidade) * preco
 
             # Lógica de consolidação
@@ -168,6 +168,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
                     quantidade=item.quantidade,
                     observacoes=item.observacoes,
                     preco_unitario=preco,
+                    nome_produto=nome
                 )
 
         self._validate_discount(subtotal_previsto, obj.desconto)
@@ -231,7 +232,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         item_existente = next(
             (i for i in db_pedido.itens if i.produto_id == item.produto_id), None
         )
-        preco = self._get_item_price(session, item.produto_id, item.preco_unitario)
+        preco, nome = self._get_product_info(session, item.produto_id, item.preco_unitario)
 
         if item_existente:
             # Apenas incrementa se já existir
@@ -249,6 +250,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
                 quantidade=item.quantidade,
                 observacoes=item.observacoes,
                 preco_unitario=preco,
+                nome_produto=nome
             )
             db_pedido.itens.append(novo_item)
 
