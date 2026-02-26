@@ -27,7 +27,7 @@ function OrderUpdatePage() {
 
       {uploadError && (
         <Alert severity="warning" className="shadow-sm font-medium">
-          O pedido foi salvo com sucesso, mas <strong>houve um erro ao enviar uma das artes</strong> (formato inválido ou ficheiro muito grande). 
+          O pedido foi salvo com sucesso, mas <strong>houve um erro ao enviar uma das artes</strong> (formato inválido ou arquivo muito grande). 
           Por favor, tente enviar a arte novamente usando os botões da tabela abaixo.
         </Alert>
       )}
