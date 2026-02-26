@@ -35,7 +35,7 @@ function AddItemRow({ onAdd }: AddItemRowProps) {
       ...tempItem,
       produto_id: produto ? produto.id : "",
       preco_unitario: produto ? Number(produto.preco_base) : 0,
-      nome_produto: produto ? produto.nome : "", 
+      nome_produto: produto ? produto.nome : "",
     });
   };
 
@@ -43,7 +43,7 @@ function AddItemRow({ onAdd }: AddItemRowProps) {
     if (!tempItem.produto_id) return;
     onAdd(tempItem as ItemPedidoInput);
     setTempItem(INITIAL_TEMP_ITEM);
-    setResetKey((prev) => prev + 1); 
+    setResetKey((prev) => prev + 1);
   };
 
   return (

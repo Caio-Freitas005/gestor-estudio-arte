@@ -18,7 +18,7 @@ export async function productsListLoader({ request }: LoaderFunctionArgs) {
 export async function productCreateAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const data = cleanFormData<ProdutoCreate>(formData);
-  
+
   data.preco_base = parseBrazilianNumber(data.preco_base);
 
   try {

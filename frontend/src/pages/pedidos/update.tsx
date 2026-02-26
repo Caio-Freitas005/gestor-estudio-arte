@@ -13,21 +13,23 @@ function OrderUpdatePage() {
         <Typography variant="h4" className="text-gray-800 font-bold">
           Pedido <span className="text-pink-500">#{pedido.id}</span>
         </Typography>
-        <span className={`px-3 py-1 rounded-full text-sm font-semibold 
-          ${pedido.status === 'Concluído' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+        <span
+          className={`px-3 py-1 rounded-full text-sm font-semibold 
+          ${pedido.status === "Concluído" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"}`}
+        >
           {pedido.status}
         </span>
       </div>
 
-      <Alert severity="info" className="shadow-sm border border-blue-100 bg-blue-50">
-        Editando pedido de <strong>{pedido.cliente?.nome}</strong>. 
-        Valor total atual: <strong>R$ {formatNumber(pedido.total)}</strong>
+      <Alert
+        severity="info"
+        className="shadow-sm border border-blue-100 bg-blue-50"
+      >
+        Editando pedido de <strong>{pedido.cliente?.nome}</strong>. Valor total
+        atual: <strong>R$ {formatNumber(pedido.total)}</strong>
       </Alert>
 
-      <OrderForm 
-        key={pedido.id}
-        defaultValues={pedido} 
-      />
+      <OrderForm key={pedido.id} defaultValues={pedido} />
     </div>
   );
 }

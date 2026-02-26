@@ -51,12 +51,7 @@ interface ItemTableProps {
   onUpdate: (updatedItem: any) => void;
 }
 
-function ItemTable({
-  items,
-  onUpload,
-  onRemove,
-  onUpdate,
-}: ItemTableProps) {
+function ItemTable({ items, onUpload, onRemove, onUpdate }: ItemTableProps) {
   // Estado para saber qual linha está em edição
   const [editId, setEditId] = useState<number | null>(null);
   const [editData, setEditData] = useState<any>(null);

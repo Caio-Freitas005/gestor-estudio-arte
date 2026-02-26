@@ -1,6 +1,6 @@
 export function formatPhone(phone: string | undefined): string {
   if (!phone) return "";
-  
+
   let cleaned = phone.replace(/\D/g, "");
 
   if (cleaned.startsWith("55") && cleaned.length >= 12) {

@@ -1,5 +1,4 @@
 import { PedidoPublic } from "../../../types/pedido.types";
-import { ProdutoPublic } from "../../../types/produto.types";
 import { statusStyles } from "..";
 import {
   formatPhone,
@@ -28,11 +27,7 @@ interface OrderDetailsProps {
   onEdit: (id: number) => void;
 }
 
-function OrderDetails({
-  pedido,
-  onClose,
-  onEdit,
-}: OrderDetailsProps) {
+function OrderDetails({ pedido, onClose, onEdit }: OrderDetailsProps) {
   // Calcula o Subtotal somando os itens
   const subtotal = pedido.itens.reduce((acc, item) => {
     return acc + item.quantidade * item.preco_unitario;
@@ -119,7 +114,7 @@ function OrderDetails({
           <div className="flex flex-col">
             {pedido.itens.map((item, index) => {
               const imgUrl = `${API_URL}${item.caminho_arte}`;
-              const nomeItem = item.nome_produto
+              const nomeItem = item.nome_produto;
               return (
                 <div
                   key={index}

@@ -29,21 +29,21 @@ export function formatDateForInput(dateInput?: string | Date) {
  */
 export const parseBrazilianNumber = (value: any): number => {
   if (!value) return 0;
-  
+
   // Substitui a vírgula por ponto para o parseFloat entender
-  const normalizedValue = value.replace(',', '.');
+  const normalizedValue = value.replace(",", ".");
   const parsed = parseFloat(normalizedValue);
-  
+
   return isNaN(parsed) ? 0 : parsed;
 };
 
 /**
- * Prepara o valor para exibição no input, garantindo que o ponto interno 
+ * Prepara o valor para exibição no input, garantindo que o ponto interno
  * seja visualizado como vírgula pelo usuário.
  */
 export const formatBrazilianInput = (value: number | undefined): string => {
   if (value === undefined || value === 0) return "0";
-  return value.toString().replace('.', ',');
+  return value.toString().replace(".", ",");
 };
 
 export function formatPhoneInput(value: string | null | undefined): string {

@@ -28,21 +28,25 @@ export function useOrderManager(
     } else {
       setLocalItems((prev) => {
         // Verifica se o item já existe na lista temporária
-        const itemExistente = prev.find((it) => it.produto_id === newItem.produto_id);
-        
+        const itemExistente = prev.find(
+          (it) => it.produto_id === newItem.produto_id,
+        );
+
         if (itemExistente) {
           // Se existir, cria uma nova lista atualizando os dados
           return prev.map((it) =>
             it.produto_id === newItem.produto_id
-              ? { 
-                  ...it, 
+              ? {
+                  ...it,
                   quantidade: it.quantidade + newItem.quantidade,
                   // Atualiza com o preço mais recente que o usuário digitou
                   preco_unitario: newItem.preco_unitario,
                   // Se digitou uma nova observação, substitui. Se deixou em branco, mantém a antiga.
-                  observacoes: newItem.observacoes ? newItem.observacoes : it.observacoes
+                  observacoes: newItem.observacoes
+                    ? newItem.observacoes
+                    : it.observacoes,
                 }
-              : it
+              : it,
           );
         }
         // Se não existir, adiciona normalmente
@@ -106,7 +110,7 @@ export function useOrderManager(
       pendingFiles.forEach((file, id) =>
         finalData.append(`${FILE_UPLOAD_PREFIX}${id}`, file),
       );
-      
+
       submit(finalData, { method: "post", encType: "multipart/form-data" });
     }
   };

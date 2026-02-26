@@ -4,7 +4,9 @@ async function handleResponse(response: Response): Promise<any> {
   if (!response.ok) {
     try {
       const errorData = await response.json();
-      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      throw new Error(
+        errorData.detail || `HTTP error! status: ${response.status}`,
+      );
     } catch (jsonError) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -20,7 +22,7 @@ export const apiBase = {
   },
 
   post: async (path: string, data: any): Promise<any> => {
-    // Verifica se os dados são um FormData 
+    // Verifica se os dados são um FormData
     const isFormData = data instanceof FormData;
 
     const response = await fetch(`${API_URL}/${path}`, {

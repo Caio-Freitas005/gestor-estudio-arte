@@ -7,7 +7,7 @@ interface AppPaginationProps {
 
 function AppPagination({ total }: AppPaginationProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const page = Number(searchParams.get("page")) || 0;
   const limit = Number(searchParams.get("limit")) || 10;
 
@@ -18,7 +18,9 @@ function AppPagination({ total }: AppPaginationProps) {
     });
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setSearchParams((prev) => {
       prev.set("limit", event.target.value);
       prev.set("page", "0"); // Reseta para a primeira página ao mudar o limite

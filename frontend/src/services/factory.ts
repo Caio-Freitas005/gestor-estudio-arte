@@ -10,26 +10,30 @@ export interface CrudService<T, TCreate, TUpdate> {
   delete: (id: string | number) => Promise<void>;
 }
 
-export function createCrudService<T, TCreate, TUpdate>(resource: string): CrudService<T, TCreate, TUpdate> {
+export function createCrudService<T, TCreate, TUpdate>(
+  resource: string,
+): CrudService<T, TCreate, TUpdate> {
   return {
     getAll: (params) => {
       // Remove parâmetros vazios ou nulos para limpar a URL
-      const cleanParams = params 
-        ? Object.fromEntries(Object.entries(params).filter(([_, v]) => v != null && v !== ""))
+      const cleanParams = params
+        ? Object.fromEntries(
+            Object.entries(params).filter(([_, v]) => v != null && v !== ""),
+          )
         : {};
 
       const query = new URLSearchParams(cleanParams).toString();
       const path = query ? `${resource}/?${query}` : `${resource}/`;
-      
+
       return apiBase.get(path);
     },
-    
+
     getById: (id) => apiBase.get(`${resource}/${id}`),
-    
+
     create: (data) => apiBase.post(`${resource}/`, data),
-    
+
     update: (id, data) => apiBase.patch(`${resource}/${id}`, data),
-    
+
     delete: (id) => apiBase.delete(`${resource}/${id}`),
   };
 }

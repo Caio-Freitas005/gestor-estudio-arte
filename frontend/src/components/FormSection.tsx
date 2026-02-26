@@ -4,7 +4,7 @@ import { Typography } from "@mui/material";
 interface FormSectionProps {
   title: string;
   children: ReactNode;
-  className?: string; 
+  className?: string;
 }
 
 function FormSection({ title, children, className = "" }: FormSectionProps) {

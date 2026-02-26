@@ -1,12 +1,16 @@
 import { Form } from "react-router";
 import { useState } from "react";
-import { formatBrazilianInput, parseBrazilianNumber } from "../../../utils/form.utils"
 import { useOrderManager } from "../hooks/useOrderManager";
-import { formatDateForInput } from "../../../utils/form.utils"
+import { formatDateForInput } from "../../../utils/form.utils";
 import { formatNumber } from "../../../utils/format.utils";
 import { PedidoPublic, StatusPedido } from "../../../types/pedido.types";
 import { ClientePublic } from "../../../types/cliente.types";
 import { searchClientsForAutocomplete } from "../orders.data";
+
+import {
+  formatBrazilianInput,
+  parseBrazilianNumber,
+} from "../../../utils/form.utils";
 
 import {
   Button,

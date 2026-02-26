@@ -2,7 +2,6 @@ import { VisibilityOutlined } from "@mui/icons-material";
 import { useState } from "react";
 import { useLoaderData, Link, useNavigate } from "react-router";
 import { Edit, ReceiptLong } from "@mui/icons-material";
-import { ProdutoPublic } from "../../types/produto.types";
 import { formatDate, formatNumber } from "../../utils/format.utils";
 
 import {

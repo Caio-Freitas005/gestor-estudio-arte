@@ -63,7 +63,7 @@ export interface PedidoCreate {
 export interface PedidoPublic extends PedidoBase {
   id: number;
   cliente?: ClientePublic | null;
-  itens: ItemPedidoPublic[]; 
+  itens: ItemPedidoPublic[];
   produtos: ProdutoPublic[];
 }
 

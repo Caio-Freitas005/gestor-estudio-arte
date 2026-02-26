@@ -1,7 +1,7 @@
 import { Form, useNavigation } from "react-router";
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { formatBrazilianInput, parseBrazilianNumber } from "../../../utils/form.utils";
+import { formatBrazilianInput } from "../../../utils/form.utils";
 import { ProdutoPublic } from "../../../types/produto.types";
 import FormSection from "../../../components/FormSection";
 
@@ -16,7 +16,7 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
   const produto = defaultValues || ({} as ProdutoPublic);
 
   const [precoInput, setPrecoInput] = useState<string>(
-    formatBrazilianInput(defaultValues?.preco_base || 0)
+    formatBrazilianInput(defaultValues?.preco_base || 0),
   );
 
   return (
@@ -55,7 +55,7 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
           label="Preço Base (R$)"
           name="preco_base"
           required
-          type="text" 
+          type="text"
           value={precoInput}
           onChange={(e) => {
             const val = e.target.value;
