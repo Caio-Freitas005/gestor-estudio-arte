@@ -45,7 +45,7 @@ const UploadButton = ({ onUpload, produto_id, hasArt }: any) => (
 
 interface ItemTableProps {
   items: ItemPedidoPublic[] | ItemPedidoInput[];
-  produtos: ProdutoPublic[];
+  produtos?: ProdutoPublic[];
   onUpload: (file: File, produto_id: number) => void;
   onRemove: (produto_id: number) => void;
   onUpdate: (updatedItem: any) => void;
@@ -53,7 +53,7 @@ interface ItemTableProps {
 
 function ItemTable({
   items,
-  produtos,
+  produtos = [],
   onUpload,
   onRemove,
   onUpdate,
@@ -96,7 +96,8 @@ function ItemTable({
         <TableBody>
           {items.map((item) => {
             const isEditing = editId === item.produto_id;
-            const produto = produtos?.find((p) => p.id === item.produto_id);
+            // Procura o produto se a lista existir, se não, coloca um fallback
+            const nomeExibicao = item.nome_produto;
             const imgUrl = item.caminho_arte?.startsWith("blob:")
               ? item.caminho_arte
               : `${API_URL}${item.caminho_arte}`;
@@ -106,7 +107,7 @@ function ItemTable({
                 <TableCell>
                   <div className="flex flex-col">
                     <Typography variant="body2" className="font-medium">
-                      {produto?.nome}
+                      {nomeExibicao}
                     </Typography>
 
                     {item.observacoes && (

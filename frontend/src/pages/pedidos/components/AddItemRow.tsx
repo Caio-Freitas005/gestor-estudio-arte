@@ -1,19 +1,21 @@
 import { useState } from "react";
-import { TextField, MenuItem, Button } from "@mui/material";
-import { ProdutoPublic } from "../../../types/produto.types";
+import { TextField, Button } from "@mui/material";
 import { ItemPedidoInput } from "../../../types/pedido.types";
+import { ProdutoPublic } from "../../../types/produto.types";
+import { searchProductsForAutocomplete } from "../orders.data";
 import FormSection from "../../../components/FormSection";
+import AsyncAutocomplete from "../../../components/AsyncAutoComplete";
 
 interface AddItemRowProps {
-  produtos: ProdutoPublic[];
   onAdd: (item: ItemPedidoInput) => void;
 }
 
 interface TempItemState {
-  produto_id: number | ""; 
-  quantidade: number; 
+  produto_id: number | "";
+  quantidade: number;
   observacoes: string;
   preco_unitario: number;
+  nome_produto?: string;
 }
 
 const INITIAL_TEMP_ITEM: TempItemState = {
@@ -23,15 +25,17 @@ const INITIAL_TEMP_ITEM: TempItemState = {
   preco_unitario: 0,
 };
 
-function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
+function AddItemRow({ onAdd }: AddItemRowProps) {
   const [tempItem, setTempItem] = useState<TempItemState>(INITIAL_TEMP_ITEM);
+  // Estado para resetar o componente Autocomplete para valores padrão após adicionar item
+  const [resetKey, setResetKey] = useState(0);
 
-  const handleProductChange = (id: number) => {
-    const prod = produtos.find((p) => p.id === id);
+  const handleProductChange = (produto: ProdutoPublic | null) => {
     setTempItem({
       ...tempItem,
-      produto_id: id,
-      preco_unitario: prod ? Number(prod.preco_base) : 0,
+      produto_id: produto ? produto.id : "",
+      preco_unitario: produto ? Number(produto.preco_base) : 0,
+      nome_produto: produto ? produto.nome : "", 
     });
   };
 
@@ -39,24 +43,21 @@ function AddItemRow({ produtos, onAdd }: AddItemRowProps) {
     if (!tempItem.produto_id) return;
     onAdd(tempItem as ItemPedidoInput);
     setTempItem(INITIAL_TEMP_ITEM);
+    setResetKey((prev) => prev + 1); 
   };
 
   return (
     <FormSection title="Adicionar Produto" className="flex gap-2 items-end">
-      <TextField
-        select
-        label="Produto"
-        value={tempItem.produto_id}
-        onChange={(e) => handleProductChange(Number(e.target.value))}
-        size="small"
-        sx={{ width: 200 }}
-      >
-        {produtos.map((p) => (
-          <MenuItem key={p.id} value={p.id}>
-            {p.nome}
-          </MenuItem>
-        ))}
-      </TextField>
+      <div style={{ width: 250 }}>
+        <AsyncAutocomplete<ProdutoPublic>
+          key={resetKey}
+          label="Produto"
+          fetchFn={searchProductsForAutocomplete}
+          getOptionLabel={(option) => option.nome}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          onChangeValue={handleProductChange}
+        />
+      </div>
 
       <TextField
         label="Qtd"

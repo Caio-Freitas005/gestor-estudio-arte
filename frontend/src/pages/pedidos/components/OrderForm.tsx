@@ -6,7 +6,7 @@ import { formatDateForInput } from "../../../utils/form.utils"
 import { formatNumber } from "../../../utils/format.utils";
 import { PedidoPublic, StatusPedido } from "../../../types/pedido.types";
 import { ClientePublic } from "../../../types/cliente.types";
-import { ProdutoPublic } from "../../../types/produto.types";
+import { searchClientsForAutocomplete } from "../orders.data";
 
 import {
   Button,
@@ -20,14 +20,13 @@ import {
 import AddItemRow from "../components/AddItemRow";
 import ItemTable from "../components/ItemTable";
 import FormSection from "../../../components/FormSection";
+import AsyncAutocomplete from "../../../components/AsyncAutoComplete";
 
 interface OrderFormProps {
   defaultValues?: PedidoPublic;
-  clientes: ClientePublic[];
-  produtos: ProdutoPublic[];
 }
 
-function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
+function OrderForm({ defaultValues }: OrderFormProps) {
   const isEditing = !!defaultValues?.id;
 
   // Valor numérico para cálculos (subtotal, etc)
@@ -76,20 +75,20 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
         title="Informações de Identificação"
         className="grid grid-cols-4 md:grid-cols-3 gap-6"
       >
-        <TextField
-          select
-          label="Cliente"
-          name="cliente_id"
-          defaultValue={defaultValues?.cliente_id || ""}
-          size="small"
-          required
-        >
-          {clientes.map((c) => (
-            <MenuItem key={c.id} value={c.id}>
-              {c.nome}
-            </MenuItem>
-          ))}
-        </TextField>
+        <div className="md:col-span-1 col-span-2">
+          <AsyncAutocomplete<ClientePublic>
+            name="cliente_id"
+            label="Cliente"
+            // Se estiver editando um pedido, preenche o cliente atual
+            defaultValue={defaultValues?.cliente || null}
+            fetchFn={searchClientsForAutocomplete}
+            // Diz ao componente como mostrar o nome do cliente na lista
+            getOptionLabel={(option) => option.nome}
+            // Diz como ele sabe se dois clientes são o mesmo
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            required
+          />
+        </div>
 
         <TextField
           label="Data"
@@ -130,11 +129,11 @@ function OrderForm({ defaultValues, clientes, produtos }: OrderFormProps) {
         />
       </FormSection>
 
-      <AddItemRow produtos={produtos} onAdd={addItem} />
+      <AddItemRow onAdd={addItem} />
 
       <ItemTable
         items={displayItems}
-        produtos={produtos}
+        produtos={defaultValues?.produtos}
         onUpload={handleUpload}
         onRemove={removeItem}
         onUpdate={updateItem}
