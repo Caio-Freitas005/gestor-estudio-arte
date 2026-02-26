@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 
 class ItemPedidoBase(TimestampMixin, SQLModel):
     quantidade: int = Field(default=1, ge=1)
-    preco_unitario: Decimal = Field(default=0.0, max_digits=10, decimal_places=2)
-    nome_produto: str 
+    preco_unitario: Decimal = Field(default=0.0, max_digits=10, decimal_places=2, ge=0)
+    nome_produto: str
     caminho_arte: str | None = None
     observacoes: str | None = None
     pedido_id: int | None = Field(
@@ -42,7 +42,7 @@ class ItemPedidoPublic(ItemPedidoBase):
 class ItemPedidoUpdate(SQLModel):
     quantidade: int | None = Field(default=None, ge=1)
     preco_unitario: Decimal | None = Field(
-        default=None, max_digits=10, decimal_places=2
+        default=None, max_digits=10, decimal_places=2, ge=0
     )
     caminho_arte: str | None = None
     observacoes: str | None = None
