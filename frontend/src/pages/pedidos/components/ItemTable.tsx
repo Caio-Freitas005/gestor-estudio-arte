@@ -103,19 +103,35 @@ function ItemTable({
             return (
               <TableRow key={item.produto_id}>
                 <TableCell>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-1">
                     <Typography variant="body2" className="font-medium">
                       {nomeItem}
                     </Typography>
 
-                    {item.observacoes && (
-                      <Typography
-                        variant="caption"
-                        color="textSecondary"
-                        className="italic bg-pink-50 px-1 rounded w-fit"
-                      >
-                        Obs: {item.observacoes}
-                      </Typography>
+                    {isEditing ? (
+                      <TextField
+                        size="small"
+                        variant="standard"
+                        placeholder="Observação"
+                        value={editData.observacoes || ""}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            observacoes: e.target.value,
+                          })
+                        }
+                        fullWidth
+                      />
+                    ) : (
+                      item.observacoes && (
+                        <Typography
+                          variant="caption"
+                          color="textSecondary"
+                          className="italic bg-pink-50 px-1 rounded w-fit"
+                        >
+                          Obs: {item.observacoes}
+                        </Typography>
+                      )
                     )}
                   </div>
                 </TableCell>
