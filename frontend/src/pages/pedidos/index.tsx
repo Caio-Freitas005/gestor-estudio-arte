@@ -45,9 +45,8 @@ export const statusStyles: Record<string, string> = {
 };
 
 function OrdersListPage() {
-  const { pedidos, produtos } = useLoaderData() as {
+  const { pedidos } = useLoaderData() as {
     pedidos: PedidoPaginated;
-    produtos: ProdutoPublic[];
   };
 
   const navigate = useNavigate();
@@ -213,7 +212,6 @@ function OrdersListPage() {
             pedido={selectedOrder}
             onClose={handleCloseDetails}
             onEdit={(id) => navigate(`${id}`)}
-            produtos={produtos}
           />
         )}
       </Drawer>
