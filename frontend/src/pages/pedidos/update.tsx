@@ -5,7 +5,7 @@ import { formatNumber } from "../../utils/format.utils";
 import OrderForm from "./components/OrderForm";
 
 function OrderUpdatePage() {
-  const { pedido, clientes, produtos } = useLoaderData() as UpdateLoaderData;
+  const { pedido } = useLoaderData() as UpdateLoaderData;
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,8 +27,6 @@ function OrderUpdatePage() {
       <OrderForm 
         key={pedido.id}
         defaultValues={pedido} 
-        clientes={clientes} 
-        produtos={produtos} 
       />
     </div>
   );
