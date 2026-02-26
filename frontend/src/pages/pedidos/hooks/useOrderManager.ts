@@ -26,7 +26,28 @@ export function useOrderManager(
         { method: "post", encType: "application/json" },
       );
     } else {
-      setLocalItems((prev) => [...prev, newItem]);
+      setLocalItems((prev) => {
+        // Verifica se o item já existe na lista temporária
+        const itemExistente = prev.find((it) => it.produto_id === newItem.produto_id);
+        
+        if (itemExistente) {
+          // Se existir, cria uma nova lista atualizando os dados
+          return prev.map((it) =>
+            it.produto_id === newItem.produto_id
+              ? { 
+                  ...it, 
+                  quantidade: it.quantidade + newItem.quantidade,
+                  // Atualiza com o preço mais recente que o usuário digitou
+                  preco_unitario: newItem.preco_unitario,
+                  // Se digitou uma nova observação, substitui. Se deixou em branco, mantém a antiga.
+                  observacoes: newItem.observacoes ? newItem.observacoes : it.observacoes
+                }
+              : it
+          );
+        }
+        // Se não existir, adiciona normalmente
+        return [...prev, newItem];
+      });
     }
   };
 
