@@ -116,6 +116,14 @@ export function useOrderManager(
   };
 
   const handleUpload = (file: File, produto_id: number) => {
+    // Validação de UX (fail fast)
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      // Nota: Depois trocar alert por um Toast personalizado
+      alert("Formato inválido! Por favor, selecione apenas imagens (JPG, PNG ou WEBP).");
+      return; // Para a execução e não envia nada para o backend
+    }
+
     if (isEditing) {
       const fd = new FormData();
       fd.append("file", file);

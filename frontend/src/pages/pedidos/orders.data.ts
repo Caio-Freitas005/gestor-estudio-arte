@@ -78,14 +78,16 @@ export async function orderUpdateAction({
 
 export async function orderCreateAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-
   const orderDataRaw = formData.get("orderData") as string;
   if (!orderDataRaw) return null;
 
   const data = JSON.parse(orderDataRaw) as PedidoCreate;
 
+  let newOrderId: number | null = null;
+
   try {
     const newOrder = await ordersService.create(data);
+    newOrderId = newOrder.id;
 
     // Percorre o FormData em busca de arquivos pendentes (Prefixo_ID)
     for (const [key, value] of formData.entries()) {
@@ -105,7 +107,15 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
     return redirect("/pedidos");
   } catch (err) {
     console.error("Erro ao criar pedido e artes:", err);
-    return null;
+
+    // Se o pedido chegou a ser salvo no banco de dados, mas alguma arte falhou
+    if (newOrderId) {
+      // Redireciona para a tela de edição avisando que houve erro no upload
+      return redirect(`/pedidos/${newOrderId}?aviso=erro_upload`);
+    }
+
+    // Se falhou antes de criar o pedido, devolve erro para o formulário
+    return { error: "Falha ao processar o pedido. Verifique os dados." };
   }
 }
 
