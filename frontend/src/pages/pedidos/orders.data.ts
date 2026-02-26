@@ -25,16 +25,10 @@ export async function ordersListLoader({ request }: LoaderFunctionArgs) {
     "max_total",
   ]);
 
-  const [pedidos, produtos] = await Promise.all([
-    ordersService.getAll(params), // O objeto 'params' já tem q, status, skip, limit, etc.
-    productsService.getAll(),
-  ]);
+  // Agora busca só os pedidos com paginação
+  const pedidos = await ordersService.getAll(params); // O objeto 'params' já tem q, status, skip, limit, etc.
 
-  // Retorna 'pedidos' como objeto (para a tabela) e 'produtos' como array (para filtros/modais)
-  return {
-    pedidos,
-    produtos: produtos.dados,
-  };
+  return { pedidos };
 }
 
 export type UpdateLoaderData = {

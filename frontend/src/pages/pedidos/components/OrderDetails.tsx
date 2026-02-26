@@ -24,14 +24,12 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 interface OrderDetailsProps {
   pedido: PedidoPublic;
-  produtos: ProdutoPublic[];
   onClose: () => void;
   onEdit: (id: number) => void;
 }
 
 function OrderDetails({
   pedido,
-  produtos,
   onClose,
   onEdit,
 }: OrderDetailsProps) {
@@ -120,9 +118,8 @@ function OrderDetails({
         <FormSection title="Itens e Observações">
           <div className="flex flex-col">
             {pedido.itens.map((item, index) => {
-              const produto = produtos?.find((p) => p.id === item.produto_id);
               const imgUrl = `${API_URL}${item.caminho_arte}`;
-
+              const nomeItem = item.nome_produto
               return (
                 <div
                   key={index}
@@ -157,7 +154,7 @@ function OrderDetails({
                           variant="subtitle1"
                           className="!font-bold !text-slate-800 !leading-tight truncate-multiline"
                         >
-                          {produto.nome}
+                          {nomeItem}
                         </Typography>
 
                         <Typography

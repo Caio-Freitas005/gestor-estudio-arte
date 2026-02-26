@@ -133,7 +133,6 @@ function OrderForm({ defaultValues }: OrderFormProps) {
 
       <ItemTable
         items={displayItems}
-        produtos={defaultValues?.produtos}
         onUpload={handleUpload}
         onRemove={removeItem}
         onUpdate={updateItem}
