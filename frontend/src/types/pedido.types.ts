@@ -18,6 +18,7 @@ export enum StatusPedido {
 export interface ItemPedidoInput {
   produto_id: number;
   quantidade: number;
+  nome_produto: string;
   observacoes?: string | null;
   caminho_arte?: string | null;
   preco_unitario?: number;
@@ -33,6 +34,7 @@ export interface ItemPedidoUpdate {
 export interface ItemPedidoPublic {
   produto_id: number;
   quantidade: number;
+  nome_produto: string;
   preco_unitario: number;
   observacoes?: string | null;
   caminho_arte?: string | null;
