@@ -1,4 +1,4 @@
-import { Form, useNavigation } from "react-router";
+import { Form } from "react-router";
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
 import { formatBrazilianInput } from "../../../utils/form.utils";
@@ -10,9 +10,6 @@ interface ProdutoFormProps {
 }
 
 function ProductForm({ defaultValues }: ProdutoFormProps) {
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
-
   const produto = defaultValues || ({} as ProdutoPublic);
 
   const [precoInput, setPrecoInput] = useState<string>(
@@ -83,11 +80,9 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
         type="submit"
         variant="contained"
         color="primary"
-        disabled={isSubmitting}
         className="mt-2"
         disableElevation
       >
-        {isSubmitting ? "Salvando..." : "Salvar Produto"}
       </Button>
     </Form>
   );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, useNavigation } from "react-router";
+import { Form } from "react-router";
 import { formatPhoneInput } from "../../../utils/form.utils";
 import { Button, TextField } from "@mui/material";
 import { ClientePublic } from "../../../types/cliente.types";
@@ -9,9 +9,6 @@ interface ClienteFormProps {
 }
 
 function ClientForm({ defaultValues }: ClienteFormProps) {
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
-
   const cliente = defaultValues || ({} as ClientePublic);
 
   // Estado para controlar o que é visto no input
@@ -84,11 +81,9 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         type="submit"
         variant="contained"
         color="primary"
-        disabled={isSubmitting}
         className="mt-2"
         disableElevation
       >
-        {isSubmitting ? "Salvando..." : "Salvar Cliente"}
       </Button>
     </Form>
   );
