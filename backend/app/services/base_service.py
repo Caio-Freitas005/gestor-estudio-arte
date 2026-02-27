@@ -2,7 +2,7 @@ from typing import Any, Generic, Sequence, Type, TypeVar
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, or_
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlmodel import Session, SQLModel, select
 
 # Define tipos genéricos para a model e para os schemas de criação e atualização
@@ -107,9 +107,10 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         try:
             session.delete(db_obj)
             session.commit()
-        except IntegrityError:
-            session.rollback()  # Desfaz a operação
+        # Captura exception de forma genérica para dar mensagem personalizada
+        except (IntegrityError, SQLAlchemyError):
+            session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Não é possível excluir esse registro, pois ele já está vinculado a um ou mais pedidos.",
+                detail=f"Não é possível excluir este {self.model.__name__.lower()}, pois ele já está vinculado a um ou mais registros no sistema.",
             )
