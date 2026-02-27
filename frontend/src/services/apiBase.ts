@@ -2,15 +2,27 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 async function handleResponse(response: Response): Promise<any> {
   if (!response.ok) {
+    let errorMessage = `Erro HTTP: ${response.status}`;
+    
     try {
       const errorData = await response.json();
-      throw new Error(
-        errorData.detail || `HTTP error! status: ${response.status}`,
-      );
-    } catch (jsonError) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      
+      // Se for do Pydantic, o detail é uma lista de erros
+      if (Array.isArray(errorData.detail)) {
+        errorMessage = errorData.detail[0].msg; 
+      } 
+      // Se for erro customizado, o detail é uma string direta
+      else if (errorData.detail) {
+        errorMessage = errorData.detail;
+      }
+    } catch (e) {
+      // Falha silenciosa se a resposta não for um JSON válido
     }
+
+    // Lança um objeto com a propriedade detail exata
+    throw { detail: errorMessage };
   }
+  
   if (response.status === 204) return null;
   return response.json();
 }
