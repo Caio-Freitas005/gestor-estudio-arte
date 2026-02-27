@@ -56,7 +56,7 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         if desc_val > subtotal:
             raise HTTPException(
                 status_code=400,
-                detail=f"O desconto (R$ {desc_val}) não pode ser maior que o subtotal (R$ {subtotal}).",
+                detail=f"O desconto (R$ {desc_val}) não pode ser maior que o subtotal do pedido (R$ {subtotal}). Ajuste os valores e tente novamente.",
             )
 
     def _recalculate_totals(self, pedido: Pedido):
@@ -67,11 +67,12 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
             for item in pedido.itens
         )
 
-        # Obtém desconto, garantindo que não seja None
-        desconto = pedido.desconto or Decimal("0.0")
+        # Chama a função para validar
+        self._validate_discount(subtotal, pedido.desconto)
 
-        # Total líquido (garantindo precisão Decimal e evitando valores negativos)
-        pedido.total = max(Decimal("0.0"), subtotal - desconto)  # type: ignore
+        # Se passou pela validação, aplica o cálculo
+        desconto = pedido.desconto or Decimal("0.0")
+        pedido.total = subtotal - desconto
 
     def get_all_detailed(
         self,
@@ -163,14 +164,12 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
 
         # Consolida itens duplicados no input inicial
         itens_dict: dict[int, ItemPedido] = {}
-        subtotal_previsto = Decimal("0.0")
 
         for item in obj.itens:
             # Lógica centralizada para validar produto e definir preço
             preco, nome = self._get_product_info(
                 session, item.produto_id, item.preco_unitario
             )
-            subtotal_previsto += Decimal(item.quantidade) * preco
 
             # Lógica de consolidação
             if item.produto_id in itens_dict:
@@ -183,8 +182,6 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
                     preco_unitario=preco,
                     nome_produto=nome,
                 )
-
-        self._validate_discount(subtotal_previsto, obj.desconto)
 
         db_pedido = Pedido.model_validate(obj.model_dump(exclude={"itens"}))
 
@@ -205,14 +202,6 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         self, session: Session, db_pedido: Pedido, obj: PedidoUpdate
     ) -> Pedido:
         """Atualiza, recalcula e valida se o novo desconto é compatível com o subtotal atual."""
-        # Se o usuário está tentando alterar o desconto
-        if obj.desconto is not None:
-            # Calcula o subtotal atual do pedido existente no banco
-            subtotal_atual = sum(
-                (Decimal(item.preco_unitario) * Decimal(item.quantidade))
-                for item in db_pedido.itens
-            )
-            self._validate_discount(subtotal_atual, obj.desconto)
 
         # Aplica as mudanças do schema
         update_data = obj.model_dump(exclude_unset=True)
