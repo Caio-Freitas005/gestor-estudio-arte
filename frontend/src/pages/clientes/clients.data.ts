@@ -41,8 +41,7 @@ export async function clientCreateAction({ request }: ActionFunctionArgs) {
     return redirect("/clientes");
   } catch (err) {
     console.error(err);
-    // Retornar o erro para exibição depois
-    return null;
+    return { error: err.detail || "Falha ao processar operação" };
   }
 }
 
@@ -62,8 +61,7 @@ export async function clientUpdateAction({
     return redirect("/clientes");
   } catch (err) {
     console.error(err);
-    // Retornar o erro para exibição depois
-    return null;
+    return { error: err.detail || "Falha ao processar operação" };
   }
 }
 
@@ -77,6 +75,6 @@ export async function clientDeleteAction({ params }: ActionFunctionArgs) {
     return redirect("/clientes");
   } catch (err) {
     console.error(err);
-    throw err;
+    return { error: err.detail || "Erro ao excluir o cliente." };
   }
 }

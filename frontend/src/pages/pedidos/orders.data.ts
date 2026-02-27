@@ -72,7 +72,9 @@ export async function orderUpdateAction({
     return redirect("/pedidos");
   } catch (err) {
     console.error("Erro na action de pedido:", err);
-    return { error: "Falha ao processar operação" };
+    return {
+      error: err.detail || "Falha ao processar operação",
+    };
   }
 }
 
@@ -115,7 +117,7 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
     }
 
     // Se falhou antes de criar o pedido, devolve erro para o formulário
-    return { error: "Falha ao processar o pedido. Verifique os dados." };
+    return { error: err.detail || "Falha ao processar operação" };
   }
 }
 

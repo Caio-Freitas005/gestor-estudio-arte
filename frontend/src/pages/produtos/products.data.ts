@@ -26,8 +26,7 @@ export async function productCreateAction({ request }: ActionFunctionArgs) {
     return redirect("/produtos");
   } catch (err) {
     console.error(err);
-    // Retornar o erro para exibição depois
-    return null;
+    return { error: err.detail || "Falha ao processar operação" };
   }
 }
 
@@ -65,8 +64,7 @@ export async function productUpdateAction({
     return redirect("/produtos");
   } catch (err) {
     console.error(err);
-    // Retornar o erro para exibição depois
-    return null;
+    return { error: err.detail || "Falha ao processar operação" };
   }
 }
 
@@ -80,6 +78,6 @@ export async function productDeleteAction({ params }: ActionFunctionArgs) {
     return redirect("/produtos");
   } catch (err) {
     console.error(err);
-    throw err;
+    return { error: err.detail || "Erro ao excluir o produto." };
   }
 }
