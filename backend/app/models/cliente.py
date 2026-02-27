@@ -1,7 +1,7 @@
 from datetime import date
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from pydantic import EmailStr
+from pydantic import EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlmodel import Field, Relationship, SQLModel  # type: ignore
 
@@ -10,11 +10,13 @@ from .base import TimestampMixin
 if TYPE_CHECKING:
     from .pedido import Pedido
 
+
 # Adapta telefone para o tipo brasileiro
 class TelefoneBR(PhoneNumber):
     default_region_code = "BR"
-    # E164 salva como: +5511999999999 
+    # E164 salva como: +5511999999999
     phone_format = "E164"
+
 
 class ClienteBase(TimestampMixin, SQLModel):
     nome: str = Field(index=True)
@@ -22,6 +24,23 @@ class ClienteBase(TimestampMixin, SQLModel):
     email: EmailStr | None = Field(default=None, max_length=100, unique=True)
     data_nascimento: date | None = None
     observacoes: str | None = None
+
+    @field_validator("nome", mode="before")
+    @classmethod
+    def sanitizar_nome(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            nome_limpo = " ".join(v.split())
+            if not nome_limpo:
+                raise ValueError("O nome do cliente não pode estar vazio.")
+            return nome_limpo
+        return v
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def sanitizar_email(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v
 
 
 class Cliente(ClienteBase, table=True):

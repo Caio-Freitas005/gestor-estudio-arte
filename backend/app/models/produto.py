@@ -1,5 +1,7 @@
 from decimal import Decimal
+from typing import Any
 
+from pydantic import field_validator
 from sqlmodel import Field, Relationship, SQLModel  # type: ignore
 
 from .base import TimestampMixin
@@ -13,6 +15,24 @@ class ProdutoBase(TimestampMixin, SQLModel):
         default=0.0, max_digits=10, decimal_places=2, index=True, ge=0
     )
     unidade_medida: str | None = Field(default=None, max_length=20, index=True)
+
+    # Cria a regra de limpeza
+    @field_validator("nome", mode="before")
+    @classmethod
+    def sanitizar_nome(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            # Limpa espaços sobrando
+            nome_limpo = " ".join(v.split())
+
+            # Impede nomes vazios
+            if not nome_limpo:
+                raise ValueError("O nome do produto não pode estar vazio.")
+
+            return nome_limpo
+        
+        # Se não for string, retorna o valor bruto. 
+        # O Pydantic receberá esse valor e validará contra a anotação 'str' definida no campo
+        return v
 
 
 class Produto(ProdutoBase, table=True):
