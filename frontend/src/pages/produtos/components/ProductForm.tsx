@@ -83,6 +83,7 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
         className="mt-2"
         disableElevation
       >
+        Salvar Produto
       </Button>
     </Form>
   );

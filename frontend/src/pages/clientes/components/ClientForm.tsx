@@ -13,7 +13,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
 
   // Estado para controlar o que é visto no input
   const [telefoneInput, setTelefoneInput] = useState<string>(
-    formatPhoneInput(cliente.telefone)
+    formatPhoneInput(cliente.telefone),
   );
 
   return (
@@ -84,6 +84,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         className="mt-2"
         disableElevation
       >
+        Salvar Cliente
       </Button>
     </Form>
   );
