@@ -87,21 +87,32 @@ function OrderForm({ defaultValues }: OrderFormProps) {
             defaultValue={defaultValues?.cliente || null}
             fetchFn={searchClientsForAutocomplete}
             // Diz ao componente como mostrar o nome do cliente na lista
-            getOptionLabel={(option) => {
-              // Se o cliente tiver telefone, mostra o nome + telefone
-              if (option.telefone) {
-                return `${option.nome} - ${formatPhone(option.telefone)}`;
-              }
-              // Se não tiver telefone mas tiver email, mostra o nome + email
-              if (option.email) {
-                return `${option.nome} - ${option.email}`;
-              }
-              // Se não tiver nenhum contato, mostra o nome + ID para garantir a diferença
-              return `${option.nome} - ID: #${option.id}`;
-            }}
+            getOptionLabel={(option) => option.nome}
             // Diz como ele sabe se dois clientes são o mesmo
             isOptionEqualToValue={(option, value) => option.id === value.id}
             required
+            // Customiza como a lista suspensa é desenhada
+            renderOption={(props, option) => {
+              // Separa a key do resto das propriedades
+              const { key, ...optionProps } = props as any;
+
+              return (
+                <li key={option.id} {...optionProps}>
+                  <div className="flex flex-col py-1">
+                    <span className="font-medium text-slate-800 leading-tight">
+                      {option.nome}
+                    </span>
+                    <span className="text-[13px] text-slate-400 mt-0.5">
+                      {option.telefone
+                        ? `📞 ${formatPhone(option.telefone)}`
+                        : option.email
+                          ? `✉️ ${option.email}`
+                          : `ID #${option.id}`}
+                    </span>
+                  </div>
+                </li>
+              );
+            }}
           />
         </div>
 
