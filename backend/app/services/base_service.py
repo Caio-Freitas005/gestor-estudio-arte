@@ -2,7 +2,7 @@ from typing import Any, Generic, Sequence, Type, TypeVar
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, or_
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, SQLModel, select
 
 # Define tipos genéricos para a model e para os schemas de criação e atualização
@@ -108,7 +108,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             session.delete(db_obj)
             session.commit()
         # Captura exception de forma genérica para dar mensagem personalizada
-        except (IntegrityError, SQLAlchemyError):
+        except Exception:
             session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
