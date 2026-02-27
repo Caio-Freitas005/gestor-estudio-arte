@@ -76,6 +76,8 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             # Descobre qual entidade falhou para dar a mensagem correta
             if self.model.__name__ == "Cliente":
                 msg = "Já existe um cliente cadastrado com esse e-mail."
+            elif self.model.__name__ == "Produto":
+                msg = "Já existe um produto cadastrado com este nome."
             else:
                 msg = "Dados duplicados ou inválidos para esta operação."
 
@@ -96,6 +98,8 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             session.rollback()
             if self.model.__name__ == "Cliente":
                 msg = "Já existe um cliente cadastrado com este e-mail."
+            elif self.model.__name__ == "Produto":
+                msg = "Já existe um produto cadastrado com este nome."
             else:
                 msg = "Dados duplicados ou inválidos para esta operação."
 

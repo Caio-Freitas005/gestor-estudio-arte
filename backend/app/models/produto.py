@@ -7,7 +7,7 @@ from .item_pedido import ItemPedido
 
 
 class ProdutoBase(TimestampMixin, SQLModel):
-    nome: str = Field(index=True)
+    nome: str = Field(index=True, unique=True)
     descricao: str | None = None
     preco_base: Decimal = Field(
         default=0.0, max_digits=10, decimal_places=2, index=True, ge=0
