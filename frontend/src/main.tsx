@@ -6,6 +6,7 @@ import {
   ThemeProvider,
   StyledEngineProvider,
 } from "@mui/material/styles";
+import { CircularProgress } from "@mui/material";
 
 import "./index.css";
 import App from "./App";
@@ -54,6 +55,14 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    hydrateFallbackElement: (
+      <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-50">
+        <CircularProgress size={48} />
+        <p className="mt-4 font-medium text-gray-500">
+          Carregando o sistema...
+        </p>
+      </div>
+    ),
     children: [
       ...dashboardRoutes,
       {
