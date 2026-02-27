@@ -18,7 +18,7 @@ class ItemPedidoInput(SQLModel):
     produto_id: int
     quantidade: int = Field(default=1, ge=1)
     observacoes: str | None = None
-    preco_unitario: Decimal | None = Field(default=None, ge=0)
+    preco_unitario: Decimal | None = Field(default=None)
 
 
 class StatusPedido(str, Enum):
