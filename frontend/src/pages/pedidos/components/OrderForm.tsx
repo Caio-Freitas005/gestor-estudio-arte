@@ -2,7 +2,7 @@ import { Form } from "react-router";
 import { useState } from "react";
 import { useOrderManager } from "../hooks/useOrderManager";
 import { formatDateForInput } from "../../../utils/form.utils";
-import { formatNumber } from "../../../utils/format.utils";
+import { formatNumber, formatPhone } from "../../../utils/format.utils";
 import { PedidoPublic, StatusPedido } from "../../../types/pedido.types";
 import { ClientePublic } from "../../../types/cliente.types";
 import { searchClientsForAutocomplete } from "../orders.data";
@@ -87,7 +87,18 @@ function OrderForm({ defaultValues }: OrderFormProps) {
             defaultValue={defaultValues?.cliente || null}
             fetchFn={searchClientsForAutocomplete}
             // Diz ao componente como mostrar o nome do cliente na lista
-            getOptionLabel={(option) => option.nome}
+            getOptionLabel={(option) => {
+              // Se o cliente tiver telefone, mostra o nome + telefone
+              if (option.telefone) {
+                return `${option.nome} - ${formatPhone(option.telefone)}`;
+              }
+              // Se não tiver telefone mas tiver email, mostra o nome + email
+              if (option.email) {
+                return `${option.nome} - ${option.email}`;
+              }
+              // Se não tiver nenhum contato, mostra o nome + ID para garantir a diferença
+              return `${option.nome} - ID: #${option.id}`;
+            }}
             // Diz como ele sabe se dois clientes são o mesmo
             isOptionEqualToValue={(option, value) => option.id === value.id}
             required
