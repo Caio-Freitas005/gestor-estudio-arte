@@ -15,7 +15,7 @@ export const ordersService = {
 
   addItem: async (pedido_id: number, item: ItemPedidoInput) => {
     const response = await apiBase.post(`${basePath}/${pedido_id}/itens`, item);
-    return response.data;
+    return response;
   },
 
   updateItem: async (
@@ -27,14 +27,14 @@ export const ordersService = {
       `${basePath}/${pedido_id}/itens/${produto_id}`,
       item,
     );
-    return response.data;
+    return response;
   },
 
   removeItem: async (pedido_id: number, produto_id: number) => {
     const response = await apiBase.delete(
       `${basePath}/${pedido_id}/itens/${produto_id}`,
     );
-    return response.data;
+    return response;
   },
 
   uploadArt: async (
@@ -46,6 +46,6 @@ export const ordersService = {
       `${basePath}/${pedido_id}/itens/${produto_id}/upload-arte`,
       formData,
     );
-    return response.data;
+    return response;
   },
 };
