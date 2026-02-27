@@ -80,6 +80,7 @@ function AddItemRow({ onAdd }: AddItemRowProps) {
             preco_unitario: Number(e.target.value),
           })
         }
+        onFocus={(e) => e.target.select()}
         size="small"
         sx={{ width: 130 }}
       />
