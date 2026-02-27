@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, HTMLAttributes, ReactNode } from "react";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
 
 interface AsyncAutocompleteProps<T> {
@@ -10,6 +10,7 @@ interface AsyncAutocompleteProps<T> {
   defaultValue?: T | null; // O valor inicial (para edição de pedidos)
   required?: boolean;
   onChangeValue?: (value: T | null) => void; // Avisa o pai da mudança no valor
+  renderOption?: (props: HTMLAttributes<HTMLLIElement>, option: T) => ReactNode; // Para customizar detalhes na lista suspensa
 }
 
 function AsyncAutocomplete<T>({
@@ -21,6 +22,7 @@ function AsyncAutocomplete<T>({
   defaultValue = null,
   required = false,
   onChangeValue,
+  renderOption,
 }: AsyncAutocompleteProps<T>) {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<readonly T[]>([]);
@@ -104,6 +106,7 @@ function AsyncAutocomplete<T>({
         loading={loading}
         loadingText="Buscando..."
         noOptionsText="Nenhum resultado"
+        renderOption={renderOption}
         renderInput={(params) => (
           <TextField
             {...params}
