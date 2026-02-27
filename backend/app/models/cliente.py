@@ -46,6 +46,6 @@ class ClientePublicPaginated(SQLModel):
 class ClienteUpdate(SQLModel):
     nome: str | None = None
     telefone: TelefoneBR | None = Field(default=None, max_length=20)
-    email: str | None = Field(default=None, max_length=100)
+    email: EmailStr | None = Field(default=None, max_length=100)
     data_nascimento: date | None = None
     observacoes: str | None = None
