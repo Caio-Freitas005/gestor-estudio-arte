@@ -74,6 +74,12 @@ class PedidoService(BaseService[Pedido, PedidoCreate, PedidoUpdate]):
         desconto = pedido.desconto or Decimal("0.0")
         pedido.total = subtotal - desconto
 
+        if pedido.total <= 0:
+            raise HTTPException(
+                status_code=400, 
+                detail="O valor total do pedido deve ser maior que R$ 0,00."
+            )
+
     def get_all_detailed(
         self,
         session: Session,
