@@ -39,7 +39,7 @@ class ClienteBase(TimestampMixin, SQLModel):
     @classmethod
     def sanitizar_email(cls, v: Any) -> Any:
         if isinstance(v, str):
-            return v.strip().lower()
+            return v.lower()
         return v
 
 
