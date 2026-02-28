@@ -68,3 +68,20 @@ class ClienteUpdate(SQLModel):
     email: EmailStr | None = Field(default=None, max_length=100)
     data_nascimento: date | None = None
     observacoes: str | None = None
+
+    @field_validator("nome", mode="before")
+    @classmethod
+    def sanitizar_nome(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            nome_limpo = " ".join(v.split())
+            if not nome_limpo:
+                raise ValueError("O nome do cliente não pode estar vazio.")
+            return nome_limpo
+        return v
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def sanitizar_email(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            return v.lower()
+        return v

@@ -29,8 +29,8 @@ class ProdutoBase(TimestampMixin, SQLModel):
                 raise ValueError("O nome do produto não pode estar vazio.")
 
             return nome_limpo
-        
-        # Se não for string, retorna o valor bruto. 
+
+        # Se não for string, retorna o valor bruto.
         # O Pydantic receberá esse valor e validará contra a anotação 'str' definida no campo
         return v
 
@@ -62,3 +62,13 @@ class ProdutoUpdate(SQLModel):
         default=None, max_digits=10, decimal_places=2, gt=0
     )
     unidade_medida: str | None = Field(default=None, max_length=20)
+
+    @field_validator("nome", mode="before")
+    @classmethod
+    def sanitizar_nome(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            nome_limpo = " ".join(v.split())
+            if not nome_limpo:
+                raise ValueError("O nome do produto não pode estar vazio.")
+            return nome_limpo
+        return v
