@@ -12,7 +12,7 @@ class ProdutoBase(TimestampMixin, SQLModel):
     nome: str = Field(index=True, unique=True)
     descricao: str | None = None
     preco_base: Decimal = Field(
-        default=0.0, max_digits=10, decimal_places=2, index=True, ge=0
+        default=0.0, max_digits=10, decimal_places=2, index=True, gt=0
     )
     unidade_medida: str | None = Field(default=None, max_length=20, index=True)
 
@@ -59,6 +59,6 @@ class ProdutoUpdate(SQLModel):
     nome: str | None = None
     descricao: str | None = None
     preco_base: Decimal | None = Field(
-        default=None, max_digits=10, decimal_places=2, ge=0
+        default=None, max_digits=10, decimal_places=2, gt=0
     )
     unidade_medida: str | None = Field(default=None, max_length=20)
