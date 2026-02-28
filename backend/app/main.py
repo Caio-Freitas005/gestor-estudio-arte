@@ -2,9 +2,10 @@ import os
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import FRONTEND_DIST_DIR, UPLOAD_DIR, create_db_and_tables
@@ -25,6 +26,52 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_request: Request, exc: RequestValidationError):
+    """Captura os erros mais comuns no sistema, traduz e 
+    transforma em respostas simples e genéricas."""
+    pydantic_error = exc.errors()[0]
+    error_type = pydantic_error.get("type")
+    message = pydantic_error.get("msg")
+    location = pydantic_error.get("loc", [])
+
+    # Mapeamento de erros comuns para mensagens
+    translations = {
+        "greater_than_equal": "Este campo não aceita valores negativos.",
+        "greater_than": "O valor deve ser maior que zero.",
+        "decimal_max_digits": "O valor é muito grande (máximo de 8 dígitos inteiros).",
+        "decimal_max_places": "O valor deve ter no máximo 2 casas decimais.",
+        "decimal_type": "O valor deve ser um número decimal válido.",
+        "string_too_long": "O texto inserido é muito longo (máximo de 20 caracteres).",
+        "value_error": "O formato inserido é inválido.",
+        "assertion_error": "Validação falhou.",
+        "missing": "Este campo é obrigatório.",
+    }
+
+    # Erros de email são verificados separadamente por conta
+    # da quantidade de tipos associados no Pydantic
+
+    # Verifica se o erro é especificamente no campo email
+    if "email" in location:
+        if "too_long" in error_type:
+            message = "O e-mail inserido é muito longo (máximo  de 100 caracteres)."
+        else:
+            message = "O formato de e-mail inserido é inválido."
+
+    # Se não for email, verifica no dicionário de traduções
+    elif error_type in translations:
+        message = translations[error_type]
+
+    # Limpa a string de erro caso venha de um @field_validator personalizado
+    message = str(message).replace("Value error, ", "")
+
+    return JSONResponse(
+        status_code=422,
+        content={"detail": message},
+    )
+
 
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
