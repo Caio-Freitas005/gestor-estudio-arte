@@ -1,6 +1,11 @@
 import { VisibilityOutlined } from "@mui/icons-material";
 import { useState } from "react";
-import { useLoaderData, Link, useNavigate } from "react-router";
+import {
+  useLoaderData,
+  Link,
+  useNavigate,
+  useSearchParams,
+} from "react-router";
 import { Edit, ReceiptLong } from "@mui/icons-material";
 import { formatDate, formatNumber } from "../../utils/format.utils";
 
@@ -58,6 +63,14 @@ function OrdersListPage() {
   const handleCloseDetails = () => {
     setSelectedOrder(null);
   };
+
+  const [searchParams] = useSearchParams();
+  const hasFilter =
+    searchParams.get("q") ||
+    searchParams.get("data_pedido") ||
+    searchParams.get("data_conclusao") ||
+    searchParams.get("min_total") ||
+    searchParams.get("max_total");
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full">
@@ -117,7 +130,9 @@ function OrdersListPage() {
                   align="center"
                   className="py-20 text-gray-400 italic"
                 >
-                  Nenhum pedido encontrado.
+                  {hasFilter
+                    ? "Nenhum resultado encontrado para esta busca."
+                    : "Nenhum pedido em aberto. Cadastre algum pedido."}
                 </TableCell>
               </TableRow>
             ) : (
