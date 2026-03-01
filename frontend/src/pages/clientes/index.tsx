@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppToast } from "../../hooks/useAppToast";
 import { ClientePaginated } from "../../types/cliente.types";
-import { Link, useLoaderData, useFetcher } from "react-router";
+import { Link, useLoaderData, useFetcher, useSearchParams } from "react-router";
 import { formatPhone, formatDate } from "../../utils/format.utils";
 
 import {
@@ -35,15 +36,28 @@ function ClientsListPage() {
   const fetcher = useFetcher();
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
+  // Passa os dados do fetcher para o hook ouvir as respostas de segundo plano
+  useAppToast(fetcher.data);
+
   const confirmDelete = () => {
     if (deleteId) {
       fetcher.submit(null, {
         method: "post",
         action: `${deleteId}/excluir`,
       });
-      setDeleteId(null);
     }
   };
+
+  // Para fechar o modal só quando a API responder
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      setDeleteId(null);
+    }
+  }, [fetcher.state, fetcher.data]);
+
+  // Para verificar se é uma busca de filtro
+  const [searchParams] = useSearchParams();
+  const hasFilter = searchParams.get("q");
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full">
@@ -89,7 +103,9 @@ function ClientsListPage() {
                   align="center"
                   className="py-20 text-gray-400 italic"
                 >
-                  Nenhum cliente cadastrado.
+                  {hasFilter
+                    ? "Nenhum resultado encontrado para esta busca."
+                    : "Nenhum cliente cadastrado. Cadastre algum cliente."}
                 </TableCell>
               </TableRow>
             ) : (
