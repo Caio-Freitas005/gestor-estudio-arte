@@ -1,6 +1,7 @@
 import { Form } from "react-router";
 import { useState } from "react";
 import { useOrderManager } from "../hooks/useOrderManager";
+import { useAppToast } from "../../../hooks/useAppToast";
 import { formatDateForInput } from "../../../utils/form.utils";
 import { formatNumber, formatPhone } from "../../../utils/format.utils";
 import { PedidoPublic, StatusPedido } from "../../../types/pedido.types";
@@ -25,12 +26,15 @@ import AddItemRow from "../components/AddItemRow";
 import ItemTable from "../components/ItemTable";
 import FormSection from "../../../components/FormSection";
 import AsyncAutocomplete from "../../../components/AsyncAutoComplete";
+import toast from "react-hot-toast";
 
 interface OrderFormProps {
   defaultValues?: PedidoPublic;
 }
 
 function OrderForm({ defaultValues }: OrderFormProps) {
+  useAppToast();
+
   const isEditing = !!defaultValues?.id;
 
   // Valor numérico para cálculos (subtotal, etc)
@@ -56,19 +60,40 @@ function OrderForm({ defaultValues }: OrderFormProps) {
 
   // Calcula o Subtotal em tempo real
   const subtotal = displayItems.reduce((acc, item) => {
-    return acc + item.quantidade * item.preco_unitario;
+    return acc + Number(item.quantidade) * Number(item.preco_unitario);
   }, 0);
 
-  // Validações e Cálculo Final
+  const isPedidoVazio = displayItems.length === 0;
+  const isTotalZerado = subtotal - desconto <= 0 && !isPedidoVazio;
   const isDescontoInvalido = desconto > subtotal;
   const totalFinal = Math.max(0, subtotal - desconto);
+  const hasError = isDescontoInvalido || isTotalZerado || isPedidoVazio;
 
   return (
     <Form
+      onKeyDown={(e) => {
+        if (
+          e.key === "Enter" &&
+          (e.target as HTMLElement).tagName !== "TEXTAREA"
+        ) {
+          e.preventDefault();
+        }
+      }}
       onSubmit={(e) => {
         e.preventDefault();
         // Trava extra de segurança antes de enviar
         if (isDescontoInvalido) {
+          toast.error(
+            "O desconto não pode ser maior que o subtotal do pedido!",
+          );
+          return;
+        }
+        if (isPedidoVazio) {
+          toast.error("O pedido não pode estar vazio!");
+          return;
+        }
+        if (isTotalZerado) {
+          toast.error("O total do pedido não pode ser R$ 0,00!");
           return;
         }
         saveOrder(new FormData(e.currentTarget));
@@ -231,7 +256,7 @@ function OrderForm({ defaultValues }: OrderFormProps) {
         type="submit"
         variant="contained"
         style={{ maxWidth: "1050px" }}
-        disabled={isDescontoInvalido}
+        disabled={hasError}
       >
         Salvar Pedido
       </Button>
