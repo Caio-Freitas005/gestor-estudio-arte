@@ -5,6 +5,7 @@ import { productsService } from "../../services/products.service";
 import { PedidoPublic, PedidoCreate } from "../../types/pedido.types";
 import { getCommonParams } from "../../utils/loader.utils";
 import { FILE_UPLOAD_PREFIX } from "../../utils/constants";
+import toast from "react-hot-toast";
 
 export async function searchClientsForAutocomplete(query: string) {
   const res = await clientsService.getAll({ q: query, limit: 10 });
@@ -64,12 +65,23 @@ export async function orderUpdateAction({
 
     if (handler) {
       await handler(id, payload);
-      return { success: true }; // Retorno para o fetcher não recarregar a página inteira
+
+      // Mapeia a intenção para mensagens personalizadas ao editar
+      const mensagens: Record<string, string> = {
+        add_item: "Item adicionado ao pedido!",
+        remove_item: "Item removido com sucesso.",
+        update_item: "Item atualizado com sucesso!",
+      };
+
+      return {
+        success: mensagens[intent] || "Operação realizada com sucesso!",
+      };
     }
 
     // Caso não haja intenção específica, é a atualização do cabeçalho do pedido
     await ordersService.update(id, payload);
-    return redirect("/pedidos");
+
+    return { success: "Pedido atualizado com sucesso!" };
   } catch (err) {
     console.error("Erro na action de pedido:", err);
     return {
@@ -105,7 +117,7 @@ export async function orderCreateAction({ request }: ActionFunctionArgs) {
         await ordersService.uploadArt(newOrder.id, produto_id, fileFormData);
       }
     }
-
+    toast.success("Pedido criado com sucesso!");
     return redirect("/pedidos");
   } catch (err) {
     console.error("Erro ao criar pedido e artes:", err);
@@ -144,7 +156,7 @@ export async function orderUploadArtAction({
       Number(params.produto_id),
       formData,
     );
-    return { success: true };
+    return { success: "Arte anexada com sucesso ao pedido!" };
   } catch (err) {
     return {
       error:
