@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link, useLoaderData, useFetcher } from "react-router";
+import { useEffect, useState } from "react";
+import { useAppToast } from "../../hooks/useAppToast";
+import { Link, useLoaderData, useFetcher, useSearchParams } from "react-router";
 import { DeleteOutline, Edit, SellOutlined } from "@mui/icons-material";
 import { ProdutoPaginated } from "../../types/produto.types";
 import { formatNumber } from "../../utils/format.utils";
@@ -29,15 +30,28 @@ function ProductsListPage() {
   const fetcher = useFetcher();
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
+  useAppToast(fetcher.data);
+
   const confirmDelete = () => {
     if (deleteId) {
       fetcher.submit(null, {
         method: "post",
         action: `${deleteId}/excluir`,
       });
-      setDeleteId(null);
     }
   };
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      setDeleteId(null);
+    }
+  }, [fetcher.state, fetcher.data]);
+
+  const [searchParams] = useSearchParams();
+  const hasFilter =
+    searchParams.get("q") ||
+    searchParams.get("min_preco") ||
+    searchParams.get("max_preco");
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full">
@@ -85,7 +99,9 @@ function ProductsListPage() {
                   align="center"
                   className="py-20 text-gray-400 italic"
                 >
-                  Catálogo vazio.
+                  {hasFilter
+                    ? "Nenhum resultado encontrado para esta busca."
+                    : "Catálogo vazio. Cadastre algum produto."}
                 </TableCell>
               </TableRow>
             ) : (
