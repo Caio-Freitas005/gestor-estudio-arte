@@ -2,6 +2,8 @@ import { useState } from "react";
 import { formatNumber } from "../../../utils/format.utils";
 import { ItemPedidoInput, ItemPedidoPublic } from "../../../types/pedido.types";
 import { ProdutoPublic } from "../../../types/produto.types";
+import NumberInput from "../components/NumberInput";
+import CurrencyInput from "../components/CurrencyInput";
 
 import {
   Table,
@@ -38,6 +40,7 @@ const UploadButton = ({ onUpload, produto_id, hasArt }: any) => (
       type="file"
       hidden
       accept="image/*"
+      onClick={(e) => ((e.target as HTMLInputElement).value = "")} // Para limpar
       onChange={(e) => onUpload(e.target.files?.[0], produto_id)}
     />
   </IconButton>
@@ -62,7 +65,12 @@ function ItemTable({ items, onUpload, onRemove, onUpdate }: ItemTableProps) {
   };
 
   const saveEdit = () => {
-    onUpdate(editData);
+    // Garante que os dados voltem como número após a edição visual
+    onUpdate({
+      ...editData,
+      quantidade: Number(editData.quantidade) || 1,
+      preco_unitario: Number(editData.preco_unitario) || 0,
+    });
     setEditId(null);
   };
 
@@ -88,6 +96,19 @@ function ItemTable({ items, onUpload, onRemove, onUpdate }: ItemTableProps) {
           </TableRow>
         </TableHead>
         <TableBody>
+          {/*Estado vazio*/}
+          {items.length === 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                align="center"
+                className="py-12 text-gray-400 italic"
+              >
+                Nenhum produto adicionado ao pedido ainda.
+              </TableCell>
+            </TableRow>
+          )}
+
           {items.map((item) => {
             const isEditing = editId === item.produto_id;
             const nomeItem = item.nome_produto;
@@ -115,6 +136,9 @@ function ItemTable({ items, onUpload, onRemove, onUpdate }: ItemTableProps) {
                             observacoes: e.target.value,
                           })
                         }
+                        onKeyUp={(e) => {
+                          if (e.key === "Enter") saveEdit();
+                        }}
                         fullWidth
                       />
                     ) : (
@@ -133,17 +157,14 @@ function ItemTable({ items, onUpload, onRemove, onUpdate }: ItemTableProps) {
 
                 <TableCell align="center">
                   {isEditing ? (
-                    <TextField
-                      type="number"
+                    <NumberInput
                       size="small"
                       variant="standard"
                       value={editData.quantidade}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          quantidade: Number(e.target.value),
-                        })
+                      onChangeValue={(val) =>
+                        setEditData({ ...editData, quantidade: val })
                       }
+                      onEnter={saveEdit}
                     />
                   ) : (
                     item.quantidade
@@ -152,17 +173,14 @@ function ItemTable({ items, onUpload, onRemove, onUpdate }: ItemTableProps) {
 
                 <TableCell align="right">
                   {isEditing ? (
-                    <TextField
-                      type="number"
+                    <CurrencyInput
                       size="small"
                       variant="standard"
                       value={editData.preco_unitario}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          preco_unitario: Number(e.target.value),
-                        })
+                      onChangeValue={(val) =>
+                        setEditData({ ...editData, preco_unitario: val })
                       }
+                      onEnter={saveEdit}
                     />
                   ) : (
                     `R$ ${formatNumber(item.preco_unitario)}`
@@ -205,33 +223,61 @@ function ItemTable({ items, onUpload, onRemove, onUpdate }: ItemTableProps) {
                 <TableCell align="center">
                   {isEditing ? (
                     <>
-                      <IconButton
-                        onClick={saveEdit}
-                        color="primary"
-                        size="small"
-                      >
-                        <Save fontSize="small" />
-                      </IconButton>
-                      <IconButton onClick={() => setEditId(null)} size="small">
-                        <Cancel fontSize="small" />
-                      </IconButton>
+                      <Tooltip title="Salvar Edição">
+                        <IconButton
+                          onClick={saveEdit}
+                          color="primary"
+                          size="small"
+                        >
+                          <Save fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Cancelar Edição">
+                        <IconButton
+                          onClick={() => setEditId(null)}
+                          size="small"
+                        >
+                          <Cancel fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </>
                   ) : (
                     <>
-                      <IconButton
-                        onClick={() => startEdit(item)}
-                        size="small"
-                        className="group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
+                      <Tooltip title="Editar">
+                        <IconButton
+                          onClick={() => startEdit(item)}
+                          size="small"
+                          className="group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
+                        >
+                          <Edit fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                      {/* Desativa a lixeira se for o único item */}
+                      <Tooltip
+                        title={
+                          items.length === 1
+                            ? "O pedido não pode ficar vazio"
+                            : "Excluir"
+                        }
                       >
-                        <Edit fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => onRemove(item.produto_id)}
-                        size="small"
-                        className="group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
-                      >
-                        <DeleteOutline fontSize="small" />
-                      </IconButton>
+                        <span>
+                          {/* O span é necessário para o Tooltip funcionar num botão disabled */}
+                          <IconButton
+                            onClick={() => onRemove(item.produto_id)}
+                            size="small"
+                            disabled={items.length === 1}
+                            className={`transition-all ${
+                              items.length === 1
+                                ? "opacity-30"
+                                : " group-hover:opacity-100 !text-red-400 hover:!bg-red-50"
+                            }`}
+                          >
+                            <DeleteOutline fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
                     </>
                   )}
                 </TableCell>
