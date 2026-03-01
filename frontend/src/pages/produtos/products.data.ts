@@ -7,6 +7,7 @@ import {
   ProdutoPublic,
   ProdutoUpdate,
 } from "../../types/produto.types";
+import toast from "react-hot-toast";
 
 export async function productsListLoader({ request }: LoaderFunctionArgs) {
   const params = getCommonParams(request, ["min_preco", "max_preco"]);
@@ -23,6 +24,7 @@ export async function productCreateAction({ request }: ActionFunctionArgs) {
 
   try {
     await productsService.create(data);
+    toast.success("Produto cadastrado com sucesso!");
     return redirect("/produtos");
   } catch (err) {
     console.error(err);
@@ -61,7 +63,7 @@ export async function productUpdateAction({
 
   try {
     await productsService.update(params.id, data);
-    return redirect("/produtos");
+    return { success: "Produto atualizado com sucesso!" };
   } catch (err) {
     console.error(err);
     return { error: err.detail || "Falha ao processar operação" };
@@ -75,7 +77,7 @@ export async function productDeleteAction({ params }: ActionFunctionArgs) {
 
   try {
     await productsService.delete(params.id);
-    return redirect("/produtos");
+    return { success: "Produto excluído com sucesso!" };
   } catch (err) {
     console.error(err);
     return { error: err.detail || "Erro ao excluir o produto." };
