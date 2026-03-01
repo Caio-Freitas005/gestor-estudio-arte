@@ -75,9 +75,22 @@ export function useOrderManager(
       }
     } else {
       if (confirm("Deseja remover este item do pedido?")) {
-        setLocalItems((prev) =>
-          prev.filter((it) => it.produto_id !== produto_id),
-        );
+        setLocalItems((prev) => {
+          // Se o item tinha uma arte temporária (blob), limpa da RAM antes de remover
+          const itemToRemove = prev.find((it) => it.produto_id === produto_id);
+          if (itemToRemove?.caminho_arte?.startsWith("blob:")) {
+            URL.revokeObjectURL(itemToRemove.caminho_arte);
+          }
+          return prev.filter((it) => it.produto_id !== produto_id);
+        });
+
+        // Remove também dos arquivos pendentes
+        setPendingFiles((prev) => {
+          const newMap = new Map(prev);
+          newMap.delete(produto_id);
+          return newMap;
+        });
+
         toast.success("Item removido com sucesso.");
       }
     }
@@ -126,6 +139,13 @@ export function useOrderManager(
       );
 
       submit(finalData, { method: "post", encType: "multipart/form-data" });
+
+      // Assim que enviar para o backend, limpa todas as URLs temporárias da RAM
+      localItems.forEach((item) => {
+        if (item.caminho_arte?.startsWith("blob:")) {
+          URL.revokeObjectURL(item.caminho_arte);
+        }
+      });
     }
   };
 
@@ -156,14 +176,20 @@ export function useOrderManager(
       });
     } else {
       const previewUrl = URL.createObjectURL(file);
-      setPendingFiles(new Map(pendingFiles.set(produto_id, file)));
-      setLocalItems((prev) =>
-        prev.map((it) =>
+      setLocalItems((prev) => {
+        // 🧹 LIMPEZA 3: Se já existia uma imagem para este produto e ela foi substituída, limpa a antiga
+        const itemExistente = prev.find((it) => it.produto_id === produto_id);
+        if (itemExistente?.caminho_arte?.startsWith("blob:")) {
+          URL.revokeObjectURL(itemExistente.caminho_arte);
+        }
+        return prev.map((it) =>
           it.produto_id === produto_id
             ? { ...it, caminho_arte: previewUrl }
             : it,
-        ),
-      );
+        );
+      });
+
+      setPendingFiles(new Map(pendingFiles.set(produto_id, file)));
     }
   };
 
