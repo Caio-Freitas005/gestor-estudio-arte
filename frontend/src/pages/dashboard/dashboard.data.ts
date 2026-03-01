@@ -9,6 +9,6 @@ export async function dashboardLoader() {
       aniversariantes: data.aniversariantes,
     };
   } catch (err: any) {
-    throw new Error(err.detail || "Falha ao carregar os dados do dashboard");
+    throw new Error(err.detail || "Falha ao carregar os dados do dashboard.");
   }
 }

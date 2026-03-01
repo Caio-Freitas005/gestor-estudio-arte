@@ -30,7 +30,7 @@ export async function productCreateAction({ request }: ActionFunctionArgs) {
     return redirect("/produtos");
   } catch (err) {
     console.error(err);
-    return { error: err.detail || "Falha ao processar operação" };
+    return { error: err.detail || "Falha ao processar operação." };
   }
 }
 
@@ -68,7 +68,7 @@ export async function productUpdateAction({
     return { success: "Produto atualizado com sucesso!" };
   } catch (err) {
     console.error(err);
-    return { error: err.detail || "Falha ao processar operação" };
+    return { error: err.detail || "Falha ao processar operação." };
   }
 }
 

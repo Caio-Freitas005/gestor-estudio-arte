@@ -43,7 +43,7 @@ export async function clientCreateAction({ request }: ActionFunctionArgs) {
     return redirect("/clientes");
   } catch (err) {
     console.error(err);
-    return { error: err.detail || "Falha ao processar operação" };
+    return { error: err.detail || "Falha ao processar operação." };
   }
 }
 
@@ -63,7 +63,7 @@ export async function clientUpdateAction({
     return { success: "Cliente atualizado com sucesso!" };
   } catch (err) {
     console.error(err);
-    return { error: err.detail || "Falha ao processar operação" };
+    return { error: err.detail || "Falha ao processar operação." };
   }
 }
 
