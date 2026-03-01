@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAppToast } from "@/hooks/useAppToast";
-import { Form } from "react-router";
+import { Form, useNavigation } from "react-router";
 import { formatPhoneInput } from "@/utils/form.utils";
 import { Button, TextField } from "@mui/material";
 import { ClientePublic } from "@/types/cliente.types";
@@ -12,6 +12,9 @@ interface ClienteFormProps {
 
 function ClientForm({ defaultValues }: ClienteFormProps) {
   useAppToast();
+
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state !== "idle";
 
   const cliente = defaultValues || ({} as ClientePublic);
 
@@ -96,7 +99,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
         className="mt-2"
         disableElevation
       >
-        Salvar Cliente
+        {isSubmitting ? "Salvando..." : "Salvar Cliente"}
       </Button>
     </Form>
   );

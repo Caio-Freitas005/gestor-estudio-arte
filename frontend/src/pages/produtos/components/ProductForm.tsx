@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, useNavigation } from "react-router";
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
 import { useAppToast } from "@/hooks/useAppToast";
@@ -13,6 +13,9 @@ interface ProdutoFormProps {
 
 function ProductForm({ defaultValues }: ProdutoFormProps) {
   useAppToast();
+
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state !== "idle";
 
   const produto = defaultValues || ({} as ProdutoPublic);
 
@@ -106,7 +109,7 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
         className="mt-2"
         disableElevation
       >
-        Salvar Produto
+        {isSubmitting ? "Salvando..." : "Salvar Produto"}
       </Button>
     </Form>
   );

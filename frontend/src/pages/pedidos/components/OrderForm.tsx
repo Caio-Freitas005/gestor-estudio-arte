@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, useNavigation } from "react-router";
 import { useState } from "react";
 import { useOrderManager } from "../hooks/useOrderManager";
 import { useAppToast } from "@/hooks/useAppToast";
@@ -31,6 +31,9 @@ interface OrderFormProps {
 
 function OrderForm({ defaultValues }: OrderFormProps) {
   useAppToast();
+
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state !== "idle";
 
   const isEditing = !!defaultValues?.id;
 
@@ -264,7 +267,7 @@ function OrderForm({ defaultValues }: OrderFormProps) {
         style={{ maxWidth: "1050px" }}
         disabled={hasError}
       >
-        Salvar Pedido
+        {isSubmitting ? "Processando Pedido..." : "Salvar Pedido"}
       </Button>
     </Form>
   );
