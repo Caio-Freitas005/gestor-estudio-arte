@@ -265,7 +265,7 @@ function OrderForm({ defaultValues }: OrderFormProps) {
         type="submit"
         variant="contained"
         style={{ maxWidth: "1050px" }}
-        disabled={hasError}
+        disabled={hasError || isSubmitting}
       >
         {isSubmitting ? "Processando Pedido..." : "Salvar Pedido"}
       </Button>
