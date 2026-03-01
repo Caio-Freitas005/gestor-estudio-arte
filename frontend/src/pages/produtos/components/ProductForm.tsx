@@ -1,15 +1,22 @@
 import { Form } from "react-router";
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { formatBrazilianInput } from "../../../utils/form.utils";
+import { useAppToast } from "../../../hooks/useAppToast";
+import {
+  formatBrazilianInput,
+  parseBrazilianNumber,
+} from "../../../utils/form.utils";
 import { ProdutoPublic } from "../../../types/produto.types";
 import FormSection from "../../../components/FormSection";
+import toast from "react-hot-toast";
 
 interface ProdutoFormProps {
   defaultValues?: ProdutoPublic;
 }
 
 function ProductForm({ defaultValues }: ProdutoFormProps) {
+  useAppToast();
+
   const produto = defaultValues || ({} as ProdutoPublic);
 
   const [precoInput, setPrecoInput] = useState<string>(
@@ -17,7 +24,17 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
   );
 
   return (
-    <Form method="post" className="flex flex-col gap-8 max-w-4xl">
+    <Form
+      method="post"
+      className="flex flex-col gap-8 max-w-4xl"
+      onSubmit={(e) => {
+        const precoNum = parseBrazilianNumber(precoInput);
+        if (precoNum <= 0) {
+          e.preventDefault();
+          toast.error("O preço base do produto deve ser maior que R$ 0,00!");
+        }
+      }}
+    >
       <FormSection
         title="Informações de Identificação"
         className="grid grid-cols-1 gap-8"
@@ -30,6 +47,12 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
           variant="outlined"
           size="small"
           fullWidth
+          slotProps={{
+            htmlInput: {
+              pattern: ".*\\S+.*",
+              title: "O nome não pode conter apenas espaços em branco",
+            },
+          }}
         />
 
         <TextField
@@ -72,7 +95,10 @@ function ProductForm({ defaultValues }: ProdutoFormProps) {
           variant="outlined"
           size="small"
           fullWidth
-          slotProps={{ inputLabel: { shrink: true } }}
+          slotProps={{
+            inputLabel: { shrink: true },
+            htmlInput: { maxLength: 20 },
+          }}
         />
       </FormSection>
 
