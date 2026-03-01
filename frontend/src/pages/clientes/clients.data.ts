@@ -7,6 +7,7 @@ import {
   ClienteUpdate,
   ClientePublic,
 } from "../../types/cliente.types";
+import toast from "react-hot-toast";
 
 export async function clientsListLoader({ request }: LoaderFunctionArgs) {
   const params = getCommonParams(request);
@@ -38,6 +39,7 @@ export async function clientCreateAction({ request }: ActionFunctionArgs) {
 
   try {
     await clientsService.create(dataToSend);
+    toast.success("Cliente cadastrado com sucesso!");
     return redirect("/clientes");
   } catch (err) {
     console.error(err);
@@ -58,7 +60,7 @@ export async function clientUpdateAction({
 
   try {
     await clientsService.update(params.id, dataToSend);
-    return redirect("/clientes");
+    return { success: "Cliente atualizado com sucesso!" };
   } catch (err) {
     console.error(err);
     return { error: err.detail || "Falha ao processar operação" };
@@ -72,7 +74,7 @@ export async function clientDeleteAction({ params }: ActionFunctionArgs) {
 
   try {
     await clientsService.delete(params.id);
-    return redirect("/clientes");
+    return { success: "Cliente excluído com sucesso!" };
   } catch (err) {
     console.error(err);
     return { error: err.detail || "Erro ao excluir o cliente." };
