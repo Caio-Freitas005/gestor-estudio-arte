@@ -15,6 +15,7 @@ import { clientRoutes } from "./pages/clientes/routes";
 import { productRoutes } from "./pages/produtos/routes";
 import { orderRoutes } from "./pages/pedidos/routes";
 import { dashboardRoutes } from "./pages/dashboard/routes";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const theme = createTheme({
   palette: {
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <ErrorBoundary />,
     hydrateFallbackElement: (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-50">
         <CircularProgress size={48} />
