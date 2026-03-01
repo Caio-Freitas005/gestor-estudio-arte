@@ -28,12 +28,12 @@ async function handleResponse(response: Response): Promise<any> {
 }
 
 export const apiBase = {
-  get: async (path: string): Promise<any> => {
+  get: async <T = any>(path: string): Promise<T> => {
     const response = await fetch(`${API_URL}/${path}`);
     return handleResponse(response);
   },
 
-  post: async (path: string, data: any): Promise<any> => {
+  post: async <T = any>(path: string, data: any): Promise<T> => {
     // Verifica se os dados são um FormData
     const isFormData = data instanceof FormData;
 
@@ -49,7 +49,7 @@ export const apiBase = {
     return handleResponse(response);
   },
 
-  patch: async (path: string, data: any): Promise<any> => {
+  patch: async <T = any>(path: string, data: any): Promise<T> => {
     const isFormData = data instanceof FormData;
     const response = await fetch(`${API_URL}/${path}`, {
       method: "PATCH",
@@ -61,7 +61,7 @@ export const apiBase = {
     return handleResponse(response);
   },
 
-  delete: async (path: string): Promise<any> => {
+  delete: async <T = any>(path: string): Promise<T> => {
     const response = await fetch(`${API_URL}/${path}`, {
       method: "DELETE",
     });
