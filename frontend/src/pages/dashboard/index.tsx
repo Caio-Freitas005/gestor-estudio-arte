@@ -1,6 +1,7 @@
 import { useLoaderData, Link } from "react-router";
 import { formatDate, formatNumber } from "@/utils/format.utils";
 import { statusStyles } from "../pedidos/index";
+import { DashboardData } from "@/types/dashboard.types";
 
 import {
   Grid,
@@ -31,7 +32,8 @@ import FormSection from "@/components/FormSection";
 import StatCard from "./components/StatCard";
 
 function DashboardPage() {
-  const { status, pedidosRecentes, aniversariantes } = useLoaderData() as any;
+  const { status, pedidosRecentes, aniversariantes } =
+    useLoaderData() as DashboardData;
 
   return (
     <div className="flex flex-col gap-8 max-w-6xl mx-auto w-full">
@@ -93,7 +95,6 @@ function DashboardPage() {
           />
         </Grid>
       </Grid>
-      <Grid size={{ xs: 12 }}></Grid>
 
       {/* Atividade Recente e Avisos Rápidos */}
       <Grid container spacing={4}>
@@ -106,7 +107,7 @@ function DashboardPage() {
                 </Typography>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {aniversariantes.map((cliente: any) => (
+                  {aniversariantes.map((cliente) => (
                     <div
                       key={cliente.id}
                       className="flex items-center gap-3 p-3 bg-pink-50/50 rounded-xl border border-pink-100"
@@ -151,7 +152,7 @@ function DashboardPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {pedidosRecentes.map((pedido: any) => (
+                    {pedidosRecentes.map((pedido) => (
                       <TableRow
                         key={pedido.id}
                         className="hover:bg-gray-50/50 transition-colors"
