@@ -8,10 +8,7 @@ import { PedidoPublic, StatusPedido } from "@/types/pedido.types";
 import { ClientePublic } from "@/types/cliente.types";
 import { searchClientsForAutocomplete } from "../orders.data";
 
-import {
-  formatBrazilianInput,
-  parseBrazilianNumber,
-} from "@/utils/form.utils";
+import { formatBrazilianInput, parseBrazilianNumber } from "@/utils/form.utils";
 
 import {
   Button,
@@ -206,9 +203,18 @@ function OrderForm({ defaultValues }: OrderFormProps) {
                 stringValue === ""
               ) {
                 setDescontoInput(stringValue); // Atualiza o que o usuário vê (mantendo a vírgula)
-
-                const numValue = parseBrazilianNumber(stringValue);
-                setDesconto(numValue); // Atualiza o número para o cálculo do total
+              }
+            }}
+            onBlur={() => {
+              // Só atualiza o estado quando sai do campo
+              const numValue = parseBrazilianNumber(descontoInput);
+              setDesconto(numValue);
+            }}
+            onKeyDown={(e) => {
+              // Se apertar Enter, também atualiza o cálculo
+              if (e.key === "Enter") {
+                const numValue = parseBrazilianNumber(descontoInput);
+                setDesconto(numValue);
               }
             }}
             error={isDescontoInvalido}
