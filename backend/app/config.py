@@ -8,8 +8,7 @@ from sqlmodel import Session, SQLModel, create_engine, text  # type: ignore
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_DIR = BASE_DIR
 UPLOAD_DIR = BASE_DIR / "uploads"
-ARTES_DIR = UPLOAD_DIR / "artes"
-ARTES_DIR.mkdir(parents=True, exist_ok=True)
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 FRONTEND_DIST_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 
 db_name = "gestor.db"

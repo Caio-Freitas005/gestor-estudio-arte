@@ -5,7 +5,7 @@ from uuid import uuid4
 from fastapi import HTTPException, UploadFile
 from PIL import Image, ImageOps
 
-from ..config import ARTES_DIR
+from ..config import UPLOAD_DIR
 
 MAX_FILE_SIZE = 15 * 1024 * 1024  # 15 MB
 
@@ -31,9 +31,9 @@ def process_art_image(file: UploadFile, pedido_id: int, produto_id: int) -> str:
 
         img = ImageOps.exif_transpose(img)
         file_name = f"arte_pedido_{pedido_id}_produto_{produto_id}_{uuid4().hex}.webp"
-        file_path = ARTES_DIR / file_name
+        file_path = UPLOAD_DIR / file_name
         img.save(str(file_path), "WEBP", quality=95)
-        return f"/uploads/artes/{file_name}"
+        return f"/uploads/{file_name}"
     except HTTPException:
         raise  # Deixa o erro com a mensagem original passar direto
     except Exception:
@@ -51,12 +51,12 @@ def delete_art_image(caminho_arte: str | None):
     try:
         # Pega apenas o nome do arquivo, ignorando caminhos maliciosos
         nome_arquivo = Path(caminho_arte).name
-        caminho_fisico = ARTES_DIR / nome_arquivo
+        caminho_fisico = UPLOAD_DIR / nome_arquivo
 
-        # Verifica se o arquivo existe e se realmente está dentro da pasta de artes permitida
+        # Verifica se o arquivo existe e se realmente está dentro da pasta de uploads permitida
         if caminho_fisico.exists() and caminho_fisico.is_file():
             # A função resolve() resolve atalhos para garantir a segurança
-            if ARTES_DIR.resolve() in caminho_fisico.resolve().parents:
+            if UPLOAD_DIR.resolve() in caminho_fisico.resolve().parents:
                 caminho_fisico.unlink()
     except Exception as e:
         print(f"Não foi possível deletar a imagem '{caminho_arte}': {e}")
