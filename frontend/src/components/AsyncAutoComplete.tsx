@@ -13,7 +13,7 @@ interface AsyncAutocompleteProps<T> {
   renderOption?: (props: HTMLAttributes<HTMLLIElement>, option: T) => ReactNode; // Para customizar detalhes na lista suspensa
 }
 
-function AsyncAutocomplete<T>({
+function AsyncAutoComplete<T>({
   name,
   label,
   fetchFn,
@@ -133,4 +133,4 @@ function AsyncAutocomplete<T>({
   );
 }
 
-export default AsyncAutocomplete;
+export default AsyncAutoComplete;
