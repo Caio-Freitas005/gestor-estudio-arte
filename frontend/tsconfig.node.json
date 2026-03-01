@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "composite": true,
+    "composite": false,
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "target": "ESNext",
+    "allowJs": true,
+    "noEmit": true
   },
-  "include": [
-    "vite.config.js",
-    "eslint.config.js",
-    "src/**/*",
-    "**/*.{ts,tsx,js,jsx}"
-  ]
+  "include": ["vite.config.js", "eslint.config.js"]
 }
