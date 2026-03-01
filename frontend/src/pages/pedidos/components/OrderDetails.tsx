@@ -127,6 +127,8 @@ function OrderDetails({ pedido, onClose, onEdit }: OrderDetailsProps) {
                         >
                           <Tooltip title="Clique para ampliar">
                             <img
+                              loading="lazy"
+                              decoding="async"
                               src={imgUrl}
                               className="w-16 h-16 object-cover rounded-lg shadow-sm border-2 border-transparent hover:border-pink-400 transition-all cursor-zoom-in"
                             />
