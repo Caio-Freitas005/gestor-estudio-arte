@@ -31,6 +31,5 @@ export const productRoutes = [
   {
     path: ":id/excluir",
     action: productDeleteAction,
-    errorElement: <div>Oops! Erro ao excluir.</div>,
   },
 ];

@@ -30,6 +30,5 @@ export const clientRoutes = [
   {
     path: ":id/excluir",
     action: clientDeleteAction,
-    errorElement: <div>Oops! Erro ao excluir.</div>,
   },
 ];
