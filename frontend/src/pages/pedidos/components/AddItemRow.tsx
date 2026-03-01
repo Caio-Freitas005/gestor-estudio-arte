@@ -5,6 +5,8 @@ import { ProdutoPublic } from "../../../types/produto.types";
 import { searchProductsForAutocomplete } from "../orders.data";
 import FormSection from "../../../components/FormSection";
 import AsyncAutocomplete from "../../../components/AsyncAutoComplete";
+import NumberInput from "../components/NumberInput";
+import CurrencyInput from "../components/CurrencyInput";
 
 interface AddItemRowProps {
   onAdd: (item: ItemPedidoInput) => void;
@@ -12,9 +14,9 @@ interface AddItemRowProps {
 
 interface TempItemState {
   produto_id: number | "";
-  quantidade: number;
+  quantidade: number | string;
   observacoes: string;
-  preco_unitario: number;
+  preco_unitario: number | string;
   nome_produto?: string;
 }
 
@@ -41,7 +43,12 @@ function AddItemRow({ onAdd }: AddItemRowProps) {
 
   const submitAdd = () => {
     if (!tempItem.produto_id) return;
-    onAdd(tempItem as ItemPedidoInput);
+    // Converte números antes de enviar para o hook
+    onAdd({
+      ...tempItem,
+      quantidade: Number(tempItem.quantidade) || 1,
+      preco_unitario: Number(tempItem.preco_unitario) || 0,
+    } as ItemPedidoInput);
     setTempItem(INITIAL_TEMP_ITEM);
     setResetKey((prev) => prev + 1);
   };
@@ -59,30 +66,24 @@ function AddItemRow({ onAdd }: AddItemRowProps) {
         />
       </div>
 
-      <TextField
+      <NumberInput
         label="Qtd"
-        type="number"
-        value={tempItem.quantidade}
-        onChange={(e) =>
-          setTempItem({ ...tempItem, quantidade: Number(e.target.value) })
-        }
         size="small"
         sx={{ width: 80 }}
+        value={tempItem.quantidade}
+        onChangeValue={(val) => setTempItem({ ...tempItem, quantidade: val })}
+        onEnter={submitAdd}
       />
 
-      <TextField
+      <CurrencyInput
         label="Valor Unitário"
-        type="number"
-        value={tempItem.preco_unitario}
-        onChange={(e) =>
-          setTempItem({
-            ...tempItem,
-            preco_unitario: Number(e.target.value),
-          })
-        }
-        onFocus={(e) => e.target.select()}
         size="small"
         sx={{ width: 130 }}
+        value={tempItem.preco_unitario}
+        onChangeValue={(val) =>
+          setTempItem({ ...tempItem, preco_unitario: val })
+        }
+        onEnter={submitAdd}
       />
 
       <TextField
@@ -91,12 +92,16 @@ function AddItemRow({ onAdd }: AddItemRowProps) {
         onChange={(e) =>
           setTempItem({ ...tempItem, observacoes: e.target.value })
         }
+        onKeyUp={(e) => {
+          if (e.key === "Enter") submitAdd();
+        }}
         size="small"
         sx={{ flexGrow: 0.3 }}
         placeholder="Ex: Nome na caneca..."
       />
 
       <Button
+        type="button"
         variant="contained"
         onClick={submitAdd}
         disabled={!tempItem.produto_id}
