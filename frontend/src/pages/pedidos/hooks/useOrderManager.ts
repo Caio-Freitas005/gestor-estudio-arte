@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useAppToast } from "../../../hooks/useAppToast";
 import { useSubmit, useFetcher } from "react-router";
 import { ItemPedidoInput, PedidoPublic } from "../../../types/pedido.types";
 import { cleanFormData, parseBrazilianNumber } from "../../../utils/form.utils";
 import { FILE_UPLOAD_PREFIX } from "../../../utils/constants";
+import toast from "react-hot-toast";
 
 export function useOrderManager(
   defaultValues?: PedidoPublic,
@@ -11,16 +13,8 @@ export function useOrderManager(
   const submit = useSubmit();
   const fetcher = useFetcher();
 
-  // "Ouve" as respostas do servidor em segundo plano (na edição)
-  useEffect(() => {
-    // fetcher.state === "idle" significa que a requisição já terminou
-    if (fetcher.state === "idle" && fetcher.data) {
-      if (fetcher.data.error) {
-        // Mostra o erro que veio da orderUploadArtAction
-        alert(`Erro: ${fetcher.data.error}`);
-      }
-    }
-  }, [fetcher.state, fetcher.data]);
+  // Substitui o useEffect anterior, escutando em segundo plano e trazendo erros
+  useAppToast(fetcher.data);
 
   // Estado para novos itens (criação)
   const [localItems, setLocalItems] = useState<ItemPedidoInput[]>([]);
@@ -45,12 +39,16 @@ export function useOrderManager(
 
         if (itemExistente) {
           // Se existir, cria uma nova lista atualizando os dados
+
+          // Dispara o Toast
+          toast.success("Item atualizado com sucesso!");
           return prev.map((it) =>
             it.produto_id === newItem.produto_id
               ? {
                   ...it,
-                  quantidade: it.quantidade + newItem.quantidade,
-                  // Atualiza com o preço mais recente que o usuário digitou
+                  quantidade:
+                    Number(it.quantidade) + Number(newItem.quantidade),
+                  // Se existir, cria uma nova lista atualizando os dados
                   preco_unitario: newItem.preco_unitario,
                   // Se digitou uma nova observação, substitui. Se deixou em branco, mantém a antiga.
                   observacoes: newItem.observacoes
@@ -61,6 +59,7 @@ export function useOrderManager(
           );
         }
         // Se não existir, adiciona normalmente
+        toast.success("Item adicionado ao pedido!");
         return [...prev, newItem];
       });
     }
@@ -75,9 +74,12 @@ export function useOrderManager(
         );
       }
     } else {
-      setLocalItems((prev) =>
-        prev.filter((it) => it.produto_id !== produto_id),
-      );
+      if (confirm("Deseja remover este item do pedido?")) {
+        setLocalItems((prev) =>
+          prev.filter((it) => it.produto_id !== produto_id),
+        );
+        toast.success("Item removido com sucesso.");
+      }
     }
   };
 
@@ -93,6 +95,7 @@ export function useOrderManager(
           it.produto_id === updatedItem.produto_id ? updatedItem : it,
         ),
       );
+      toast.success("Item atualizado com sucesso!");
     }
   };
 
@@ -130,9 +133,17 @@ export function useOrderManager(
     // Validação de UX (fail fast)
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
-      // Nota: Depois trocar alert por um Toast personalizado
-      alert("Formato inválido! Por favor, selecione apenas imagens (JPG, PNG ou WEBP).");
+      toast.error(
+        "Formato inválido! Por favor, selecione apenas imagens (JPG, JPEG, PNG ou WEBP).",
+      );
       return; // Para a execução e não envia nada para o backend
+    }
+
+    if (file.size > 15 * 1024 * 1024) {
+      toast.error(
+        "A imagem é muito pesada! O tamanho máximo permitido é 15MB.",
+      );
+      return;
     }
 
     if (isEditing) {
