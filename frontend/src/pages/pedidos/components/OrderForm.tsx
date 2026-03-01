@@ -1,17 +1,17 @@
 import { Form } from "react-router";
 import { useState } from "react";
 import { useOrderManager } from "../hooks/useOrderManager";
-import { useAppToast } from "../../../hooks/useAppToast";
-import { formatDateForInput } from "../../../utils/form.utils";
-import { formatNumber, formatPhone } from "../../../utils/format.utils";
-import { PedidoPublic, StatusPedido } from "../../../types/pedido.types";
-import { ClientePublic } from "../../../types/cliente.types";
+import { useAppToast } from "@/hooks/useAppToast";
+import { formatDateForInput } from "@/utils/form.utils";
+import { formatNumber, formatPhone } from "@/utils/format.utils";
+import { PedidoPublic, StatusPedido } from "@/types/pedido.types";
+import { ClientePublic } from "@/types/cliente.types";
 import { searchClientsForAutocomplete } from "../orders.data";
 
 import {
   formatBrazilianInput,
   parseBrazilianNumber,
-} from "../../../utils/form.utils";
+} from "@/utils/form.utils";
 
 import {
   Button,
@@ -22,10 +22,10 @@ import {
   InputAdornment,
 } from "@mui/material";
 
-import AddItemRow from "../components/AddItemRow";
-import ItemTable from "../components/ItemTable";
-import FormSection from "../../../components/FormSection";
-import AsyncAutocomplete from "../../../components/AsyncAutoComplete";
+import AddItemRow from "./AddItemRow";
+import ItemTable from "./ItemTable";
+import FormSection from "@/components/FormSection";
+import AsyncAutoComplete from "@/components/AsyncAutoComplete";
 import toast from "react-hot-toast";
 
 interface OrderFormProps {
@@ -105,7 +105,7 @@ function OrderForm({ defaultValues }: OrderFormProps) {
         className="grid grid-cols-4 md:grid-cols-3 gap-6"
       >
         <div className="md:col-span-1 col-span-2">
-          <AsyncAutocomplete<ClientePublic>
+          <AsyncAutoComplete<ClientePublic>
             name="cliente_id"
             label="Cliente"
             // Se estiver editando um pedido, preenche o cliente atual

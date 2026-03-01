@@ -1,4 +1,4 @@
-import { apiBase } from "../../services/apiBase";
+import { apiBase } from "@/services/apiBase";
 
 export async function dashboardLoader() {
   try {

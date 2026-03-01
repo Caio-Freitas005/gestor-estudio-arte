@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAppToast } from "../../hooks/useAppToast";
-import { ClientePaginated } from "../../types/cliente.types";
+import { useAppToast } from "@/hooks/useAppToast";
+import { ClientePaginated } from "@/types/cliente.types";
 import { Link, useLoaderData, useFetcher, useSearchParams } from "react-router";
-import { formatPhone, formatDate } from "../../utils/format.utils";
+import { formatPhone, formatDate } from "@/utils/format.utils";
 
 import {
   Table,
@@ -23,10 +23,10 @@ import {
   DeleteOutline,
 } from "@mui/icons-material";
 
-import PageHeader from "../../components/PageHeader";
-import DeleteDialog from "../../components/DeleteDialog";
-import AppPagination from "../../components/AppPagination";
-import Searchbar from "../../components/Searchbar";
+import PageHeader from "@/components/PageHeader";
+import DeleteDialog from "@/components/DeleteDialog";
+import AppPagination from "@/components/AppPagination";
+import Searchbar from "@/components/Searchbar";
 
 function ClientsListPage() {
   const { clientes } = useLoaderData() as {

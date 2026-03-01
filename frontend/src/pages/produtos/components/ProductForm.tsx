@@ -1,13 +1,10 @@
 import { Form } from "react-router";
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { useAppToast } from "../../../hooks/useAppToast";
-import {
-  formatBrazilianInput,
-  parseBrazilianNumber,
-} from "../../../utils/form.utils";
-import { ProdutoPublic } from "../../../types/produto.types";
-import FormSection from "../../../components/FormSection";
+import { useAppToast } from "@/hooks/useAppToast";
+import { ProdutoPublic } from "@/types/produto.types";
+import { formatBrazilianInput, parseBrazilianNumber } from "@/utils/form.utils";
+import FormSection from "@/components/FormSection";
 import toast from "react-hot-toast";
 
 interface ProdutoFormProps {

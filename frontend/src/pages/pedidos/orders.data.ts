@@ -1,10 +1,10 @@
 import { LoaderFunctionArgs, ActionFunctionArgs, redirect } from "react-router";
-import { ordersService } from "../../services/orders.service";
-import { clientsService } from "../../services/clients.service";
-import { productsService } from "../../services/products.service";
-import { PedidoPublic, PedidoCreate } from "../../types/pedido.types";
-import { getCommonParams } from "../../utils/loader.utils";
-import { FILE_UPLOAD_PREFIX } from "../../utils/constants";
+import { ordersService } from "@/services/orders.service";
+import { clientsService } from "@/services/clients.service";
+import { productsService } from "@/services/products.service";
+import { PedidoPublic, PedidoCreate } from "@/types/pedido.types";
+import { getCommonParams } from "@/utils/loader.utils";
+import { FILE_UPLOAD_PREFIX } from "@/utils/constants";
 import toast from "react-hot-toast";
 
 export async function searchClientsForAutocomplete(query: string) {

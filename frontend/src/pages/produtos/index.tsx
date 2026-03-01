@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useAppToast } from "../../hooks/useAppToast";
+import { useAppToast } from "@/hooks/useAppToast";
 import { Link, useLoaderData, useFetcher, useSearchParams } from "react-router";
 import { DeleteOutline, Edit, SellOutlined } from "@mui/icons-material";
-import { ProdutoPaginated } from "../../types/produto.types";
-import { formatNumber } from "../../utils/format.utils";
+import { ProdutoPaginated } from "@/types/produto.types";
+import { formatNumber } from "@/utils/format.utils";
 
 import {
   Table,
@@ -17,11 +17,11 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import PageHeader from "../../components/PageHeader";
-import DeleteDialog from "../../components/DeleteDialog";
-import AppPagination from "../../components/AppPagination";
-import Searchbar from "../../components/Searchbar";
-import RangeFilter from "../../components/RangeFilter";
+import PageHeader from "@/components/PageHeader";
+import DeleteDialog from "@/components/DeleteDialog";
+import AppPagination from "@/components/AppPagination";
+import Searchbar from "@/components/Searchbar";
+import RangeFilter from "@/components/RangeFilter";
 
 function ProductsListPage() {
   const { produtos } = useLoaderData() as {

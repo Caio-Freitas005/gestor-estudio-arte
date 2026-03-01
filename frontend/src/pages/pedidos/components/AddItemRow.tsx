@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { TextField, Button } from "@mui/material";
-import { ItemPedidoInput } from "../../../types/pedido.types";
-import { ProdutoPublic } from "../../../types/produto.types";
+import { ItemPedidoInput } from "@/types/pedido.types";
+import { ProdutoPublic } from "@/types/produto.types";
 import { searchProductsForAutocomplete } from "../orders.data";
-import FormSection from "../../../components/FormSection";
-import AsyncAutocomplete from "../../../components/AsyncAutoComplete";
-import NumberInput from "../components/NumberInput";
-import CurrencyInput from "../components/CurrencyInput";
+
+import FormSection from "@/components/FormSection";
+import AsyncAutoComplete from "@/components/AsyncAutoComplete";
+import NumberInput from "./NumberInput";
+import CurrencyInput from "./CurrencyInput";
 
 interface AddItemRowProps {
   onAdd: (item: ItemPedidoInput) => void;
@@ -56,7 +57,7 @@ function AddItemRow({ onAdd }: AddItemRowProps) {
   return (
     <FormSection title="Adicionar Produto" className="flex gap-2 items-end">
       <div style={{ width: 250 }}>
-        <AsyncAutocomplete<ProdutoPublic>
+        <AsyncAutoComplete<ProdutoPublic>
           key={resetKey}
           label="Produto"
           fetchFn={searchProductsForAutocomplete}

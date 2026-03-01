@@ -1,12 +1,14 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "react-router";
-import { productsService } from "../../services/products.service";
-import { cleanFormData, parseBrazilianNumber } from "../../utils/form.utils";
-import { getCommonParams } from "../../utils/loader.utils";
+import { productsService } from "@/services/products.service";
+import { cleanFormData, parseBrazilianNumber } from "@/utils/form.utils";
+import { getCommonParams } from "@/utils/loader.utils";
+
 import {
   ProdutoCreate,
   ProdutoPublic,
   ProdutoUpdate,
-} from "../../types/produto.types";
+} from "@/types/produto.types";
+
 import toast from "react-hot-toast";
 
 export async function productsListLoader({ request }: LoaderFunctionArgs) {

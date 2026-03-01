@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
 import { Typography } from "@mui/material";
-import { ProdutoPublic } from "../../types/produto.types";
+import { ProdutoPublic } from "@/types/produto.types";
 import ProductForm from "./components/ProductForm";
 
 function ProductUpdatePage() {

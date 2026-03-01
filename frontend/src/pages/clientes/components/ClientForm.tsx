@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useAppToast } from "../../../hooks/useAppToast";
+import { useAppToast } from "@/hooks/useAppToast";
 import { Form } from "react-router";
-import { formatPhoneInput } from "../../../utils/form.utils";
+import { formatPhoneInput } from "@/utils/form.utils";
 import { Button, TextField } from "@mui/material";
-import { ClientePublic } from "../../../types/cliente.types";
-import FormSection from "../../../components/FormSection";
+import { ClientePublic } from "@/types/cliente.types";
+import FormSection from "@/components/FormSection";
+
 interface ClienteFormProps {
   defaultValues?: ClientePublic;
 }

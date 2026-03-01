@@ -6,14 +6,15 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router";
+
 import { Edit, ReceiptLong } from "@mui/icons-material";
-import { formatDate, formatNumber } from "../../utils/format.utils";
+import { formatDate, formatNumber } from "@/utils/format.utils";
 
 import {
   PedidoPaginated,
   PedidoPublic,
   StatusPedido,
-} from "../../types/pedido.types";
+} from "@/types/pedido.types";
 
 import {
   Table,
@@ -28,12 +29,12 @@ import {
   Drawer,
 } from "@mui/material";
 
-import PageHeader from "../../components/PageHeader";
+import PageHeader from "@/components/PageHeader";
 import OrderDetails from "./components/OrderDetails";
 import StatusFilter from "./components/StatusFilter";
-import RangeFilter from "../../components/RangeFilter";
-import Searchbar from "../../components/Searchbar";
-import AppPagination from "../../components/AppPagination";
+import RangeFilter from "@/components/RangeFilter";
+import Searchbar from "@/components/Searchbar";
+import AppPagination from "@/components/AppPagination";
 import DateFilter from "./components/DateFilter";
 
 export const statusStyles: Record<string, string> = {

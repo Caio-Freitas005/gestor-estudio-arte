@@ -1,12 +1,12 @@
 import { LoaderFunctionArgs, ActionFunctionArgs, redirect } from "react-router";
-import { clientsService } from "../../services/clients.service";
-import { cleanFormData } from "../../utils/form.utils";
-import { getCommonParams } from "../../utils/loader.utils";
+import { clientsService } from "@/services/clients.service";
+import { cleanFormData } from "@/utils/form.utils";
+import { getCommonParams } from "@/utils/loader.utils";
 import {
   ClienteCreate,
   ClienteUpdate,
   ClientePublic,
-} from "../../types/cliente.types";
+} from "@/types/cliente.types";
 import toast from "react-hot-toast";
 
 export async function clientsListLoader({ request }: LoaderFunctionArgs) {

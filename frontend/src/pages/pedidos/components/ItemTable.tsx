@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { formatNumber } from "../../../utils/format.utils";
-import { ItemPedidoInput, ItemPedidoPublic } from "../../../types/pedido.types";
-import { ProdutoPublic } from "../../../types/produto.types";
-import NumberInput from "../components/NumberInput";
-import CurrencyInput from "../components/CurrencyInput";
+import { formatNumber } from "@/utils/format.utils";
+import { ItemPedidoInput, ItemPedidoPublic } from "@/types/pedido.types";
+import { ProdutoPublic } from "@/types/produto.types";
+import NumberInput from "./NumberInput";
+import CurrencyInput from "./CurrencyInput";
 
 import {
   Table,

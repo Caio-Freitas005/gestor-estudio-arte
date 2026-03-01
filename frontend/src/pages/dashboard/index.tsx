@@ -1,5 +1,5 @@
 import { useLoaderData, Link } from "react-router";
-import { formatDate, formatNumber } from "../../utils/format.utils";
+import { formatDate, formatNumber } from "@/utils/format.utils";
 import { statusStyles } from "../pedidos/index";
 
 import {
@@ -26,8 +26,8 @@ import {
   Block,
 } from "@mui/icons-material";
 
-import PageHeader from "../../components/PageHeader";
-import FormSection from "../../components/FormSection";
+import PageHeader from "@/components/PageHeader";
+import FormSection from "@/components/FormSection";
 import StatCard from "./components/StatCard";
 
 function DashboardPage() {

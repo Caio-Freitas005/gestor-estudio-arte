@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router";
 import { MenuItem, Select, FormControl } from "@mui/material";
-import { StatusPedido } from "../../../types/pedido.types";
+import { StatusPedido } from "@/types/pedido.types";
 
 function StatusFilter() {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -1,10 +1,7 @@
-import { PedidoPublic } from "../../../types/pedido.types";
+import { PedidoPublic } from "@/types/pedido.types";
 import { statusStyles } from "..";
-import {
-  formatPhone,
-  formatDate,
-  formatNumber,
-} from "../../../utils/format.utils";
+import { formatPhone, formatDate, formatNumber } from "@/utils/format.utils";
+import { Close, Edit, LocalPhone, Receipt, Cake } from "@mui/icons-material";
 
 import {
   Box,
@@ -15,9 +12,8 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Close, Edit, LocalPhone, Receipt, Cake } from "@mui/icons-material";
 
-import FormSection from "../../../components/FormSection";
+import FormSection from "@/components/FormSection";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

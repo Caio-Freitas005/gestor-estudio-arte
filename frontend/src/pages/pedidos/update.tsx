@@ -1,7 +1,7 @@
 import { useLoaderData, useSearchParams } from "react-router";
 import { Typography, Alert } from "@mui/material";
 import { UpdateLoaderData } from "./orders.data";
-import { formatNumber } from "../../utils/format.utils";
+import { formatNumber } from "@/utils/format.utils";
 import OrderForm from "./components/OrderForm";
 
 function OrderUpdatePage() {

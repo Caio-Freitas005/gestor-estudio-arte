@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useAppToast } from "../../../hooks/useAppToast";
+import { useAppToast } from "@/hooks/useAppToast";
 import { useSubmit, useFetcher } from "react-router";
-import { ItemPedidoInput, PedidoPublic } from "../../../types/pedido.types";
-import { cleanFormData, parseBrazilianNumber } from "../../../utils/form.utils";
-import { FILE_UPLOAD_PREFIX } from "../../../utils/constants";
+import { ItemPedidoInput, PedidoPublic } from "@/types/pedido.types";
+import { cleanFormData, parseBrazilianNumber } from "@/utils/form.utils";
+import { FILE_UPLOAD_PREFIX } from "@/utils/constants";
 import toast from "react-hot-toast";
 
 export function useOrderManager(
