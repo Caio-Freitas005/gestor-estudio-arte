@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAppToast } from "../../../hooks/useAppToast";
 import { Form } from "react-router";
 import { formatPhoneInput } from "../../../utils/form.utils";
 import { Button, TextField } from "@mui/material";
@@ -9,6 +10,8 @@ interface ClienteFormProps {
 }
 
 function ClientForm({ defaultValues }: ClienteFormProps) {
+  useAppToast();
+
   const cliente = defaultValues || ({} as ClientePublic);
 
   // Estado para controlar o que é visto no input
@@ -30,6 +33,12 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
           variant="outlined"
           size="small"
           fullWidth
+          slotProps={{
+            htmlInput: {
+              pattern: ".*\\S+.*",
+              title: "O nome não pode conter apenas espaços em branco",
+            },
+          }}
         />
         <TextField
           label="Telefone"
@@ -39,6 +48,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
           variant="outlined"
           size="small"
           fullWidth
+          slotProps={{ htmlInput: { maxLength: 20 } }}
         />
         <TextField
           label="Email"
@@ -48,6 +58,7 @@ function ClientForm({ defaultValues }: ClienteFormProps) {
           variant="outlined"
           size="small"
           fullWidth
+          slotProps={{ htmlInput: { maxLength: 100 } }}
         />
       </FormSection>
 
