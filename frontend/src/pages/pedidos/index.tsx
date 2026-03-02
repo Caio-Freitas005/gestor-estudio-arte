@@ -1,20 +1,6 @@
-import { VisibilityOutlined } from "@mui/icons-material";
 import { useState } from "react";
-import {
-  useLoaderData,
-  Link,
-  useNavigate,
-  useSearchParams,
-} from "react-router";
-
-import { Edit, ReceiptLong } from "@mui/icons-material";
-import { formatDate, formatNumber } from "@/utils/format.utils";
-
-import {
-  PedidoPaginated,
-  PedidoPublic,
-  StatusPedido,
-} from "@/types/pedido.types";
+import { useLoaderData, useNavigate, useSearchParams } from "react-router";
+import { PedidoPaginated, PedidoPublic } from "@/types/pedido.types";
 
 import {
   Table,
@@ -23,31 +9,17 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Chip,
-  IconButton,
-  Tooltip,
   Drawer,
 } from "@mui/material";
 
 import PageHeader from "@/components/PageHeader";
 import OrderDetails from "./components/OrderDetails";
+import OrderTableRow from "./components/OrderTableRow";
 import StatusFilter from "./components/StatusFilter";
 import RangeFilter from "@/components/RangeFilter";
 import Searchbar from "@/components/Searchbar";
 import AppPagination from "@/components/AppPagination";
 import DateFilter from "./components/DateFilter";
-
-export const statusStyles: Record<string, string> = {
-  [StatusPedido.AGUARDANDO_PAGAMENTO]:
-    "!bg-amber-50 !text-amber-700 !border-amber-100",
-  [StatusPedido.AGUARDANDO_ARTE]: "!bg-pink-50 !text-pink-700 !border-pink-200",
-  [StatusPedido.EM_PRODUCAO]: "!bg-blue-50 !text-blue-700 !border-blue-100",
-  [StatusPedido.PRONTO_RETIRADA]:
-    "!bg-purple-50 !text-purple-700 !border-purple-100",
-  [StatusPedido.CONCLUIDO]:
-    "!bg-emerald-50 !text-emerald-700 !border-emerald-100",
-  [StatusPedido.CANCELADO]: "!bg-red-100 !text-red-500 !border-red-200",
-};
 
 function OrdersListPage() {
   const { pedidos } = useLoaderData() as {
@@ -127,7 +99,7 @@ function OrdersListPage() {
             {pedidos.dados.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   align="center"
                   className="py-20 text-gray-400 italic"
                 >
@@ -138,79 +110,18 @@ function OrdersListPage() {
               </TableRow>
             ) : (
               pedidos.dados.map((pedido) => (
-                <TableRow
+                <OrderTableRow
                   key={pedido.id}
-                  className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <ReceiptLong
-                        className="text-gray-300 group-hover:text-pink-400 transition-colors"
-                        fontSize="small"
-                      />
-                      <span className="font-bold text-gray-700">
-                        #{pedido.id}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-gray-600 font-medium text-sm">
-                    {formatDate(pedido.data_pedido)}
-                  </TableCell>
-                  <TableCell className="text-gray-600 font-medium text-sm">
-                    {pedido.data_conclusao
-                      ? formatDate(pedido.data_conclusao)
-                      : "-"}
-                  </TableCell>
-                  <TableCell>
-                    <span className="font-semibold text-gray-800">
-                      {pedido.cliente?.nome || (
-                        <span className="text-red-300">Não identificado</span>
-                      )}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={pedido.status}
-                      variant="outlined"
-                      size="small"
-                      className={`${
-                        statusStyles[pedido.status] || "!bg-gray-50"
-                      } !font-black !border !text-[9px] !uppercase !tracking-widest !rounded-md`}
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 text-sm">
-                      R$ {formatNumber(pedido.total)}
-                    </span>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Editar Pedido">
-                      <IconButton
-                        component={Link}
-                        to={`/pedidos/${pedido.id}`}
-                        size="small"
-                        className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
-                      >
-                        <Edit fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Ver Detalhes">
-                      <IconButton
-                        onClick={() => handleOpenDetails(pedido)}
-                        size="small"
-                        className="opacity-0 group-hover:opacity-100 transition-all !text-blue-600 hover:!bg-pink-100"
-                      >
-                        <VisibilityOutlined />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
+                  pedido={pedido}
+                  onOpenDetails={handleOpenDetails}
+                />
               ))
             )}
           </TableBody>
         </Table>
         <AppPagination total={pedidos.total} />
       </TableContainer>
+
       <Drawer
         anchor="right"
         open={Boolean(selectedOrder)}
