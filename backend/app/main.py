@@ -9,7 +9,13 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import FRONTEND_DIST_DIR, UPLOAD_DIR, create_db_and_tables
-from .routers import clientes_router, dashboard_router, pedidos_router, produtos_router
+from .routers import (
+    clientes_router,
+    dashboard_router,
+    pedidos_router,
+    produtos_router,
+    backup_router,
+)
 
 load_dotenv()
 origin = os.getenv("FRONT_URL")
@@ -30,7 +36,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_request: Request, exc: RequestValidationError):
-    """Captura os erros mais comuns no sistema, traduz e 
+    """Captura os erros mais comuns no sistema, traduz e
     transforma em respostas simples e genéricas."""
     pydantic_error = exc.errors()[0]
     error_type = pydantic_error.get("type")
@@ -87,6 +93,7 @@ app.include_router(clientes_router)
 app.include_router(produtos_router)
 app.include_router(pedidos_router)
 app.include_router(dashboard_router)
+app.include_router(backup_router)
 
 if FRONTEND_DIST_DIR.exists():
     # Serve a pasta 'assets' (JS e CSS compilados)

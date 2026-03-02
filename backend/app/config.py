@@ -9,6 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DB_DIR = BASE_DIR
 UPLOAD_DIR = BASE_DIR / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+BACKUP_DIR = BASE_DIR / "backups"
+BACKUP_DIR.mkdir(parents=True, exist_ok=True)
 FRONTEND_DIST_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 
 db_name = "gestor.db"
