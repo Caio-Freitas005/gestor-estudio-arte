@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppToast } from "@/hooks/useAppToast";
-import { Link, useLoaderData, useFetcher, useSearchParams } from "react-router";
-import { DeleteOutline, Edit, SellOutlined } from "@mui/icons-material";
+import { useLoaderData, useFetcher, useSearchParams } from "react-router";
 import { ProdutoPaginated } from "@/types/produto.types";
-import { formatNumber } from "@/utils/format.utils";
 
 import {
   Table,
@@ -12,9 +10,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Chip,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
 
 import PageHeader from "@/components/PageHeader";
@@ -22,6 +17,7 @@ import DeleteDialog from "@/components/DeleteDialog";
 import AppPagination from "@/components/AppPagination";
 import Searchbar from "@/components/Searchbar";
 import RangeFilter from "@/components/RangeFilter";
+import ProductTableRow from "./components/ProductTableRow"; // REFATORAÇÃO: O novo componente
 
 function ProductsListPage() {
   const { produtos } = useLoaderData() as {
@@ -106,61 +102,11 @@ function ProductsListPage() {
               </TableRow>
             ) : (
               produtos.dados.map((produto) => (
-                <TableRow
-                  key={produto.id}
-                  className="hover:bg-pink-50/10 transition-colors group border-b border-gray-50"
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-pink-50 rounded-xl text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-all shadow-sm shadow-pink-50">
-                        <SellOutlined fontSize="small" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-gray-800 leading-tight">
-                          {produto.nome}
-                        </span>
-                        <span className="text-[10px] text-gray-400 italic">
-                          {produto.descricao || "Sem descrição"}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={produto.unidade_medida || "UN"}
-                      size="small"
-                      className="!bg-gray-100 !text-gray-600 !font-black !text-[9px] !rounded-md"
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    <span className="font-mono font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-50 text-sm">
-                      R$ {formatNumber(produto.preco_base)}
-                    </span>
-                  </TableCell>
-                  <TableCell align="center">
-                    <div className="flex justify-center gap-1">
-                      <Tooltip title="Editar">
-                        <IconButton
-                          component={Link}
-                          to={`${produto.id}`}
-                          size="small"
-                          className="opacity-0 group-hover:opacity-100 transition-all !text-pink-600 hover:!bg-pink-100"
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Excluir">
-                        <IconButton
-                          size="small"
-                          className="opacity-0 group-hover:opacity-100 transition-all !text-red-400 hover:!bg-red-50"
-                          onClick={() => setDeleteId(produto.id)}
-                        >
-                          <DeleteOutline fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <ProductTableRow 
+                  key={produto.id} 
+                  produto={produto} 
+                  onDelete={setDeleteId} 
+                />
               ))
             )}
           </TableBody>
