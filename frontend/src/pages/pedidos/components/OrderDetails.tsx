@@ -1,5 +1,5 @@
 import { PedidoPublic } from "@/types/pedido.types";
-import { statusStyles } from "..";
+import { statusStyles } from "@/utils/constants";
 import { formatPhone, formatDate, formatNumber } from "@/utils/format.utils";
 import { Close, Edit, LocalPhone, Receipt, Cake } from "@mui/icons-material";
 
