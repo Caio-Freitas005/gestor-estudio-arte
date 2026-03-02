@@ -106,6 +106,25 @@ function AsyncAutoComplete<T>({
         loading={loading}
         loadingText="Buscando..."
         noOptionsText="Nenhum resultado"
+        // Força o Popper a se comportar melhor com o scroll
+        slotProps={{
+          popper: {
+            placement: "bottom-start", // Força a abertura para baixo
+            modifiers: [
+              {
+                name: "flip",
+                enabled: false, // Desativa a inversão automática para cima
+              },
+              {
+                name: "preventOverflow",
+                enabled: true,
+                options: {
+                  boundary: "viewport", // Garante que não saia da tela
+                },
+              },
+            ],
+          },
+        }}
         renderOption={renderOption}
         renderInput={(params) => (
           <TextField
