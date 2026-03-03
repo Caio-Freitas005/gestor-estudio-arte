@@ -4,6 +4,13 @@ Um sistema web **local** focado em organizar o fluxo de pedidos (do cadastro de 
 
 Este projeto foi desenhado para ser uma ferramenta **simples**, de **fácil utilização** e com **backup facilitado por cópia de arquivo**, sem a necessidade de comandos manuais complexos por parte do usuário final.
 
+> ⚠️ **Aviso de Portfólio e Propriedade**
+> Este repositório contém o código-fonte de um sistema real, desenvolvido de forma **voluntária e sob medida** para solucionar as dores operacionais de um pequeno Ateliê. 
+> 
+> O código está público **exclusivamente para fins de demonstração técnica e portfólio**. Este não é um projeto de código aberto destinado a uso comercial por terceiros, cópia ou distribuição. 
+>
+> O objetivo de manter este repositório visível é demonstrar decisões reais de arquitetura de software, como o uso do ecossistema FastAPI + React servidos localmente, e a visão de produto focada em custo zero de infraestrutura para usuários finais não-técnicos.
+
 ---
 
 ## Funcionalidades 
