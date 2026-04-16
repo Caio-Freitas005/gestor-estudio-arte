@@ -22,13 +22,13 @@ router = APIRouter(prefix="/pedidos", tags=["pedidos"])
 
 
 @router.post("/", response_model=PedidoPublic, status_code=status.HTTP_201_CREATED)
-async def create_order(pedido: PedidoCreate, session: SessionDep) -> Pedido:
+def create_order(pedido: PedidoCreate, session: SessionDep) -> Pedido:
     """Cria um pedido completo com itens e cálculo de total."""
     return pedido_service.create(session, pedido)
 
 
 @router.get("/", response_model=PedidoPublicPaginated)
-async def get_all_orders(
+def get_all_orders(
     session: SessionDep,
     q: str | None = None,
     status: StatusPedido | None = None,
@@ -54,13 +54,13 @@ async def get_all_orders(
 
 
 @router.get("/{pedido_id}", response_model=PedidoPublic)
-async def get_order_by_id(pedido_id: int, session: SessionDep) -> Pedido:
+def get_order_by_id(pedido_id: int, session: SessionDep) -> Pedido:
     """Busca um pedido por ID com detalhes se existir."""
     return pedido_service.get_by_id_detailed(session, pedido_id)
 
 
 @router.patch("/{pedido_id}", response_model=PedidoPublic)
-async def update_order(
+def update_order(
     pedido_id: int, pedido: PedidoUpdate, session: SessionDep
 ) -> Pedido:
     """Atualiza dados básicos do pedido."""
@@ -74,7 +74,7 @@ async def update_order(
 
 
 @router.post("/{pedido_id}/itens", response_model=PedidoPublic)
-async def add_item_to_order(
+def add_item_to_order(
     pedido_id: int, item: ItemPedidoInput, session: SessionDep
 ) -> Pedido:
     """Adiciona um novo produto ao pedido e recalcula o total."""
@@ -82,7 +82,7 @@ async def add_item_to_order(
 
 
 @router.patch("/{pedido_id}/itens/{produto_id}", response_model=PedidoPublic)
-async def update_item_in_order(
+def update_item_in_order(
     pedido_id: int, produto_id: int, item: ItemPedidoUpdate, session: SessionDep
 ) -> Pedido:
     """Atualiza quantidade ou valor de um item específico do pedido."""
@@ -90,7 +90,7 @@ async def update_item_in_order(
 
 
 @router.delete("/{pedido_id}/itens/{produto_id}", response_model=PedidoPublic)
-async def remove_item_from_order(
+def remove_item_from_order(
     pedido_id: int, produto_id: int, session: SessionDep
 ) -> Pedido:
     """Remove um item e recalcula o total, impedindo pedidos vazios."""
@@ -98,7 +98,7 @@ async def remove_item_from_order(
 
 
 @router.post("/{pedido_id}/itens/{produto_id}/upload-arte", response_model=PedidoPublic)
-async def upload_item_art(
+def upload_item_art(
     pedido_id: int, produto_id: int, session: SessionDep, file: UploadFile = File(...)
 ) -> Pedido:
     """Processa o upload da arte e vincula ao item do pedido."""

@@ -35,7 +35,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(_request: Request, exc: RequestValidationError):
+def validation_exception_handler(_request: Request, exc: RequestValidationError):
     """Captura os erros mais comuns no sistema, traduz e
     transforma em respostas simples e genéricas."""
     pydantic_error = exc.errors()[0]

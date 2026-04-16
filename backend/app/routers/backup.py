@@ -9,7 +9,7 @@ router = APIRouter(prefix="/backup", tags=["backup"])
 
 
 @router.post("/")
-async def create_backup():
+def create_backup():
     """Gera uma cópia física do banco de dados SQLite com timestamp."""
 
     if not db_path.exists():
